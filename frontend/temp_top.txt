@@ -1,0 +1,200 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+type PatientUser = {
+  id?: string;
+  name?: string;
+  email?: string | null;
+  phone?: string | null;
+  role?: string | null;
+  username?: string | null;
+};
+
+export default function PatientPage() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  const [openPanel, setOpenPanel] = useState<null | undefined>(null);
+  const [showProfile, setShowProfile] = useState(false);
+  const [user, setUser] = useState<PatientUser>({});
+  const [bookingForm, setBookingForm] = useState({
+    slotId: "",
+    reason: "General",
+    doctor: "",
+  });
+  const [availableSlots, setAvailableSlots] = useState<any[]>([]);
+  const [upcoming, setUpcoming] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [history, setHistory] = useState<any[]>([]);
+  const [patientNotifications, setPatientNotifications] = useState<any[]>([]);
+  const [patientNotificationsOpen, setPatientNotificationsOpen] =
+    useState(false);
+  const [doctors] = useState([
+    { id: "any", name: "Any available", rating: "" },
+    { id: "pref", name: "Preferred doctor (type below)", rating: "" },
+  ]);
+  const reservationRef = useRef<HTMLDivElement | null>(null);
+  const uniqueUpcoming = useMemo(() => {
+    const seen = new Set<string>();
+    const result: any[] = [];
+    for (const a of upcoming) {
+      const key = a.slotId || a.id;
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        result.push(a);
+      }
+    }
+    return result;
+  }, [upcoming]);
+  const [loading, setLoading] = useState(false);
+  const [pendingSlotId, setPendingSlotId] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [reserveMode, setReserveMode] = useState(false);
+  const [selectedSlot, setSelectedSlot] = useState<any | null>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<any | null>(
+    null
+  );
+  const [selectedMonth, setSelectedMonth] = useState<number | "all">("all");
+  const [selectedYear, setSelectedYear] = useState<number | "all">("all");
+  const [selectedDay, setSelectedDay] = useState<Date | null>(null);
+  const [selectedType, setSelectedType] = useState("General");
+  const [cancellingId, setCancellingId] = useState("");
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatSearch, setChatSearch] = useState("");
+  const [chatResults, setChatResults] = useState<any[]>([]);
+  const [conversations, setConversations] = useState<any[]>([]);
+  const [selectedConversation, setSelectedConversation] = useState<any | null>(null);
+  const [chatMessages, setChatMessages] = useState<any[]>([]);
+  const [chatText, setChatText] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatUnreadCount, setChatUnreadCount] = useState(0);
+
+  const filteredDays = useMemo(() => {
+    const map: Record<string, Date> = {};
+    availableSlots.forEach((s) => {
+      const d = new Date(s.startTime);
+      const purpose = (s.purpose || "").toLowerCase();
+      const matchesType =
+        !selectedType || purpose.includes(selectedType.toLowerCase());
+      const mOk = selectedMonth === "all" || d.getMonth() === selectedMonth;
+      const yOk = selectedYear === "all" || d.getFullYear() === selectedYear;
+      if (mOk && yOk && matchesType) {
+        map[d.toDateString()] = d;
+      }
+    });
+    return Object.values(map).sort((a, b) => a.getTime() - b.getTime());
+  }, [availableSlots, selectedMonth, selectedYear, selectedType]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const stored =
+        sessionStorage.getItem("currentUser") ||
+        localStorage.getItem("currentUser");
+      if (stored) setUser(JSON.parse(stored));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const loadSlots = useCallback(async () => {
+    try {
+      const res = await fetch(`${API_URL}/appointments/slots`);
+      const data = await res.json();
+      if (res.ok) setAvailableSlots(data || []);
+    } catch {
+      /* ignore */
+    }
+  }, [API_URL]);
+
+  useEffect(() => {
+    const fetchMyAppointments = async () => {
+      if (!user?.email && !user?.phone && !user?.username && !user?.name)
+        return;
+      try {
+        const identifier =
+          user.email || user.phone || user.username || user.name || "";
+        const res = await fetch(
+          `${API_URL}/appointments/mine?role=patient&identifier=${encodeURIComponent(
+            identifier
+          )}`
+        );
+        const data = await res.json();
+        if (res.ok) {
+          setUpcoming(data || []);
+          setHistory(data || []);
+        }
+      } catch {
+        /* ignore */
+      }
+    };
+    const fetchNotifications = async () => {
+      const identifier =
+        user.email || user.phone || user.username || user.name || "";
+      if (!identifier) return;
+      try {
+        const res = await fetch(
+          `${API_URL}/notifications?identifier=${encodeURIComponent(
+            identifier
+          )}`
+        );
+        const data = await res.json();
+        if (res.ok) setPatientNotifications(data || []);
+      } catch {
+        /* ignore */
+      }
+    };
+    const fetchConversations = async () => {
+      const identifier =
+        user.email || user.phone || user.username || user.name || "";
+      if (!identifier) return;
+      try {
+        const res = await fetch(
+          `${API_URL}/chat/conversations?identifier=${encodeURIComponent(
+            identifier
+          )}`
+        );
+        const data = await res.json();
+        if (res.ok) setConversations(data || []);
+      } catch {
+        /* ignore */
+      }
+      try {
+        const res = await fetch(
+          `${API_URL}/chat/unread-count?identifier=${encodeURIComponent(
+            identifier
+          )}`
+        );
+        const data = await res.json();
+        if (res.ok && typeof data === "number") setChatUnreadCount(data);
+      } catch {
+        /* ignore */
+      }
+    };
+    loadSlots();
+    fetchMyAppointments();
+    fetchNotifications();
+    fetchConversations();
+  }, [API_URL, user, loadSlots]);
+
+  const handleBook = async () => {
+    setError(null);
+    setMessage(null);
+    setPendingSlotId("");
+    if (!bookingForm.slotId) {
+      setError("Please select an available slot.");
+      return;
+    }
+    const identifier =
+      user.email || user.phone || user.username || user.name || "";
+    if (!identifier) {
+      setError("Missing patient identifier.");
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/appointments/book`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
