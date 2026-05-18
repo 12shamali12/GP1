@@ -25,7 +25,7 @@ export function PlanningTabNav({
   inactiveClass,
 }: PlanningTabNavProps) {
   return (
-    <div className="inline-flex flex-wrap gap-2 rounded-[28px] border border-white/10 bg-[rgba(255,255,255,0.14)] p-2 shadow-[0_18px_44px_rgba(7,18,34,0.08)] backdrop-blur-[18px]">
+    <div className="inline-flex flex-wrap gap-2 rounded-[22px] border border-white/10 bg-[rgba(255,255,255,0.14)] p-2 shadow-[0_18px_44px_rgba(7,18,34,0.08)] backdrop-blur-[18px]">
       {tabs.map(({ key, label }) => (
         <button
           key={key}

@@ -3,8 +3,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePublicProfile } from "@/features/profiles/hooks/use-public-profile";
 import { SettingsPanel } from "@/features/settings/components/settings-panel";
+import { SmileStreakSurface } from "@/features/smile-streak/components/smile-streak-surface";
 import { BrandMark } from "@/features/ui/components/brand-mark";
 import { ComingSoonModal } from "@/features/ui/components/coming-soon-modal";
+import { RoleShellLayout } from "@/features/ui/components/role-shell-layout";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 import { usePatientBookingActions } from "./hooks/use-patient-booking-actions";
 import { usePatientBootstrap } from "./hooks/use-patient-bootstrap";
@@ -35,6 +37,7 @@ type PatientSurface =
   | "profile"
   | "notifications"
   | "chat"
+  | "game"
   | "settings";
 
 export default function PatientPage() {
@@ -358,6 +361,13 @@ export default function PatientPage() {
         "Contact doctors, supervisors, and shared rooms from the main patient workspace instead of opening side drawers.",
       badges: ["Direct chat", "Rooms", "Attachments"],
     },
+    game: {
+      eyebrow: "Daily smile check-in",
+      title: "Healthy Smile Streak",
+      description:
+        "Three quick mouth-care rituals in 30 seconds. Build a streak, unlock badges, and keep your smile on track.",
+      badges: ["Brushing", "Habits", "Badges"],
+    },
     settings: {
       eyebrow: "Preferences",
       title: "Patient settings",
@@ -371,7 +381,7 @@ export default function PatientPage() {
 
   return (
     <>
-      <main className="denty-screen admin-suite-screen relative px-4 py-5 lg:pl-0 lg:pr-5 lg:py-6">
+      <main className="denty-screen admin-suite-screen relative px-3 py-3 sm:px-4 sm:py-4 lg:pl-0 lg:pr-5 lg:py-6">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(95,113,132,0.28),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(18,30,47,0.24),transparent_34%)]" />
           <div className="frozen-float absolute left-[8%] top-[12%] h-40 w-40 rounded-full bg-[rgba(95,113,132,0.22)] blur-3xl" />
@@ -385,21 +395,29 @@ export default function PatientPage() {
           />
         </div>
 
-        <div className="denty-shell denty-dashboard-layout relative mx-0 max-w-none space-y-6 lg:space-y-0">
-          <PatientSideRail
-            userName={user.name || "Patient"}
-            activeView={activeSurface}
-            unreadNotifications={unreadPatientNotifications}
-            chatUnreadCount={chatUnreadCount}
-            onOverview={() => setActiveSurface("overview")}
-            onProfile={() => setActiveSurface("profile")}
-            onNotifications={() => setActiveSurface("notifications")}
-            onChat={() => setActiveSurface("chat")}
-            onSettings={() => setActiveSurface("settings")}
-            onComingSoon={setComingSoon}
-          />
-
-          <section className="min-w-0 space-y-5">
+        <div className="denty-shell denty-dashboard-layout relative mx-0 max-w-none space-y-4 lg:space-y-0">
+          <RoleShellLayout
+            topbarEyebrow="Patient"
+            notificationCount={unreadPatientNotifications}
+            onNotificationsClick={() => setActiveSurface("notifications")}
+            onProfileClick={() => setActiveSurface("profile")}
+            sideRail={
+              <PatientSideRail
+                userName={user.name || "Patient"}
+                activeView={activeSurface}
+                unreadNotifications={unreadPatientNotifications}
+                chatUnreadCount={chatUnreadCount}
+                onOverview={() => setActiveSurface("overview")}
+                onProfile={() => setActiveSurface("profile")}
+                onNotifications={() => setActiveSurface("notifications")}
+                onChat={() => setActiveSurface("chat")}
+                onGame={() => setActiveSurface("game")}
+                onSettings={() => setActiveSurface("settings")}
+                onComingSoon={setComingSoon}
+              />
+            }
+          >
+          <section className="min-w-0 space-y-4 lg:space-y-5">
             <div className="overflow-hidden rounded-[32px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] px-7 py-7 shadow-[0_28px_72px_rgba(7,18,34,0.16)] backdrop-blur-[24px] md:px-9 md:py-8">
               <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
                 <div className="space-y-3">
@@ -568,6 +586,12 @@ export default function PatientPage() {
               />
             </div>
 
+            <div className={activeSurface === "game" ? "" : "hidden"}>
+              <div className="denty-panel p-6 md:p-7">
+                <SmileStreakSurface />
+              </div>
+            </div>
+
             <div className={activeSurface === "settings" ? "" : "hidden"}>
               <SettingsPanel
                 role="patient"
@@ -575,6 +599,7 @@ export default function PatientPage() {
               />
             </div>
           </section>
+          </RoleShellLayout>
         </div>
       </main>
 

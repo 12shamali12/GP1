@@ -3,6 +3,7 @@
 import {
   AuthShowcaseBackground,
 } from "@/features/ui/components/auth-showcase";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { useAuthPortal } from "./hooks/use-auth-portal";
 import { AuthLanguageSwitch } from "./ui/auth-language-switch";
 import { AuthPortalCard } from "./ui/auth-portal-card";
@@ -10,6 +11,30 @@ import { AuthStage } from "./ui/auth-stage";
 
 export default function Home() {
   const auth = useAuthPortal();
+  const t = useTranslation();
+
+  // Build the strongly-typed `t` object the existing AuthPortalCard expects.
+  // We pull from the global dictionary so the auth labels stay in sync with
+  // the rest of the suite (Settings, side rails, etc.), while leaving the
+  // legacy per-locale validation messages on `useAuthPortal` untouched.
+  const cardCopy = {
+    subtitle: t("auth.subtitle"),
+    registerSubtitle: t("auth.register_subtitle"),
+    welcome: t("auth.welcome"),
+    create: t("auth.create"),
+    login: t("auth.login"),
+    register: t("auth.register"),
+    fullName: t("auth.full_name"),
+    age: t("auth.age"),
+    gender: t("auth.gender"),
+    role: t("auth.role"),
+    rolePatient: t("auth.role.patient"),
+    roleDoctor: t("auth.role.doctor"),
+    roleSupervisor: t("auth.role.supervisor"),
+    emailOrPhone: t("auth.email_or_phone"),
+    password: t("auth.password"),
+    doctorId: t("auth.doctor_id"),
+  };
 
   return (
     <main dir={auth.lang === "ar" ? "rtl" : "ltr"} className="denty-screen">
@@ -35,15 +60,15 @@ export default function Home() {
           onLangChange={auth.setLang}
         />
 
-        <div className="pointer-events-none relative z-10 flex min-h-screen flex-col px-4 py-4 sm:px-6 sm:py-6 lg:px-8 xl:px-10">
-          <div className="grid flex-1 gap-8 py-6 xl:grid-cols-[minmax(0,0.96fr)_minmax(45rem,1.04fr)] xl:items-end xl:gap-12">
+        <div className="pointer-events-none relative z-10 flex min-h-screen flex-col px-4 py-4 sm:px-6 sm:py-6 lg:px-6 xl:px-10">
+          <div className="grid flex-1 gap-5 py-6 xl:grid-cols-[minmax(0,0.96fr)_minmax(45rem,1.04fr)] xl:items-end xl:gap-12">
             <AuthStage
               lang={auth.lang}
               mode={auth.mode}
-              title={auth.t.title}
-              subtitle={auth.t.subtitle}
-              registerSubtitle={auth.t.registerSubtitle}
-              location={auth.t.location}
+              title={t("auth.title")}
+              subtitle={t("auth.subtitle")}
+              registerSubtitle={t("auth.register_subtitle")}
+              location={t("auth.location")}
               activeSlide={auth.activeSlide}
               showcaseIndex={auth.showcaseIndex}
               slidesLength={auth.slides.length}
@@ -67,7 +92,7 @@ export default function Home() {
               loading={auth.loading}
               resendInfo={auth.resendInfo}
               portalNote={auth.portalNote}
-              t={auth.t}
+              t={cardCopy}
               onModeChange={auth.setMode}
               onRoleChange={auth.setRole}
               onContactChange={auth.setContact}

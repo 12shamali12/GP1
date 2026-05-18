@@ -58,16 +58,16 @@ export function DoctorWorkspaceDeskView({
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="denty-kicker">Partner desk</p>
-              <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Semester pairing</h3>
+              <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Semester pairing</h3>
             </div>
             <span className="denty-pill">{currentPartner ? "Confirmed" : "Admin review"}</span>
           </div>
           {workspace?.groupMembership?.group ? (
             currentPartner ? (
-              <div className="mt-5 rounded-[28px] border border-white/12 bg-white/36 p-5">
+              <div className="mt-5 rounded-[22px] border border-white/12 bg-white/36 p-5">
                 <Link
                   href={`/profiles/${currentPartner.id}`}
-                  className="text-2xl font-semibold text-[var(--foreground)] hover:text-[rgba(7,111,133,0.96)]"
+                  className="text-xl font-semibold text-[var(--foreground)] hover:text-[rgba(7,111,133,0.96)]"
                 >
                   {currentPartner.name}
                 </Link>
@@ -80,7 +80,7 @@ export function DoctorWorkspaceDeskView({
                 </p>
               </div>
             ) : (
-              <div className="mt-5 space-y-3 rounded-[28px] border border-white/12 bg-white/36 p-5">
+              <div className="mt-5 space-y-3 rounded-[22px] border border-white/12 bg-white/36 p-5">
                 <select
                   value={partnerTargetId}
                   onChange={(e) => setPartnerTargetId(e.target.value)}
@@ -105,7 +105,7 @@ export function DoctorWorkspaceDeskView({
               </div>
             )
           ) : (
-            <div className="mt-5 rounded-[28px] border border-white/12 bg-white/36 p-5 text-sm leading-7 text-[var(--muted-foreground)]">
+            <div className="mt-5 rounded-[22px] border border-white/12 bg-white/36 p-5 text-sm leading-7 text-[var(--muted-foreground)]">
               Join a group first, then request a partner from unpaired students in the same group.
             </div>
           )}
@@ -139,7 +139,7 @@ export function DoctorWorkspaceDeskView({
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="denty-kicker">Report lane</p>
-              <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Visible supervisors</h3>
+              <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Visible supervisors</h3>
             </div>
             <span className="denty-pill">{workspace?.reportSupervisors.length || 0}</span>
           </div>
@@ -165,7 +165,7 @@ export function DoctorWorkspaceDeskView({
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="denty-kicker">Today</p>
-              <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Clinic desk</h3>
+              <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Clinic desk</h3>
             </div>
             <span className="denty-pill">{todayAssignments.length} duties</span>
           </div>
@@ -174,7 +174,7 @@ export function DoctorWorkspaceDeskView({
               <div key={assignment.id} className="denty-dashboard-card p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-2xl font-semibold text-[var(--foreground)]">{assignment.clinic.name}</p>
+                    <p className="text-xl font-semibold text-[var(--foreground)]">{assignment.clinic.name}</p>
                     <p className="mt-2 text-sm text-[var(--muted-foreground)]">
                       {assignment.shift.name} - {assignment.shift.startsAt} - {assignment.shift.endsAt}
                     </p>
@@ -200,7 +200,7 @@ export function DoctorWorkspaceDeskView({
         {!workspace?.groupMembership?.group ? (
           <div className="denty-panel-strong p-6">
             <p className="denty-kicker">Join a group</p>
-            <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Request semester placement</h3>
+            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Request semester placement</h3>
             <div className="mt-5 space-y-3">
               <select
                 value={joinForm.groupId}

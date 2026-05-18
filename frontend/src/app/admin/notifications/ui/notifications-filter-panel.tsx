@@ -24,7 +24,7 @@ export function NotificationsFilterPanel({
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
           <p className="denty-kicker">Inbox</p>
-          <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
             Review incoming admin updates
           </h2>
           <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">

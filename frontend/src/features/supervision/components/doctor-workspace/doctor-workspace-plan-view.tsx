@@ -13,7 +13,7 @@ export function DoctorWorkspacePlanView({ workspace }: Props) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="denty-kicker">Two-week plan</p>
-            <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Published clinic schedule</h3>
+            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Published clinic schedule</h3>
           </div>
           <span className="denty-pill">{workspace?.schedule.length || 0} shifts</span>
         </div>
@@ -53,7 +53,7 @@ export function DoctorWorkspacePlanView({ workspace }: Props) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="denty-kicker">Exams</p>
-            <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Clinic exams</h3>
+            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Clinic exams</h3>
           </div>
           <span className="denty-pill">{workspace?.exams.length || 0}</span>
         </div>

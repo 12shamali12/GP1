@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { LanguageProvider } from "@/features/i18n/language-provider";
 import { ToastProvider } from "@/features/ui/components/toast-provider";
 
 export const metadata: Metadata = {
@@ -12,10 +13,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // `lang`/`dir` on <html> are also kept in sync by LanguageProvider once
+  // hydrated; the server defaults below are safe initial values.
   return (
-    <html lang="en">
+    <html lang="en" dir="ltr">
       <body className="antialiased">
-        <ToastProvider>{children}</ToastProvider>
+        <LanguageProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

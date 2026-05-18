@@ -11,7 +11,7 @@ import type { UserProfileReportItem } from "@/features/admin/types/admin";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 
 const panelClass =
-  "overflow-hidden rounded-[32px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.16)] backdrop-blur-[24px] md:p-7";
+  "overflow-hidden rounded-[24px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.16)] backdrop-blur-[24px] md:p-5";
 
 type ReportFilter = "pending" | "resolved" | "all";
 
@@ -104,7 +104,7 @@ export default function AdminUserReportsPage() {
       <div className="grid gap-5 xl:grid-cols-[0.76fr_1.24fr]">
         <div className={panelClass}>
           <p className="denty-kicker">Safety desk</p>
-          <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+          <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
             Moderation queue
           </h2>
           <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
@@ -117,7 +117,7 @@ export default function AdminUserReportsPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
                 Pending
               </p>
-              <p className="mt-2 text-3xl font-semibold text-[var(--foreground)]">
+              <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                 {pendingCount}
               </p>
             </div>
@@ -125,7 +125,7 @@ export default function AdminUserReportsPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
                 Reviewed
               </p>
-              <p className="mt-2 text-3xl font-semibold text-[var(--foreground)]">
+              <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                 {items.filter((item) => item.status !== "PENDING").length}
               </p>
             </div>
@@ -133,7 +133,7 @@ export default function AdminUserReportsPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
                 Total
               </p>
-              <p className="mt-2 text-3xl font-semibold text-[var(--foreground)]">
+              <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                 {items.length}
               </p>
             </div>
@@ -176,7 +176,7 @@ export default function AdminUserReportsPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="denty-kicker">Reported users</p>
-              <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+              <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                 Review lane
               </h2>
             </div>

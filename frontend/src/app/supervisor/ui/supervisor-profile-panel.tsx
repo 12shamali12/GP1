@@ -85,13 +85,13 @@ export function SupervisorProfilePanel({
 
   return (
     <div className="overflow-hidden rounded-[34px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] shadow-[0_32px_84px_rgba(7,18,34,0.18)] backdrop-blur-[26px]">
-      <div className="border-b border-white/12 px-7 py-7 md:px-9 md:py-8">
+      <div className="border-b border-white/12 px-5 py-5 md:px-7 md:py-6">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
           <div className="flex items-center gap-5">
             <button
               type="button"
               onClick={onAvatarPick}
-              className="group relative flex h-28 w-28 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-[28px] border border-white/20 bg-[linear-gradient(180deg,rgba(8,18,34,0.78),rgba(11,24,42,0.58))] text-4xl font-bold text-white shadow-[0_18px_34px_rgba(4,11,26,0.22)] transition hover:scale-[1.02] hover:border-white/28"
+              className="group relative flex h-28 w-28 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-[22px] border border-white/20 bg-[linear-gradient(180deg,rgba(8,18,34,0.78),rgba(11,24,42,0.58))] text-3xl font-bold text-white shadow-[0_18px_34px_rgba(4,11,26,0.22)] transition hover:scale-[1.02] hover:border-white/28"
               title="Click to add or update photo"
             >
               {avatarData || user.avatar ? (
@@ -115,7 +115,7 @@ export function SupervisorProfilePanel({
               </span>
               <div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-4xl font-semibold text-[var(--foreground)] md:text-5xl">
+                  <h1 className="text-3xl font-semibold text-[var(--foreground)] md:text-3xl">
                     {editName || user.name || "Supervisor"}
                   </h1>
                   <button
@@ -143,18 +143,18 @@ export function SupervisorProfilePanel({
         </div>
       </div>
 
-      <div className="grid gap-6 px-7 py-7 md:px-9 md:py-8 xl:grid-cols-[1.08fr_0.92fr]">
+      <div className="grid gap-4 px-5 py-5 md:px-7 md:py-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="denty-dashboard-card-soft p-5">
               <p className="denty-kicker">Role</p>
-              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                 {(user.role || "SUPERVISOR").toString().toUpperCase()}
               </p>
             </div>
             <div className="denty-dashboard-card-soft p-5">
               <p className="denty-kicker">Reviewed reports</p>
-              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                 {stats?.reviewedReports || 0}
               </p>
             </div>
@@ -318,13 +318,13 @@ export function SupervisorProfilePanel({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="denty-stat-card p-5">
               <p className="denty-kicker !tracking-[0.18em]">Clinics</p>
-              <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {profile?.clinicsWorked?.length || 0}
               </p>
             </div>
             <div className="denty-stat-card p-5">
               <p className="denty-kicker !tracking-[0.18em]">Reviews</p>
-              <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {stats?.reviewedReports || 0}
               </p>
             </div>
@@ -384,7 +384,7 @@ export function SupervisorProfilePanel({
       </div>
 
       {showSave ? (
-        <div className="border-t border-white/12 px-7 py-5 md:px-9">
+        <div className="border-t border-white/12 px-5 py-5 md:px-7">
           <button
             onClick={onSave}
             className="denty-button-primary px-6 py-3 text-sm font-semibold"

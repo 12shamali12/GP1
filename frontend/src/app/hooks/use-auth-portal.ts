@@ -6,6 +6,7 @@ import {
   ADMIN_EMAIL,
   ADMIN_USERNAME,
 } from "@/features/admin/lib/admin-config";
+import { useLanguage } from "@/features/i18n/language-provider";
 import { clearAuthToken, setAuthToken } from "@/lib/api/auth";
 import {
   getAuthShowcaseSlides,
@@ -58,7 +59,10 @@ export function useAuthPortal() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [lang, setLang] = useState<"en" | "ar">("en");
+  // Global language context — switching here also persists to localStorage
+  // (via LanguageProvider) so the choice survives navigation into the app
+  // suites and back to the auth screen on logout.
+  const { lang, setLang } = useLanguage();
   const [showcaseIndex, setShowcaseIndex] = useState(0);
   const [resendInfo, setResendInfo] = useState<
     { identifier: string; password: string; role: "supervisor" | "doctor" } | null

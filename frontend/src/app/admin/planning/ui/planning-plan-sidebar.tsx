@@ -69,7 +69,7 @@ export function PlanningPlanSidebar({
             <p className="denty-kicker">
               {planDraftMode === "edit" ? "Selected plan" : "New plan"}
             </p>
-            <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               {planDraftMode === "edit"
                 ? "Edit two-week plan"
                 : "Create a two-week plan"}
@@ -92,13 +92,13 @@ export function PlanningPlanSidebar({
         </div>
 
         {planDraftMode === "edit" && selectedPlan ? (
-          <div className="mt-5 rounded-[28px] border border-white/12 bg-[linear-gradient(180deg,rgba(9,20,38,0.82),rgba(11,30,52,0.56))] p-5 text-white shadow-[0_20px_54px_rgba(4,11,26,0.26)]">
+          <div className="mt-5 rounded-[22px] border border-white/12 bg-[linear-gradient(180deg,rgba(9,20,38,0.82),rgba(11,30,52,0.56))] p-5 text-white shadow-[0_20px_54px_rgba(4,11,26,0.26)]">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/56">
                   Published window
                 </p>
-                <p className="mt-3 text-2xl font-semibold text-white">
+                <p className="mt-3 text-xl font-semibold text-white">
                   {selectedPlan.label}
                 </p>
               </div>
@@ -129,7 +129,7 @@ export function PlanningPlanSidebar({
             </div>
           </div>
         ) : (
-          <div className="mt-5 rounded-[26px] border border-dashed border-white/18 bg-white/18 p-5">
+          <div className="mt-5 rounded-[20px] border border-dashed border-white/18 bg-white/18 p-5">
             <p className="text-sm text-[var(--muted-foreground)]">
               Save the plan shell first, then the 10 working days will open on
               the right side.

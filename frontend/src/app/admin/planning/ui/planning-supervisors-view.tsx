@@ -45,7 +45,7 @@ export function PlanningSupervisorsView({
     <div className="grid gap-5 xl:grid-cols-[0.64fr_1.36fr]">
       <div className={panelClass}>
         <p className="denty-kicker">Coverage desk</p>
-        <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+        <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
           Link supervisors to clinics
         </h2>
         <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
@@ -94,7 +94,7 @@ export function PlanningSupervisorsView({
         </div>
 
         {selectedClinicSupervisorTarget ? (
-          <div className="mt-5 rounded-[26px] border border-white/12 bg-[linear-gradient(180deg,rgba(9,20,38,0.82),rgba(11,30,52,0.56))] p-5 text-white shadow-[0_20px_54px_rgba(6,17,34,0.24)]">
+          <div className="mt-5 rounded-[20px] border border-white/12 bg-[linear-gradient(180deg,rgba(9,20,38,0.82),rgba(11,30,52,0.56))] p-5 text-white shadow-[0_20px_54px_rgba(6,17,34,0.24)]">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-lg font-semibold text-white">
@@ -129,7 +129,7 @@ export function PlanningSupervisorsView({
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="denty-kicker">Coverage wall</p>
-            <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               Supervisor by clinic
             </h2>
           </div>
@@ -142,11 +142,11 @@ export function PlanningSupervisorsView({
           {coveredClinics.map((clinic) => (
             <div
               key={clinic.id}
-              className="overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.44),rgba(229,237,243,0.18))] shadow-[0_20px_54px_rgba(7,18,34,0.08)] backdrop-blur-[18px]"
+              className="overflow-hidden rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.44),rgba(229,237,243,0.18))] shadow-[0_20px_54px_rgba(7,18,34,0.08)] backdrop-blur-[18px]"
             >
               <div className="grid gap-4 border-b border-white/10 px-5 py-4 xl:grid-cols-[0.42fr_0.58fr] xl:items-center">
                 <div>
-                  <p className="text-2xl font-semibold text-[var(--foreground)]">
+                  <p className="text-xl font-semibold text-[var(--foreground)]">
                     {clinic.name}
                   </p>
                   {clinic.description ? (

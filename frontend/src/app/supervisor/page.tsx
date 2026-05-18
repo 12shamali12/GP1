@@ -10,6 +10,7 @@ import { LeaderboardView } from "@/features/leaderboard/components/leaderboard-v
 import { getLeaderboardSnapshot } from "@/features/leaderboard/services/leaderboard-api";
 import type { LeaderboardSnapshot } from "@/features/admin/types/admin";
 import { SettingsPanel } from "@/features/settings/components/settings-panel";
+import { RoleShellLayout } from "@/features/ui/components/role-shell-layout";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 import { useSupervisorBootstrap } from "./hooks/use-supervisor-bootstrap";
 import { useSupervisorChat } from "./hooks/use-supervisor-chat";
@@ -319,7 +320,7 @@ export default function SupervisorPage() {
 
   return (
     <>
-      <main className="denty-screen admin-suite-screen relative px-4 py-5 lg:pl-0 lg:pr-5 lg:py-6">
+      <main className="denty-screen admin-suite-screen relative px-3 py-3 sm:px-4 sm:py-4 lg:pl-0 lg:pr-5 lg:py-6">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(95,113,132,0.28),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(18,30,47,0.24),transparent_34%)]" />
           <div className="frozen-float absolute left-[8%] top-[12%] h-40 w-40 rounded-full bg-[rgba(95,113,132,0.22)] blur-3xl" />
@@ -333,23 +334,30 @@ export default function SupervisorPage() {
           />
         </div>
 
-        <div className="denty-shell denty-dashboard-layout relative mx-0 max-w-none space-y-6 lg:space-y-0">
-          <SupervisorSideRail
-            userName={user.name || "Supervisor"}
-            activeView={activeSurface}
-            unreadNotifications={unreadNotifications}
-            chatUnreadCount={chatUnreadCount}
-            onOverview={() => setActiveSurface("overview")}
-            onProfile={() => setActiveSurface("profile")}
-            onNotifications={() => setActiveSurface("notifications")}
-            onCalendar={() => setActiveSurface("calendar")}
-            onChat={() => setActiveSurface("chat")}
-            onLeaderboard={() => setActiveSurface("leaderboard")}
-            onSettings={() => setActiveSurface("settings")}
-            onComingSoon={setComingSoon}
-          />
-
-          <section className="min-w-0 space-y-5">
+        <div className="denty-shell denty-dashboard-layout relative mx-0 max-w-none space-y-4 lg:space-y-0">
+          <RoleShellLayout
+            topbarEyebrow="Supervisor"
+            notificationCount={unreadNotifications}
+            onNotificationsClick={() => setActiveSurface("notifications")}
+            onProfileClick={() => setActiveSurface("profile")}
+            sideRail={
+              <SupervisorSideRail
+                userName={user.name || "Supervisor"}
+                activeView={activeSurface}
+                unreadNotifications={unreadNotifications}
+                chatUnreadCount={chatUnreadCount}
+                onOverview={() => setActiveSurface("overview")}
+                onProfile={() => setActiveSurface("profile")}
+                onNotifications={() => setActiveSurface("notifications")}
+                onCalendar={() => setActiveSurface("calendar")}
+                onChat={() => setActiveSurface("chat")}
+                onLeaderboard={() => setActiveSurface("leaderboard")}
+                onSettings={() => setActiveSurface("settings")}
+                onComingSoon={setComingSoon}
+              />
+            }
+          >
+          <section className="min-w-0 space-y-4 lg:space-y-5">
             <div className="overflow-hidden rounded-[32px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] px-7 py-7 shadow-[0_28px_72px_rgba(7,18,34,0.16)] backdrop-blur-[24px] md:px-9 md:py-8">
               <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
                 <div className="space-y-3">
@@ -485,6 +493,7 @@ export default function SupervisorPage() {
               />
             </div>
           </section>
+          </RoleShellLayout>
         </div>
       </main>
 

@@ -96,7 +96,7 @@ export function DoctorLegacyOperations({
           <div className="mb-4 flex items-center justify-between gap-4">
             <div>
               <p className="denty-kicker">Today&apos;s schedule</p>
-              <h3 className="mt-2 text-2xl font-semibold text-[var(--foreground)]">
+              <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                 Appointments
               </h3>
             </div>
@@ -258,7 +258,7 @@ export function DoctorLegacyOperations({
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <p className="denty-kicker">Slot planner</p>
-              <h3 className="mt-2 text-2xl font-semibold text-[var(--foreground)]">My slots</h3>
+              <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">My slots</h3>
             </div>
             <span className="denty-pill">{groupedSlots.length} days</span>
           </div>
@@ -379,32 +379,32 @@ export function DoctorLegacyOperations({
           <div className="mt-4 grid grid-cols-2 gap-3 text-[var(--foreground)]">
             <div className="denty-stat-card p-4">
               <p className="text-xs text-[var(--muted-foreground)]">Done this week</p>
-              <p className="mt-2 text-3xl font-semibold">{weeklyPerformance.done}</p>
+              <p className="mt-2 text-2xl font-semibold">{weeklyPerformance.done}</p>
             </div>
 
             <div className="denty-stat-card p-4">
               <p className="text-xs text-[var(--muted-foreground)]">Rejected reservations</p>
-              <p className="mt-2 text-3xl font-semibold">{weeklyPerformance.rejected}</p>
+              <p className="mt-2 text-2xl font-semibold">{weeklyPerformance.rejected}</p>
             </div>
 
             <div className="denty-stat-card p-4">
               <p className="text-xs text-[var(--muted-foreground)]">Cancelled by you</p>
-              <p className="mt-2 text-3xl font-semibold">{weeklyPerformance.cancelledByDoctor}</p>
+              <p className="mt-2 text-2xl font-semibold">{weeklyPerformance.cancelledByDoctor}</p>
             </div>
 
             <div className="denty-stat-card p-4">
               <p className="text-xs text-[var(--muted-foreground)]">Cancelled by patients</p>
-              <p className="mt-2 text-3xl font-semibold">{weeklyPerformance.cancelledByPatient}</p>
+              <p className="mt-2 text-2xl font-semibold">{weeklyPerformance.cancelledByPatient}</p>
             </div>
 
             <div className="denty-stat-card p-4">
               <p className="text-xs text-[var(--muted-foreground)]">No-shows</p>
-              <p className="mt-2 text-3xl font-semibold">{weeklyPerformance.noShow}</p>
+              <p className="mt-2 text-2xl font-semibold">{weeklyPerformance.noShow}</p>
             </div>
 
             <div className="denty-stat-card p-4">
               <p className="text-xs text-[var(--muted-foreground)]">Rating</p>
-              <p className="mt-2 text-3xl font-semibold">-</p>
+              <p className="mt-2 text-2xl font-semibold">-</p>
             </div>
           </div>
         </div>
@@ -415,7 +415,7 @@ export function DoctorLegacyOperations({
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="denty-kicker">Planning surface</p>
-              <h3 className="mt-2 text-2xl font-semibold text-[var(--foreground)]">
+              <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                 Availability planner
               </h3>
             </div>

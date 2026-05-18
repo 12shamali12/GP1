@@ -10,9 +10,10 @@ import {
   getGameLeaderboard,
   type GameLeaderboardSnapshot,
 } from "@/features/game/services/game-api";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 const panelClass =
-  "overflow-hidden rounded-[32px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.16)] backdrop-blur-[24px] md:p-7";
+  "overflow-hidden rounded-[24px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.16)] backdrop-blur-[24px] md:p-5";
 
 type LeaderboardTab = "academic" | "game";
 
@@ -29,23 +30,24 @@ export function LeaderboardView({
   currentUserId,
 }: LeaderboardViewProps) {
   const [tab, setTab] = useState<LeaderboardTab>("academic");
+  const t = useTranslation();
 
   return (
     <div className="space-y-5">
       <div
         role="tablist"
-        aria-label="Leaderboard"
+        aria-label={t("leaderboard.aria")}
         className="flex flex-wrap gap-3"
       >
         <TabButton
           active={tab === "academic"}
           onClick={() => setTab("academic")}
-          label="Academic"
+          label={t("leaderboard.tab_academic")}
         />
         <TabButton
           active={tab === "game"}
           onClick={() => setTab("game")}
-          label="Game"
+          label={t("leaderboard.tab_game")}
         />
       </div>
 
@@ -108,6 +110,7 @@ function AcademicLeaderboard({
   currentUserId,
 }: AcademicLeaderboardProps) {
   const [selectedBoardKey, setSelectedBoardKey] = useState("overall");
+  const t = useTranslation();
 
   const boards = useMemo(
     () => (snapshot ? [snapshot.overall, ...snapshot.semesters] : []),
@@ -133,9 +136,11 @@ function AcademicLeaderboard({
 
   const boardMeta = selectedBoard?.semester
     ? selectedBoard.semester.endsOn
-      ? `Cohort ends ${new Date(selectedBoard.semester.endsOn).toLocaleDateString()}`
-      : "Semester cohort ranking"
-    : "All approved students across every semester";
+      ? t("leaderboard.cohort_ends", {
+          date: new Date(selectedBoard.semester.endsOn).toLocaleDateString(),
+        })
+      : t("leaderboard.semester_meta")
+    : t("leaderboard.overall_meta");
 
   return (
     <div className="space-y-5">
@@ -153,7 +158,7 @@ function AcademicLeaderboard({
                   : "border-white/12 bg-white/28 text-[rgba(10,22,40,0.78)] hover:bg-white/42"
               }`}
             >
-              {board.semester ? board.semester.label : "Overall"}
+              {board.semester ? board.semester.label : t("leaderboard.overall")}
             </button>
           );
         })}
@@ -162,15 +167,15 @@ function AcademicLeaderboard({
       <div className="grid gap-5 xl:grid-cols-[0.8fr_1.2fr]">
         <div className={panelClass}>
           <p className="denty-kicker">
-            {selectedBoard?.semester ? "Semester podium" : "Top performers"}
+            {selectedBoard?.semester
+              ? t("leaderboard.semester_podium")
+              : t("leaderboard.top_performers")}
           </p>
-          <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
-            {selectedBoard?.label || "Academic leaderboard"}
+          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+            {selectedBoard?.label || t("leaderboard.title")}
           </h2>
           <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
-            Completed appointments score five points, assisted appointments score
-            two, patient stars add 0.5 each, and supervisor stars add one point
-            each.
+            {t("leaderboard.scoring")}
           </p>
 
           <div className="mt-5 rounded-[24px] border border-white/12 bg-white/24 px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.58)]">
@@ -193,12 +198,12 @@ function AcademicLeaderboard({
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/58">
-                        Rank {entry.rank}
-                        {isCurrentUser ? " | You" : ""}
+                        {t("leaderboard.rank")} {entry.rank}
+                        {isCurrentUser ? ` | ${t("common.you")}` : ""}
                       </p>
                       <Link
                         href={`/profiles/${entry.doctor.id}`}
-                        className="mt-2 block text-2xl font-semibold text-white hover:text-white/80"
+                        className="mt-2 block text-xl font-semibold text-white hover:text-white/80"
                       >
                         {entry.doctor.name}
                       </Link>
@@ -210,40 +215,40 @@ function AcademicLeaderboard({
                       </p>
                     </div>
                     <span className="rounded-full border border-white/12 bg-white/10 px-4 py-2 text-sm font-semibold">
-                      {entry.points.toFixed(1)} pts
+                      {entry.points.toFixed(1)} {t("leaderboard.points")}
                     </span>
                   </div>
 
                   <div className="mt-4 grid gap-3 md:grid-cols-2">
                     <div className="rounded-[20px] border border-white/10 bg-white/8 px-4 py-3">
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/56">
-                        Completed
+                        {t("leaderboard.completed")}
                       </p>
-                      <p className="mt-2 text-2xl font-semibold text-white">
+                      <p className="mt-2 text-xl font-semibold text-white">
                         {entry.completedCount}
                       </p>
                     </div>
                     <div className="rounded-[20px] border border-white/10 bg-white/8 px-4 py-3">
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/56">
-                        Assisted
+                        {t("leaderboard.assisted")}
                       </p>
-                      <p className="mt-2 text-2xl font-semibold text-white">
+                      <p className="mt-2 text-xl font-semibold text-white">
                         {entry.assistedCount}
                       </p>
                     </div>
                     <div className="rounded-[20px] border border-white/10 bg-white/8 px-4 py-3">
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/56">
-                        Patient stars
+                        {t("leaderboard.patient_stars")}
                       </p>
-                      <p className="mt-2 text-2xl font-semibold text-white">
+                      <p className="mt-2 text-xl font-semibold text-white">
                         {entry.patientRatingPoints.toFixed(1)}
                       </p>
                     </div>
                     <div className="rounded-[20px] border border-white/10 bg-white/8 px-4 py-3">
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-white/56">
-                        Supervisor stars
+                        {t("leaderboard.supervisor_stars")}
                       </p>
-                      <p className="mt-2 text-2xl font-semibold text-white">
+                      <p className="mt-2 text-xl font-semibold text-white">
                         {entry.supervisorRatingPoints.toFixed(1)}
                       </p>
                     </div>
@@ -255,7 +260,7 @@ function AcademicLeaderboard({
             {!loading && topThree.length === 0 ? (
               <div className="rounded-[24px] border border-dashed border-white/16 bg-white/14 p-5">
                 <p className="text-sm text-[var(--muted-foreground)]">
-                  No leaderboard entries yet for this board.
+                  {t("leaderboard.empty")}
                 </p>
               </div>
             ) : null}
@@ -265,20 +270,24 @@ function AcademicLeaderboard({
         <div className={panelClass}>
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="denty-kicker">Full ranking</p>
-              <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
-                {selectedBoard?.semester ? "Semester table" : "Overall table"}
+              <p className="denty-kicker">{t("leaderboard.full_ranking")}</p>
+              <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+                {selectedBoard?.semester
+                  ? t("leaderboard.semester_table")
+                  : t("leaderboard.overall_table")}
               </h2>
             </div>
             <div className="rounded-full border border-white/12 bg-white/26 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.62)]">
-              {selectedBoard?.semester ? selectedBoard.semester.label : "All semesters"}
+              {selectedBoard?.semester
+                ? selectedBoard.semester.label
+                : t("leaderboard.all_semesters")}
             </div>
           </div>
 
           <div className="mt-5 max-h-[54rem] space-y-3 overflow-y-auto pr-1">
             {loading ? (
               <p className="text-sm text-[var(--muted-foreground)]">
-                Loading leaderboard...
+                {t("leaderboard.loading")}
               </p>
             ) : null}
 
@@ -308,7 +317,7 @@ function AcademicLeaderboard({
                         </Link>
                         {isCurrentUser ? (
                           <span className="rounded-full border border-[rgba(7,111,133,0.36)] bg-[rgba(7,111,133,0.18)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[rgba(6,83,98,0.96)]">
-                            You
+                            {t("common.you")}
                           </span>
                         ) : null}
                       </div>
@@ -320,14 +329,14 @@ function AcademicLeaderboard({
                       </p>
                     </div>
                     <span className="rounded-full border border-[rgba(7,111,133,0.16)] bg-[rgba(7,111,133,0.1)] px-4 py-2 text-sm font-semibold text-[rgba(6,83,98,0.96)]">
-                      {entry.points.toFixed(1)} pts
+                      {entry.points.toFixed(1)} {t("leaderboard.points")}
                     </span>
                   </div>
 
                   <div className="mt-4 grid gap-3 md:grid-cols-4">
                     <div className="rounded-[20px] border border-white/10 bg-white/30 px-4 py-3">
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                        Completed
+                        {t("leaderboard.completed")}
                       </p>
                       <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                         {entry.completedCount}
@@ -335,7 +344,7 @@ function AcademicLeaderboard({
                     </div>
                     <div className="rounded-[20px] border border-white/10 bg-white/30 px-4 py-3">
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                        Assisted
+                        {t("leaderboard.assisted")}
                       </p>
                       <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                         {entry.assistedCount}
@@ -343,7 +352,7 @@ function AcademicLeaderboard({
                     </div>
                     <div className="rounded-[20px] border border-white/10 bg-white/30 px-4 py-3">
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                        Patient points
+                        {t("leaderboard.patient_points")}
                       </p>
                       <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                         {entry.patientRatingPoints.toFixed(1)}
@@ -351,7 +360,7 @@ function AcademicLeaderboard({
                     </div>
                     <div className="rounded-[20px] border border-white/10 bg-white/30 px-4 py-3">
                       <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                        Supervisor points
+                        {t("leaderboard.supervisor_points")}
                       </p>
                       <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                         {entry.supervisorRatingPoints.toFixed(1)}
@@ -364,7 +373,7 @@ function AcademicLeaderboard({
 
             {!loading && !selectedBoard?.entries.length ? (
               <p className="text-sm text-[var(--muted-foreground)]">
-                No students have entered this leaderboard yet.
+                {t("leaderboard.empty_table")}
               </p>
             ) : null}
           </div>
@@ -388,6 +397,7 @@ function GameLeaderboard({ currentUserId }: GameLeaderboardProps) {
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const t = useTranslation();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -418,13 +428,12 @@ function GameLeaderboard({ currentUserId }: GameLeaderboardProps) {
     <div className={panelClass}>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="denty-kicker">Daily quiz standings</p>
-          <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
-            Game leaderboard
+          <p className="denty-kicker">{t("leaderboard.game_kicker")}</p>
+          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+            {t("leaderboard.game_title")}
           </h2>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Ranked by total quiz points across all daily attempts. Keep the
-            streak going for compounding rewards.
+            {t("leaderboard.game_description")}
           </p>
         </div>
         <button
@@ -433,7 +442,7 @@ function GameLeaderboard({ currentUserId }: GameLeaderboardProps) {
           disabled={loading}
           className="inline-flex min-h-[2.5rem] cursor-pointer items-center justify-center rounded-[16px] border border-white/14 bg-white/30 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.7)] transition hover:bg-white/45 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? "Refreshing..." : "Refresh"}
+          {loading ? t("common.refreshing") : t("common.refresh")}
         </button>
       </div>
 
@@ -446,15 +455,14 @@ function GameLeaderboard({ currentUserId }: GameLeaderboardProps) {
       <div className="mt-5 max-h-[54rem] space-y-3 overflow-y-auto pr-1">
         {loading && !snapshot ? (
           <p className="text-sm text-[var(--muted-foreground)]">
-            Loading game leaderboard...
+            {t("leaderboard.loading_game")}
           </p>
         ) : null}
 
         {!loading && entries.length === 0 && !error ? (
           <div className="rounded-[24px] border border-dashed border-white/16 bg-white/14 p-5">
             <p className="text-sm text-[var(--muted-foreground)]">
-              No doctors have played the daily quiz yet. Be the first to set the
-              pace.
+              {t("leaderboard.game_empty")}
             </p>
           </div>
         ) : null}
@@ -485,13 +493,13 @@ function GameLeaderboard({ currentUserId }: GameLeaderboardProps) {
                     </Link>
                     {isCurrentUser ? (
                       <span className="rounded-full border border-[rgba(7,111,133,0.36)] bg-[rgba(7,111,133,0.18)] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-[rgba(6,83,98,0.96)]">
-                        You
+                        {t("common.you")}
                       </span>
                     ) : null}
                     {entry.streak > 0 ? (
                       <span className="inline-flex items-center gap-1 rounded-full border border-[rgba(234,88,12,0.3)] bg-[rgba(254,215,170,0.4)] px-3 py-1 text-[11px] font-semibold text-[rgba(124,45,18,0.95)]">
                         <span aria-hidden>🔥</span>
-                        {entry.streak}-day
+                        {t("game.streak", { n: entry.streak })}
                       </span>
                     ) : null}
                   </div>
@@ -506,14 +514,14 @@ function GameLeaderboard({ currentUserId }: GameLeaderboardProps) {
                   </p>
                 </div>
                 <span className="rounded-full border border-[rgba(7,111,133,0.16)] bg-[rgba(7,111,133,0.1)] px-4 py-2 text-sm font-semibold text-[rgba(6,83,98,0.96)]">
-                  {entry.totalQuizPoints.toFixed(1)} pts
+                  {entry.totalQuizPoints.toFixed(1)} {t("leaderboard.points")}
                 </span>
               </div>
 
               <div className="mt-4 grid gap-3 md:grid-cols-3">
                 <div className="rounded-[20px] border border-white/10 bg-white/30 px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                    Attempts
+                    {t("leaderboard.attempts")}
                   </p>
                   <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                     {entry.attempts}
@@ -521,7 +529,7 @@ function GameLeaderboard({ currentUserId }: GameLeaderboardProps) {
                 </div>
                 <div className="rounded-[20px] border border-white/10 bg-white/30 px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                    Best score
+                    {t("leaderboard.best_score")}
                   </p>
                   <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                     {entry.bestScore}
@@ -529,7 +537,7 @@ function GameLeaderboard({ currentUserId }: GameLeaderboardProps) {
                 </div>
                 <div className="rounded-[20px] border border-white/10 bg-white/30 px-4 py-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                    Average
+                    {t("leaderboard.average")}
                   </p>
                   <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                     {entry.averageScore.toFixed(1)}

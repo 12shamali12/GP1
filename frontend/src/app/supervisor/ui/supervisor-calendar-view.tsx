@@ -26,11 +26,11 @@ export function SupervisorCalendarView({
 
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(340px,0.9fr)]">
-      <div className="denty-dashboard-card overflow-hidden p-6 md:p-7">
+      <div className="denty-dashboard-card overflow-hidden p-5 md:p-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="denty-kicker">Calendar</p>
-            <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               Clinic duties
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
@@ -112,7 +112,7 @@ export function SupervisorCalendarView({
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="denty-kicker">Assessments</p>
-              <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                 Upcoming exams
               </h2>
             </div>
@@ -147,13 +147,13 @@ export function SupervisorCalendarView({
 
         <div className="denty-dashboard-card overflow-hidden p-6">
           <p className="denty-kicker">Coverage</p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Clinic snapshot</h2>
+          <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">Clinic snapshot</h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             <div className="denty-dashboard-card-soft p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
                 Clinics
               </p>
-              <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {workspace?.clinics.length || 0}
               </p>
             </div>
@@ -161,7 +161,7 @@ export function SupervisorCalendarView({
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
                 Reports pending
               </p>
-              <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {workspace?.stats.pendingReports || 0}
               </p>
             </div>

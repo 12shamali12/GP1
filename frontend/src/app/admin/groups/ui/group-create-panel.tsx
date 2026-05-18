@@ -21,7 +21,7 @@ export function GroupCreatePanel({
   return (
     <div className="denty-panel-strong p-6">
       <p className="denty-kicker">Create group</p>
-      <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+      <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
         Semester group setup
       </h2>
       <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">

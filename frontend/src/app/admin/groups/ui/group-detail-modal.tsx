@@ -44,11 +44,11 @@ export function GroupDetailModal({
   return (
     <div className="fixed inset-0 z-[120] bg-[rgba(5,12,24,0.42)] px-4 py-6 backdrop-blur-[10px]">
       <div className="mx-auto flex h-full max-w-6xl items-start justify-center">
-        <div className="denty-panel-strong max-h-full w-full overflow-y-auto rounded-[34px] p-6 md:p-8">
+        <div className="denty-panel-strong max-h-full w-full overflow-y-auto rounded-[34px] p-6 md:p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="denty-kicker">Group detail</p>
-              <h2 className="mt-3 text-4xl font-semibold text-[var(--foreground)]">
+              <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
                 {selectedGroup.name}
               </h2>
               <p className="mt-2 text-sm text-[var(--muted-foreground)]">
@@ -68,7 +68,7 @@ export function GroupDetailModal({
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="denty-kicker">Group settings</p>
-                  <h3 className="mt-2 text-2xl font-semibold text-[var(--foreground)]">
+                  <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                     Edit details
                   </h3>
                 </div>
@@ -131,7 +131,7 @@ export function GroupDetailModal({
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="denty-kicker">Assigned plans</p>
-                  <h3 className="mt-2 text-2xl font-semibold text-[var(--foreground)]">
+                  <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                     Planning for this group
                   </h3>
                 </div>
@@ -154,7 +154,7 @@ export function GroupDetailModal({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="denty-kicker">Moderation desk</p>
-                <h3 className="mt-2 text-2xl font-semibold text-[var(--foreground)]">
+                <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                   Group review lives in its own page
                 </h3>
                 <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">

@@ -22,7 +22,7 @@ export function GroupDirectoryPanel({
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <p className="denty-kicker">Directory</p>
-          <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
             Groups overview
           </h2>
         </div>
@@ -49,7 +49,7 @@ export function GroupDirectoryPanel({
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="denty-kicker">Group</p>
-                  <h3 className="mt-2 text-2xl font-semibold text-[var(--foreground)]">
+                  <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                     {group.name}
                   </h3>
                   <p className="mt-2 text-sm text-[var(--muted-foreground)]">

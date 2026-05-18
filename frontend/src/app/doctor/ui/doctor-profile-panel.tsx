@@ -96,13 +96,13 @@ export function DoctorProfilePanel({
 
   return (
     <div className="overflow-hidden rounded-[34px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] shadow-[0_32px_84px_rgba(7,18,34,0.18)] backdrop-blur-[26px]">
-      <div className="border-b border-white/12 px-7 py-7 md:px-9 md:py-8">
+      <div className="border-b border-white/12 px-5 py-5 md:px-7 md:py-6">
         <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
           <div className="flex items-center gap-5">
             <button
               type="button"
               onClick={onAvatarPick}
-              className="group relative flex h-28 w-28 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-[28px] border border-white/20 bg-[linear-gradient(180deg,rgba(8,18,34,0.78),rgba(11,24,42,0.58))] text-4xl font-bold text-white shadow-[0_18px_34px_rgba(4,11,26,0.22)] transition hover:scale-[1.02] hover:border-white/28"
+              className="group relative flex h-28 w-28 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-[22px] border border-white/20 bg-[linear-gradient(180deg,rgba(8,18,34,0.78),rgba(11,24,42,0.58))] text-3xl font-bold text-white shadow-[0_18px_34px_rgba(4,11,26,0.22)] transition hover:scale-[1.02] hover:border-white/28"
               title="Click to add or update photo"
             >
               {avatarData || user.avatar ? (
@@ -132,7 +132,7 @@ export function DoctorProfilePanel({
 
               <div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-4xl font-semibold text-[var(--foreground)] md:text-5xl">
+                  <h1 className="text-3xl font-semibold text-[var(--foreground)] md:text-3xl">
                     {editName || user.name || "Doctor"}
                   </h1>
                   <button
@@ -162,7 +162,7 @@ export function DoctorProfilePanel({
       </div>
 
       {headerEditing ? (
-        <div className="border-b border-white/12 bg-white/18 px-7 py-5 md:px-9">
+        <div className="border-b border-white/12 bg-white/18 px-5 py-5 md:px-7">
           <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:items-center">
             <input
               value={headerNameInput}
@@ -188,25 +188,25 @@ export function DoctorProfilePanel({
         </div>
       ) : null}
 
-      <div className="grid gap-6 px-7 py-7 md:px-9 md:py-8 xl:grid-cols-[1.08fr_0.92fr]">
+      <div className="grid gap-4 px-5 py-5 md:px-7 md:py-6 xl:grid-cols-[1.08fr_0.92fr]">
         <div className="space-y-5">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="denty-dashboard-card-soft p-5">
               <p className="denty-kicker">Role</p>
-              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                 {(user.role || "DOCTOR").toString().toUpperCase()}
               </p>
             </div>
             <div className="denty-dashboard-card-soft p-5">
               <p className="denty-kicker">Student ID</p>
-              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                 {doctorIdNumber || "Not set"}
               </p>
             </div>
             {profile?.semester ? (
               <div className="denty-dashboard-card-soft p-5">
                 <p className="denty-kicker">Semester</p>
-                <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+                <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {profile.semester.label}
                 </p>
               </div>
@@ -214,7 +214,7 @@ export function DoctorProfilePanel({
             {profile?.groupMembership ? (
               <div className="denty-dashboard-card-soft p-5">
                 <p className="denty-kicker">Group</p>
-                <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+                <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {profile.groupMembership.name}
                 </p>
                 <p className="mt-2 text-sm text-[var(--muted-foreground)]">
@@ -227,7 +227,7 @@ export function DoctorProfilePanel({
                 <p className="denty-kicker">Partner</p>
                 <Link
                   href={`/profiles/${profile.partner.id}`}
-                  className="mt-3 inline-block text-2xl font-semibold text-[var(--foreground)] hover:text-[rgba(7,111,133,0.96)]"
+                  className="mt-3 inline-block text-xl font-semibold text-[var(--foreground)] hover:text-[rgba(7,111,133,0.96)]"
                 >
                   {profile.partner.name}
                 </Link>
@@ -371,36 +371,36 @@ export function DoctorProfilePanel({
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="denty-stat-card p-5">
               <p className="denty-kicker !tracking-[0.18em]">Patient avg</p>
-              <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {summary?.patientRatingAverage?.toFixed(1) || "-"}
               </p>
             </div>
             <div className="denty-stat-card p-5">
               <p className="denty-kicker !tracking-[0.18em]">Supervisor avg</p>
-              <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {summary?.supervisorRatingAverage?.toFixed(1) || "-"}
               </p>
             </div>
             <div className="denty-stat-card p-5">
               <p className="denty-kicker !tracking-[0.18em]">Completed</p>
-              <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {summary?.completedCases || 0}
               </p>
             </div>
             <div className="denty-stat-card p-5">
               <p className="denty-kicker !tracking-[0.18em]">Assisted</p>
-              <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+              <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {summary?.assistedCases || 0}
               </p>
             </div>
           </div>
 
           {summary?.leaderboard ? (
-            <div className="rounded-[28px] border border-white/12 bg-[linear-gradient(180deg,rgba(9,20,38,0.82),rgba(11,30,52,0.56))] p-5 text-white shadow-[0_20px_52px_rgba(6,17,34,0.22)]">
+            <div className="rounded-[22px] border border-white/12 bg-[linear-gradient(180deg,rgba(9,20,38,0.82),rgba(11,30,52,0.56))] p-5 text-white shadow-[0_20px_52px_rgba(6,17,34,0.22)]">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/56">
                 Academic ranking
               </p>
-              <p className="mt-3 text-4xl font-semibold text-white">
+              <p className="mt-3 text-3xl font-semibold text-white">
                 #{summary.leaderboard.rank}
               </p>
               <p className="mt-2 text-sm text-white/72">
@@ -508,7 +508,7 @@ export function DoctorProfilePanel({
       </div>
 
       {showSave ? (
-        <div className="border-t border-white/12 px-7 py-5 md:px-9">
+        <div className="border-t border-white/12 px-5 py-5 md:px-7">
           <button
             onClick={onSave}
             className="denty-button-primary px-6 py-3 text-sm font-semibold"

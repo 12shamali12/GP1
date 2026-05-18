@@ -13,7 +13,7 @@ import {
 } from "./hooks/use-admin-planning-workspace";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 const panelClass =
-  "overflow-hidden rounded-[32px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.76),rgba(225,234,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.14)] backdrop-blur-[24px] md:p-7";
+  "overflow-hidden rounded-[24px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.76),rgba(225,234,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.14)] backdrop-blur-[24px] md:p-5";
 const planningTabBaseClass =
   "inline-flex min-h-[3.2rem] items-center justify-center rounded-[20px] border px-5 py-3 text-sm font-semibold uppercase tracking-[0.16em] shadow-[0_18px_38px_rgba(7,18,34,0.1)] backdrop-blur-[18px] transition";
 const planningTabActiveClass =
@@ -364,7 +364,7 @@ export default function AdminPlanningPage() {
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
                 <p className="denty-kicker">Planning wall</p>
-                <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   Ten-day clinic board
                 </h2>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
@@ -391,10 +391,10 @@ export default function AdminPlanningPage() {
             {selectedPlan ? (
               <>
                 <div className="mt-5 grid gap-4 xl:grid-cols-[1.08fr_0.92fr]">
-                  <div className="rounded-[28px] border border-white/12 bg-[linear-gradient(180deg,rgba(9,20,38,0.82),rgba(11,30,52,0.56))] p-5 text-white shadow-[0_20px_54px_rgba(6,17,34,0.24)]">
+                  <div className="rounded-[22px] border border-white/12 bg-[linear-gradient(180deg,rgba(9,20,38,0.82),rgba(11,30,52,0.56))] p-5 text-white shadow-[0_20px_54px_rgba(6,17,34,0.24)]">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="text-2xl font-semibold text-white">
+                        <p className="text-xl font-semibold text-white">
                           {selectedPlan.label}
                         </p>
                         <p className="mt-2 text-sm text-white/70">
@@ -412,19 +412,19 @@ export default function AdminPlanningPage() {
                   <div className="grid gap-3 md:grid-cols-3">
                     <div className="rounded-[24px] border border-white/10 bg-white/24 px-4 py-4">
                       <p className="denty-kicker !tracking-[0.16em]">Clinic days</p>
-                      <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                      <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                         {planDays.filter((day) => !day.isVacation).length}
                       </p>
                     </div>
                     <div className="rounded-[24px] border border-white/10 bg-white/24 px-4 py-4">
                       <p className="denty-kicker !tracking-[0.16em]">Free days</p>
-                      <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                      <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                         {planDays.filter((day) => day.isVacation).length}
                       </p>
                     </div>
                     <div className="rounded-[24px] border border-white/10 bg-white/24 px-4 py-4">
                       <p className="denty-kicker !tracking-[0.16em]">Wall rows</p>
-                      <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                      <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                         {planDays.length}
                       </p>
                     </div>
@@ -435,7 +435,7 @@ export default function AdminPlanningPage() {
                   {planDays.map((day, index) => (
                     <div
                       key={day.assignmentDate}
-                      className="overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.42),rgba(229,237,243,0.16))] shadow-[0_18px_42px_rgba(7,18,34,0.08)] backdrop-blur-[18px]"
+                      className="overflow-hidden rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.42),rgba(229,237,243,0.16))] shadow-[0_18px_42px_rgba(7,18,34,0.08)] backdrop-blur-[18px]"
                     >
                       <div className="grid gap-4 px-5 py-4 xl:grid-cols-[auto_minmax(0,0.8fr)_minmax(0,1.2fr)] xl:items-center">
                         <div className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/12 bg-[rgba(9,20,38,0.08)] text-base font-semibold text-[var(--foreground)]">
@@ -443,7 +443,7 @@ export default function AdminPlanningPage() {
                         </div>
 
                         <div>
-                          <p className="text-2xl font-semibold text-[var(--foreground)]">
+                          <p className="text-xl font-semibold text-[var(--foreground)]">
                             {formatDateLabel(day.assignmentDate, {
                               weekday: "long",
                               day: "numeric",
@@ -534,7 +534,7 @@ export default function AdminPlanningPage() {
                 </div>
               </>
             ) : (
-              <div className="mt-5 rounded-[26px] border border-dashed border-white/18 bg-white/18 p-5">
+              <div className="mt-5 rounded-[20px] border border-dashed border-white/18 bg-white/18 p-5">
                 <p className="text-sm text-[var(--muted-foreground)]">
                   Create or choose a plan to edit its 10 working days.
                 </p>

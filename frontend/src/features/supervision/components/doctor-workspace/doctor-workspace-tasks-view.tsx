@@ -13,7 +13,7 @@ export function DoctorWorkspaceTasksView({ workspace }: Props) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="denty-kicker">Clinic tasks</p>
-            <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Semester checklist</h3>
+            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Semester checklist</h3>
           </div>
           <span className="denty-pill">{workspace?.clinicTasks.length || 0}</span>
         </div>
@@ -40,7 +40,7 @@ export function DoctorWorkspaceTasksView({ workspace }: Props) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="denty-kicker">Report history</p>
-            <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Reviewed work</h3>
+            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Reviewed work</h3>
           </div>
           <span className="denty-pill">{workspace?.reports.length || 0}</span>
         </div>

@@ -17,9 +17,9 @@ export function ComingSoonModal({
 }: ComingSoonModalProps) {
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-[rgba(19,37,58,0.22)] p-4 backdrop-blur-md">
-      <div className="denty-modal w-full max-w-4xl overflow-hidden rounded-[32px]">
+      <div className="denty-modal w-full max-w-4xl overflow-hidden rounded-[24px]">
         <div className="grid gap-0 md:grid-cols-[0.95fr_1.05fr]">
-          <div className="frozen-stage border-b border-[rgba(148,163,184,0.14)] bg-[linear-gradient(180deg,rgba(230,244,246,0.9),rgba(255,255,255,0.96))] p-6 md:border-b-0 md:border-r md:p-8">
+          <div className="frozen-stage border-b border-[rgba(148,163,184,0.14)] bg-[linear-gradient(180deg,rgba(230,244,246,0.9),rgba(255,255,255,0.96))] p-6 md:border-b-0 md:border-r md:p-6">
             <div className="space-y-5">
               <div className="flex items-center justify-between gap-4">
                 <span className="denty-pill">Feature workshop</span>
@@ -28,7 +28,7 @@ export function ComingSoonModal({
 
               <div className="space-y-3">
                 <p className="denty-kicker">In progress</p>
-                <h3 className="max-w-md text-3xl font-semibold text-[var(--foreground)] md:text-4xl">
+                <h3 className="max-w-md text-2xl font-semibold text-[var(--foreground)] md:text-2xl">
                   {title}
                 </h3>
                 <p className="max-w-md text-sm leading-7 text-[var(--muted-foreground)] md:text-base">
@@ -59,7 +59,7 @@ export function ComingSoonModal({
             </div>
           </div>
 
-          <div className="bg-white p-6 md:p-8">
+          <div className="bg-white p-6 md:p-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="denty-kicker">What comes next</p>

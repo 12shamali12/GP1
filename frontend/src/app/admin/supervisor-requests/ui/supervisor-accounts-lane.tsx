@@ -28,7 +28,7 @@ export function SupervisorAccountsLane({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="denty-kicker">Review studio</p>
-          <h2 className="text-2xl font-semibold text-[var(--foreground)]">
+          <h2 className="text-xl font-semibold text-[var(--foreground)]">
             Supervisors
           </h2>
           <p className="mt-2 text-sm text-[var(--muted-foreground)]">

@@ -41,7 +41,7 @@ export function SupervisorWorkspaceLiveView({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="denty-kicker">Clinic duties</p>
-            <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Who is in your clinic today</h2>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Who is in your clinic today</h2>
           </div>
           <span className="denty-pill">{workspace?.clinicOverview.length || 0} duties</span>
         </div>
@@ -50,7 +50,7 @@ export function SupervisorWorkspaceLiveView({
             <div key={duty.id} className="denty-dashboard-card p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-2xl font-semibold text-[var(--foreground)]">{duty.clinic.name}</p>
+                  <p className="text-xl font-semibold text-[var(--foreground)]">{duty.clinic.name}</p>
                   <p className="mt-2 text-sm text-[var(--muted-foreground)]">
                     {new Date(duty.assignmentDate).toLocaleDateString()} - {duty.shift.name} - {duty.shift.startsAt} - {duty.shift.endsAt}
                   </p>
@@ -86,7 +86,7 @@ export function SupervisorWorkspaceLiveView({
       <div className="space-y-5">
         <div className="denty-panel-strong p-6">
           <p className="denty-kicker">Student finder</p>
-          <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Search by name or student ID</h2>
+          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Search by name or student ID</h2>
           <div className="mt-5 space-y-3">
             <input
               value={searchTerm}
@@ -118,7 +118,7 @@ export function SupervisorWorkspaceLiveView({
 
         <div className="denty-panel-strong p-6">
           <p className="denty-kicker">Selected student</p>
-          <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">{selectedStudent?.name || "Choose a student"}</h2>
+          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">{selectedStudent?.name || "Choose a student"}</h2>
           <p className="mt-3 text-sm text-[var(--muted-foreground)]">
             {selectedStudent
               ? `${selectedStudent.doctorIdNumber || selectedStudent.username}${selectedStudent.groupMembership?.group ? ` - ${selectedStudent.groupMembership.group.name}` : ""}`

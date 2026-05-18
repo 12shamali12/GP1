@@ -30,11 +30,11 @@ export function PatientSlotModal({
 
   return (
     <div className="fixed inset-0 z-30 flex items-center justify-center bg-[rgba(19,37,58,0.22)] p-4 backdrop-blur-md">
-      <div className="denty-modal w-full max-w-2xl space-y-5 rounded-[30px] p-6">
+      <div className="denty-modal w-full max-w-2xl space-y-5 rounded-[22px] p-6">
         <div className="flex items-center justify-between">
           <div>
             <p className="denty-kicker">Reservation summary</p>
-            <h3 className="mt-2 text-2xl font-semibold text-[var(--foreground)]">
+            <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
               {selectedCase?.title || slot.purpose || "Clinic appointment"}
             </h3>
           </div>

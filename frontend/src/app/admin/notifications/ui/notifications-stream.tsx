@@ -16,7 +16,7 @@ export function NotificationsStream({
   return (
     <div className="denty-panel-strong max-h-[50rem] overflow-hidden p-6">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-2xl font-semibold text-[var(--foreground)]">
+        <h2 className="text-xl font-semibold text-[var(--foreground)]">
           Inbox stream
         </h2>
         <span className="denty-pill">{filteredItems.length} shown</span>
@@ -31,7 +31,7 @@ export function NotificationsStream({
         {filteredItems.map((item) => (
           <div
             key={item.id}
-            className={`rounded-[26px] border p-5 shadow-[0_20px_44px_rgba(7,18,34,0.1)] ${
+            className={`rounded-[20px] border p-5 shadow-[0_20px_44px_rgba(7,18,34,0.1)] ${
               item.read
                 ? "border-white/12 bg-white/26"
                 : "border-[rgba(137,219,255,0.22)] bg-[linear-gradient(180deg,rgba(255,255,255,0.42),rgba(230,240,247,0.32))]"

@@ -21,7 +21,7 @@ function SummaryMetric({
   return (
     <div className="denty-dashboard-card p-5">
       <p className="denty-kicker !tracking-[0.18em]">{label}</p>
-      <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">{value}</p>
+      <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">{value}</p>
       <p className="mt-2 text-sm text-[var(--muted-foreground)]">{note}</p>
     </div>
   );
@@ -38,9 +38,9 @@ export function DoctorDashboardSummary({
   return (
     <>
       <div className="grid gap-4 xl:grid-cols-[1.16fr_0.72fr_0.72fr_0.72fr]">
-        <div className="denty-panel-strong p-6 md:p-7">
+        <div className="denty-panel-strong p-5 md:p-6">
           <p className="denty-kicker">Doctor workspace</p>
-          <h1 className="mt-3 text-3xl font-semibold text-[var(--foreground)] md:text-4xl">
+          <h1 className="mt-3 text-2xl font-semibold text-[var(--foreground)] md:text-2xl">
             Welcome back, {userName || "Doctor"}
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)] md:text-base">

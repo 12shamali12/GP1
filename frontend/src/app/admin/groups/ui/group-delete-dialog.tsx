@@ -17,11 +17,11 @@ export function GroupDeleteDialog({
 
   return (
     <div className="fixed inset-0 z-[140] flex items-center justify-center bg-[rgba(7,18,34,0.42)] p-4 backdrop-blur-[12px]">
-      <div className="w-full max-w-lg overflow-hidden rounded-[32px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.84),rgba(225,234,241,0.42))] p-6 shadow-[0_34px_90px_rgba(4,11,26,0.28)] backdrop-blur-[28px] md:p-7">
+      <div className="w-full max-w-lg overflow-hidden rounded-[24px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.84),rgba(225,234,241,0.42))] p-6 shadow-[0_34px_90px_rgba(4,11,26,0.28)] backdrop-blur-[28px] md:p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="denty-kicker">Delete group</p>
-            <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               Confirm permanent deletion
             </h2>
             <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">

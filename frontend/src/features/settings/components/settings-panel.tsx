@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { authHeaders, logout } from "@/lib/api/auth";
 import { useToast } from "@/features/ui/components/toast-provider";
+import { useLanguage, useTranslation } from "@/features/i18n/language-provider";
 import {
   useSettingsPrefs,
   type LanguagePreference,
@@ -29,65 +30,90 @@ type SettingsPanelProps = {
   onEditProfile?: () => void;
 };
 
-type ThemeOption = { value: ThemePreference; label: string; hint: string };
-type LanguageOption = { value: LanguagePreference; label: string; hint: string };
+type ThemeOption = {
+  value: ThemePreference;
+  labelKey: string;
+  hintKey: string;
+};
+type LanguageOption = {
+  value: LanguagePreference;
+  labelKey: string;
+  hintKey: string;
+};
 
 const THEME_OPTIONS: ThemeOption[] = [
-  { value: "light", label: "Light", hint: "Frozen Lake daytime palette." },
-  { value: "dark", label: "Dark", hint: "Calmer navy palette for low light." },
-  { value: "system", label: "System", hint: "Match the device preference." },
+  {
+    value: "light",
+    labelKey: "settings.theme.light",
+    hintKey: "settings.theme.light_hint",
+  },
+  {
+    value: "dark",
+    labelKey: "settings.theme.dark",
+    hintKey: "settings.theme.dark_hint",
+  },
+  {
+    value: "system",
+    labelKey: "settings.theme.system",
+    hintKey: "settings.theme.system_hint",
+  },
 ];
 
 const LANGUAGE_OPTIONS: LanguageOption[] = [
-  { value: "en", label: "English", hint: "Primary platform language." },
-  { value: "ar", label: "Arabic", hint: "Preference stored for future RTL." },
+  {
+    value: "en",
+    labelKey: "settings.language.en",
+    hintKey: "settings.language.en_hint",
+  },
+  {
+    value: "ar",
+    labelKey: "settings.language.ar",
+    hintKey: "settings.language.ar_hint",
+  },
 ];
 
 const NOTIFICATION_FIELDS: Array<{
   key: keyof NotificationPrefs;
-  label: string;
-  description: string;
+  labelKey: string;
+  descKey: string;
 }> = [
   {
     key: "appointmentUpdates",
-    label: "Appointment updates",
-    description: "Confirmations, reschedules, and cancellations.",
+    labelKey: "settings.notifications.appointment_updates",
+    descKey: "settings.notifications.appointment_updates_desc",
   },
   {
     key: "caseReviews",
-    label: "Case reviews",
-    description: "Supervisor decisions and feedback on submitted cases.",
+    labelKey: "settings.notifications.case_reviews",
+    descKey: "settings.notifications.case_reviews_desc",
   },
   {
     key: "chatMessages",
-    label: "Chat messages",
-    description: "New direct messages and room mentions.",
+    labelKey: "settings.notifications.chat_messages",
+    descKey: "settings.notifications.chat_messages_desc",
   },
   {
     key: "systemAnnouncements",
-    label: "System announcements",
-    description: "Planned maintenance and platform-wide updates.",
+    labelKey: "settings.notifications.system_announcements",
+    descKey: "settings.notifications.system_announcements_desc",
   },
 ];
 
-const ROLE_COPY: Record<SettingsRole, { eyebrow: string; title: string; description: string }> = {
+const ROLE_COPY_KEYS: Record<
+  SettingsRole,
+  { eyebrow: string; description: string }
+> = {
   doctor: {
-    eyebrow: "Doctor preferences",
-    title: "Settings",
-    description:
-      "Tune appearance, language, notifications, and account controls for the doctor suite.",
+    eyebrow: "settings.eyebrow.doctor",
+    description: "settings.role.description.doctor",
   },
   patient: {
-    eyebrow: "Patient preferences",
-    title: "Settings",
-    description:
-      "Tune appearance, language, notifications, and account controls for your care desk.",
+    eyebrow: "settings.eyebrow.patient",
+    description: "settings.role.description.patient",
   },
   supervisor: {
-    eyebrow: "Supervisor preferences",
-    title: "Settings",
-    description:
-      "Tune appearance, language, notifications, and account controls for the supervision workspace.",
+    eyebrow: "settings.eyebrow.supervisor",
+    description: "settings.role.description.supervisor",
   },
 };
 
@@ -129,15 +155,15 @@ const PASSWORD_ENDPOINT = "/auth/change-password";
 export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
   const router = useRouter();
   const { pushToast } = useToast();
+  const t = useTranslation();
+  const { lang, setLang } = useLanguage();
   const {
     hydrated,
     theme,
     reducedMotion,
-    language,
     notifications,
     setTheme,
     setReducedMotion,
-    setLanguage,
     toggleNotification,
   } = useSettingsPrefs();
 
@@ -171,22 +197,23 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
     () => formatRoleLabel(role, storedUser.role ?? null),
     [role, storedUser.role],
   );
-  const roleCopy = ROLE_COPY[role];
+  const roleCopyKeys = ROLE_COPY_KEYS[role];
 
   const handlePasswordSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!identifier) {
       pushToast({
         kind: "error",
-        title: "Change password",
-        description: "We could not identify the current account. Please sign in again.",
+        title: t("settings.change_password"),
+        description:
+          "We could not identify the current account. Please sign in again.",
       });
       return;
     }
     if (nextPassword.length < 8) {
       pushToast({
         kind: "error",
-        title: "Change password",
+        title: t("settings.change_password"),
         description: "Choose a new password with at least 8 characters.",
       });
       return;
@@ -194,7 +221,7 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
     if (nextPassword !== confirmPassword) {
       pushToast({
         kind: "error",
-        title: "Change password",
+        title: t("settings.change_password"),
         description: "The new password and confirmation do not match.",
       });
       return;
@@ -220,7 +247,11 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
           (data && typeof data === "object" && "message" in data
             ? String((data as { message: unknown }).message)
             : null) || "Failed to change password.";
-        pushToast({ kind: "error", title: "Change password", description: message });
+        pushToast({
+          kind: "error",
+          title: t("settings.change_password"),
+          description: message,
+        });
         return;
       }
       pushToast({
@@ -235,7 +266,7 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
     } catch {
       pushToast({
         kind: "error",
-        title: "Change password",
+        title: t("settings.change_password"),
         description: "Network error. Please try again.",
       });
     } finally {
@@ -244,12 +275,8 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
   };
 
   const handleLanguageChange = (next: LanguagePreference) => {
-    setLanguage(next);
-    setLanguageHint(
-      next === "ar"
-        ? "Language preference saved (full RTL coming in v2)."
-        : "Language preference saved.",
-    );
+    setLang(next);
+    setLanguageHint(t("settings.language.saved"));
   };
 
   const handleLogout = () => {
@@ -259,38 +286,41 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
 
   return (
     <div className="space-y-5">
-      <section className="denty-panel-strong p-6 md:p-8">
+      <section className="denty-panel-strong p-6 md:p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <div className="space-y-2">
-            <p className="denty-kicker">{roleCopy.eyebrow}</p>
-            <h2 className="text-3xl font-semibold text-[var(--foreground)] md:text-4xl">
-              {roleCopy.title}
+            <p className="denty-kicker">{t(roleCopyKeys.eyebrow)}</p>
+            <h2 className="text-2xl font-semibold text-[var(--foreground)] md:text-2xl">
+              {t("settings.title")}
             </h2>
             <p className="max-w-2xl text-sm leading-7 text-[var(--muted-foreground)] md:text-base">
-              {roleCopy.description}
+              {t(roleCopyKeys.description)}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <span className="denty-status-chip denty-status-chip-strong">{roleLabel}</span>
             {hydrated ? (
-              <span className="denty-status-chip">Theme: {theme}</span>
+              <span className="denty-status-chip">
+                {t("settings.chip.theme")}: {theme}
+              </span>
             ) : null}
             {hydrated ? (
-              <span className="denty-status-chip">Language: {language.toUpperCase()}</span>
+              <span className="denty-status-chip">
+                {t("settings.chip.language")}: {lang.toUpperCase()}
+              </span>
             ) : null}
           </div>
         </div>
       </section>
 
-      <section className="denty-panel p-6 md:p-8">
+      <section className="denty-panel p-6 md:p-6">
         <header className="space-y-2">
-          <p className="denty-kicker">Appearance</p>
-          <h3 className="text-xl font-semibold text-[var(--foreground)] md:text-2xl">
-            Theme and motion
+          <p className="denty-kicker">{t("settings.appearance")}</p>
+          <h3 className="text-xl font-semibold text-[var(--foreground)] md:text-xl">
+            {t("settings.theme_and_motion")}
           </h3>
           <p className="max-w-2xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Choose the visual mode that fits the moment and lower the motion intensity
-            when needed.
+            {t("settings.appearance.description")}
           </p>
         </header>
 
@@ -310,10 +340,10 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
                 }`}
               >
                 <p className="text-sm font-semibold text-[var(--foreground)]">
-                  {option.label}
+                  {t(option.labelKey)}
                 </p>
                 <p className="mt-1 text-xs leading-5 text-[var(--muted-foreground)]">
-                  {option.hint}
+                  {t(option.hintKey)}
                 </p>
               </button>
             );
@@ -323,10 +353,10 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
         <div className="mt-6 denty-subpanel flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-sm font-semibold text-[var(--foreground)]">
-              Reduce motion
+              {t("settings.reduced_motion")}
             </p>
             <p className="mt-1 text-xs leading-5 text-[var(--muted-foreground)]">
-              Disable the floating and drifting animations across the suite.
+              {t("settings.reduced_motion.description")}
             </p>
           </div>
           <label className="inline-flex items-center gap-3 cursor-pointer">
@@ -337,27 +367,26 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
               className="h-5 w-5 accent-[var(--color-navy)]"
             />
             <span className="text-sm font-semibold text-[var(--foreground)]">
-              {reducedMotion ? "On" : "Off"}
+              {reducedMotion ? t("common.on") : t("common.off")}
             </span>
           </label>
         </div>
       </section>
 
-      <section className="denty-panel p-6 md:p-8">
+      <section className="denty-panel p-6 md:p-6">
         <header className="space-y-2">
-          <p className="denty-kicker">Language</p>
-          <h3 className="text-xl font-semibold text-[var(--foreground)] md:text-2xl">
-            Interface language
+          <p className="denty-kicker">{t("settings.language")}</p>
+          <h3 className="text-xl font-semibold text-[var(--foreground)] md:text-xl">
+            {t("settings.language.title")}
           </h3>
           <p className="max-w-2xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Choose the preferred display language. Full Arabic translation and
-            right-to-left layout will arrive in a later release.
+            {t("settings.language.description")}
           </p>
         </header>
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
           {LANGUAGE_OPTIONS.map((option) => {
-            const active = language === option.value;
+            const active = lang === option.value;
             return (
               <button
                 key={option.value}
@@ -371,10 +400,10 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
                 }`}
               >
                 <p className="text-sm font-semibold text-[var(--foreground)]">
-                  {option.label}
+                  {t(option.labelKey)}
                 </p>
                 <p className="mt-1 text-xs leading-5 text-[var(--muted-foreground)]">
-                  {option.hint}
+                  {t(option.hintKey)}
                 </p>
               </button>
             );
@@ -388,15 +417,14 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
         ) : null}
       </section>
 
-      <section className="denty-panel p-6 md:p-8">
+      <section className="denty-panel p-6 md:p-6">
         <header className="space-y-2">
-          <p className="denty-kicker">Notifications</p>
-          <h3 className="text-xl font-semibold text-[var(--foreground)] md:text-2xl">
-            Email me about
+          <p className="denty-kicker">{t("settings.notifications")}</p>
+          <h3 className="text-xl font-semibold text-[var(--foreground)] md:text-xl">
+            {t("settings.notifications.title")}
           </h3>
           <p className="max-w-2xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Pick the events that should reach you by email. Preferences stored locally;
-            server-side delivery coming soon.
+            {t("settings.notifications.description")}
           </p>
         </header>
 
@@ -414,10 +442,10 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
                   />
                   <span className="min-w-0">
                     <span className="block text-sm font-semibold text-[var(--foreground)]">
-                      {field.label}
+                      {t(field.labelKey)}
                     </span>
                     <span className="mt-1 block text-xs leading-5 text-[var(--muted-foreground)]">
-                      {field.description}
+                      {t(field.descKey)}
                     </span>
                   </span>
                 </label>
@@ -427,42 +455,42 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
         </ul>
       </section>
 
-      <section className="denty-panel p-6 md:p-8">
+      <section className="denty-panel p-6 md:p-6">
         <header className="space-y-2">
-          <p className="denty-kicker">Account</p>
-          <h3 className="text-xl font-semibold text-[var(--foreground)] md:text-2xl">
-            Signed in as
+          <p className="denty-kicker">{t("settings.account")}</p>
+          <h3 className="text-xl font-semibold text-[var(--foreground)] md:text-xl">
+            {t("settings.account.signed_in")}
           </h3>
         </header>
 
         <dl className="mt-5 grid gap-3 sm:grid-cols-2">
           <div className="denty-subpanel p-4">
             <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-              Name
+              {t("settings.field.name")}
             </dt>
             <dd className="mt-2 text-sm font-semibold text-[var(--foreground)]">
-              {storedUser.name || "Not set"}
+              {storedUser.name || t("common.not_set")}
             </dd>
           </div>
           <div className="denty-subpanel p-4">
             <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-              Email
+              {t("settings.field.email")}
             </dt>
             <dd className="mt-2 text-sm font-semibold text-[var(--foreground)] break-all">
-              {storedUser.email || "Not set"}
+              {storedUser.email || t("common.not_set")}
             </dd>
           </div>
           <div className="denty-subpanel p-4">
             <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-              Phone
+              {t("settings.field.phone")}
             </dt>
             <dd className="mt-2 text-sm font-semibold text-[var(--foreground)]">
-              {storedUser.phone || "Not set"}
+              {storedUser.phone || t("common.not_set")}
             </dd>
           </div>
           <div className="denty-subpanel p-4">
             <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-              Role
+              {t("settings.field.role")}
             </dt>
             <dd className="mt-2 text-sm font-semibold text-[var(--foreground)]">
               {roleLabel}
@@ -471,10 +499,10 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
           {role === "doctor" ? (
             <div className="denty-subpanel p-4 sm:col-span-2">
               <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                Semester
+                {t("settings.field.semester")}
               </dt>
               <dd className="mt-2 text-sm font-semibold text-[var(--foreground)]">
-                {semesterLabel || "Not set"}
+                {semesterLabel || t("common.not_set")}
               </dd>
             </div>
           ) : null}
@@ -487,7 +515,7 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
               onClick={onEditProfile}
               className="denty-button-primary px-5 py-2.5 text-sm font-semibold"
             >
-              Edit profile
+              {t("settings.edit_profile")}
             </button>
           ) : null}
           <button
@@ -496,14 +524,16 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
             className="denty-button-secondary px-5 py-2.5 text-sm font-semibold"
             aria-expanded={passwordOpen}
           >
-            {passwordOpen ? "Cancel password change" : "Change password"}
+            {passwordOpen
+              ? t("settings.cancel_password")
+              : t("settings.change_password")}
           </button>
           <button
             type="button"
             onClick={handleLogout}
             className="denty-action denty-action-danger px-5 py-2.5 text-sm font-semibold"
           >
-            Log out
+            {t("settings.log_out")}
           </button>
         </div>
 
@@ -515,7 +545,7 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
             <div className="grid gap-3 sm:grid-cols-3">
               <label className="flex flex-col gap-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                  Current password
+                  {t("settings.current_password")}
                 </span>
                 <input
                   type="password"
@@ -528,7 +558,7 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
               </label>
               <label className="flex flex-col gap-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                  New password
+                  {t("settings.new_password")}
                 </span>
                 <input
                   type="password"
@@ -542,7 +572,7 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
               </label>
               <label className="flex flex-col gap-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                  Confirm new
+                  {t("settings.confirm_new")}
                 </span>
                 <input
                   type="password"
@@ -557,14 +587,16 @@ export function SettingsPanel({ role, onEditProfile }: SettingsPanelProps) {
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs text-[var(--muted-foreground)]">
-                Choose at least 8 characters. The change applies immediately.
+                {t("settings.password_hint")}
               </p>
               <button
                 type="submit"
                 disabled={submitting}
                 className="denty-button-primary px-5 py-2.5 text-sm font-semibold disabled:opacity-60"
               >
-                {submitting ? "Updating..." : "Update password"}
+                {submitting
+                  ? t("settings.updating")
+                  : t("settings.update_password")}
               </button>
             </div>
           </form>

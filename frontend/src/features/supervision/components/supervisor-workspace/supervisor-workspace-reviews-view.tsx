@@ -137,7 +137,7 @@ export function SupervisorWorkspaceReviewsView({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="denty-kicker">Reports</p>
-            <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               Report review lane
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)]">
@@ -337,7 +337,7 @@ export function SupervisorWorkspaceReviewsView({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="denty-kicker">Exams</p>
-            <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               Schedule and grade exams
             </h2>
           </div>

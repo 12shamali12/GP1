@@ -43,6 +43,11 @@ export function authHeaders(): Record<string, string> {
  * Clears every piece of client-side auth state. Caller is responsible for
  * navigation. Wipes both sessionStorage and localStorage because legacy code
  * (use-auth-portal) read currentUser from both.
+ *
+ * IMPORTANT: user-preference keys such as `denty-language`, `denty-theme`,
+ * and `denty-notifications-prefs` are intentionally LEFT IN PLACE on logout.
+ * They are device preferences, not session data, and the user should see the
+ * same language / theme on the auth screen after logging out.
  */
 export function logout(): void {
   if (!isBrowser) return;

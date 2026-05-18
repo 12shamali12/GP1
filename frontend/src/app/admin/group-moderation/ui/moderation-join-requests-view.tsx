@@ -18,7 +18,7 @@ export function ModerationJoinRequestsView({
     <div className="denty-panel-strong max-h-[48rem] overflow-hidden p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-semibold text-[var(--foreground)]">
+          <h2 className="text-xl font-semibold text-[var(--foreground)]">
             Join requests
           </h2>
           <p className="mt-2 text-sm text-[var(--muted-foreground)]">

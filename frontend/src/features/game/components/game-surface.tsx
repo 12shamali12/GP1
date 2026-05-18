@@ -18,25 +18,66 @@ import {
   type QuizAttemptResult,
   type QuizQuestion,
 } from "@/features/game/services/game-api";
+import { FlameStreak } from "@/features/game/components/flame-streak";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { ApiError } from "@/lib/api/http";
 import { useToast } from "@/features/ui/components/toast-provider";
 
-const panelInnerClass =
-  "overflow-hidden rounded-[32px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.16)] backdrop-blur-[24px] md:p-7";
+/* -------------------------------------------------------------------------- */
+/* Constants                                                                  */
+/* -------------------------------------------------------------------------- */
 
-const CATEGORY_LABEL: Record<string, string> = {
-  anatomy: "Anatomy",
-  caries: "Caries",
-  periodontics: "Periodontics",
-  endodontics: "Endodontics",
-  "oral-surgery": "Oral surgery",
-};
+const panelInnerClass =
+  "overflow-hidden rounded-[24px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.16)] backdrop-blur-[24px] md:p-5";
 
 /** Total seconds allowed per question. The backend enforces the cap too. */
 const QUESTION_SECONDS = 30;
 
 /** Recompute the countdown tick interval. */
-const COUNTDOWN_MS = 250;
+const COUNTDOWN_MS = 100;
+
+/**
+ * Each known quiz category gets a colour accent. The chip colour lights up
+ * the lobby preview AND the question card's left border during play, so the
+ * doctor builds an intuitive sense of "this is an anatomy question" before
+ * even reading it.
+ */
+const CATEGORY_STYLE: Record<
+  string,
+  { chip: string; border: string; key: string }
+> = {
+  anatomy: {
+    chip: "bg-[rgba(59,130,246,0.18)] text-[rgba(30,64,175,0.95)] border-[rgba(59,130,246,0.32)]",
+    border: "border-l-[rgba(59,130,246,0.85)]",
+    key: "game.cat.anatomy",
+  },
+  caries: {
+    chip: "bg-[rgba(239,68,68,0.16)] text-[rgba(153,27,27,0.95)] border-[rgba(239,68,68,0.3)]",
+    border: "border-l-[rgba(239,68,68,0.85)]",
+    key: "game.cat.caries",
+  },
+  periodontics: {
+    chip: "bg-[rgba(34,197,94,0.18)] text-[rgba(22,101,52,0.95)] border-[rgba(34,197,94,0.32)]",
+    border: "border-l-[rgba(34,197,94,0.85)]",
+    key: "game.cat.periodontics",
+  },
+  endodontics: {
+    chip: "bg-[rgba(168,85,247,0.18)] text-[rgba(107,33,168,0.95)] border-[rgba(168,85,247,0.32)]",
+    border: "border-l-[rgba(168,85,247,0.85)]",
+    key: "game.cat.endodontics",
+  },
+  "oral-surgery": {
+    chip: "bg-[rgba(249,115,22,0.18)] text-[rgba(154,52,18,0.95)] border-[rgba(249,115,22,0.32)]",
+    border: "border-l-[rgba(249,115,22,0.85)]",
+    key: "game.cat.oral-surgery",
+  },
+};
+
+const CATEGORY_KEYS = Object.keys(CATEGORY_STYLE);
+
+/* -------------------------------------------------------------------------- */
+/* Types                                                                      */
+/* -------------------------------------------------------------------------- */
 
 type QuizPhase =
   | { kind: "loading" }
@@ -52,6 +93,12 @@ type QuizPhase =
       selectedIndex: number | null;
       questionStartedAt: number;
       secondsLeft: number;
+      /**
+       * Tracks the "selected pulse" UI feedback — true for ~300ms after a
+       * click, so the option button can show a brief animation before we
+       * advance to the next question.
+       */
+      lockedAt: number | null;
     }
   | { kind: "submitting"; today: GameTodayStatus }
   | {
@@ -59,6 +106,19 @@ type QuizPhase =
       today: GameTodayStatus;
       result: QuizAttemptResult;
     };
+
+export type GameSurfaceProps = {
+  /**
+   * Optional callback — when supplied, the results screen renders a primary
+   * "View leaderboard" CTA that calls this. The doctor shell wires this to
+   * `setActiveSurface("leaderboard")`.
+   */
+  onViewLeaderboard?: () => void;
+};
+
+/* -------------------------------------------------------------------------- */
+/* Helpers                                                                    */
+/* -------------------------------------------------------------------------- */
 
 function formatAttemptDate(iso: string | undefined): string {
   if (!iso) return "";
@@ -78,12 +138,143 @@ function formatCountdown(ms: number): string {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
-function categoryLabel(category: string): string {
-  return CATEGORY_LABEL[category] ?? category;
+/** Tiny counter hook: animates from 0 to `target` over `duration` ms. */
+function useCountUp(target: number, duration = 800): number {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / duration);
+      // ease-out cubic for a satisfying decel
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(target * eased);
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target, duration]);
+  return value;
 }
 
-export function GameSurface() {
+/* -------------------------------------------------------------------------- */
+/* Sub-components                                                             */
+/* -------------------------------------------------------------------------- */
+
+/** Circular SVG countdown ring drawn around the question number. */
+function CountdownRing({
+  secondsLeft,
+  totalSeconds,
+  questionNumber,
+}: {
+  secondsLeft: number;
+  totalSeconds: number;
+  questionNumber: number;
+}) {
+  const pct = Math.max(0, Math.min(1, secondsLeft / totalSeconds));
+  const radius = 32;
+  const circumference = 2 * Math.PI * radius;
+  const dashOffset = circumference * (1 - pct);
+
+  // Colour shift: green > 20s, yellow 10-20s, red <10s
+  let stroke = "url(#ring-green)";
+  if (secondsLeft <= 10) stroke = "url(#ring-red)";
+  else if (secondsLeft <= 20) stroke = "url(#ring-yellow)";
+
+  const danger = secondsLeft <= 3;
+
+  return (
+    <div
+      className={`relative inline-flex h-20 w-20 items-center justify-center ${
+        danger ? "denty-shake" : ""
+      }`}
+    >
+      <svg className="h-20 w-20 -rotate-90" viewBox="0 0 80 80" aria-hidden="true">
+        <defs>
+          <linearGradient id="ring-green" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#34d399" />
+            <stop offset="100%" stopColor="#059669" />
+          </linearGradient>
+          <linearGradient id="ring-yellow" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#fde047" />
+            <stop offset="100%" stopColor="#eab308" />
+          </linearGradient>
+          <linearGradient id="ring-red" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f87171" />
+            <stop offset="100%" stopColor="#dc2626" />
+          </linearGradient>
+        </defs>
+        <circle
+          cx="40"
+          cy="40"
+          r={radius}
+          fill="none"
+          stroke="rgba(10,22,40,0.08)"
+          strokeWidth="6"
+        />
+        <circle
+          cx="40"
+          cy="40"
+          r={radius}
+          fill="none"
+          stroke={stroke}
+          strokeWidth="6"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={dashOffset}
+          style={{ transition: "stroke-dashoffset 100ms linear" }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-xl font-bold text-[var(--foreground)] tabular-nums">
+          {questionNumber}
+        </span>
+        <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.5)]">
+          {Math.ceil(secondsLeft)}s
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/** Six stars radiating from the score on the results screen. */
+function StarBurst() {
+  // Six stars at 60deg increments. CSS keyframes do the radiating motion.
+  return (
+    <div className="pointer-events-none absolute inset-0">
+      {[0, 60, 120, 180, 240, 300].map((rot, i) => (
+        <span
+          key={rot}
+          className="denty-burst-star"
+          style={
+            {
+              ["--burst-rot" as string]: `${rot}deg`,
+              animationDelay: `${i * 60}ms`,
+            } as React.CSSProperties
+          }
+        >
+          <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
+            <path
+              d="M12 2l2.6 6.5 7 .6-5.3 4.6 1.7 6.8L12 16.9 5.9 20.5l1.7-6.8L2.4 9.1l7-.6L12 2Z"
+              fill="#fbbf24"
+              stroke="#b45309"
+              strokeWidth="0.8"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Main surface                                                               */
+/* -------------------------------------------------------------------------- */
+
+export function GameSurface({ onViewLeaderboard }: GameSurfaceProps = {}) {
   const { pushToast } = useToast();
+  const t = useTranslation();
 
   const [phase, setPhase] = useState<QuizPhase>({ kind: "loading" });
   const [attempts, setAttempts] = useState<QuizAttempt[]>([]);
@@ -96,9 +287,9 @@ export function GameSurface() {
   // Daily reset countdown timer.
   const resetTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // ---------------------------------------------------------------------------
-  // Bootstrap
-  // ---------------------------------------------------------------------------
+  /* ------------------------------------------------------------------ */
+  /* Bootstrap                                                          */
+  /* ------------------------------------------------------------------ */
 
   const loadToday = useCallback(async () => {
     try {
@@ -135,9 +326,9 @@ export function GameSurface() {
     void refreshAttempts();
   }, [loadToday, refreshAttempts]);
 
-  // ---------------------------------------------------------------------------
-  // Daily-reset countdown (only meaningful when we have a `resetAt`)
-  // ---------------------------------------------------------------------------
+  /* ------------------------------------------------------------------ */
+  /* Daily-reset countdown                                              */
+  /* ------------------------------------------------------------------ */
 
   const resetAtIso = useMemo<string | null>(() => {
     if (phase.kind === "already-played" || phase.kind === "lobby") {
@@ -173,9 +364,9 @@ export function GameSurface() {
     };
   }, [resetAtIso]);
 
-  // ---------------------------------------------------------------------------
-  // Per-question timer
-  // ---------------------------------------------------------------------------
+  /* ------------------------------------------------------------------ */
+  /* Per-question timer                                                 */
+  /* ------------------------------------------------------------------ */
 
   const clearQuestionTimer = useCallback(() => {
     if (questionTimerRef.current) {
@@ -184,7 +375,6 @@ export function GameSurface() {
     }
   }, []);
 
-  // Always clean up on unmount.
   useEffect(() => clearQuestionTimer, [clearQuestionTimer]);
 
   /**
@@ -192,42 +382,40 @@ export function GameSurface() {
    * next question. When all 10 are recorded, transition into `submitting`
    * and post to the backend.
    */
-  const lockAnswer = useCallback(
-    (selectedIndex: number) => {
-      setPhase((prev) => {
-        if (prev.kind !== "playing") return prev;
-        const current = prev.questions[prev.currentIndex];
-        if (!current) return prev;
+  const lockAnswer = useCallback((selectedIndex: number) => {
+    setPhase((prev) => {
+      if (prev.kind !== "playing") return prev;
+      const current = prev.questions[prev.currentIndex];
+      if (!current) return prev;
 
-        const elapsed = Date.now() - prev.questionStartedAt;
-        const clampedMs = Math.min(
-          QUESTION_SECONDS * 1000,
-          Math.max(0, elapsed),
-        );
+      const elapsed = Date.now() - prev.questionStartedAt;
+      const clampedMs = Math.min(
+        QUESTION_SECONDS * 1000,
+        Math.max(0, elapsed),
+      );
 
-        const newAnswer: QuizAttemptAnswer = {
-          questionId: current.id,
-          selectedIndex,
-          timeMs: clampedMs,
-        };
-        const nextAnswers = [...prev.answers, newAnswer];
+      const newAnswer: QuizAttemptAnswer = {
+        questionId: current.id,
+        selectedIndex,
+        timeMs: clampedMs,
+      };
+      const nextAnswers = [...prev.answers, newAnswer];
 
-        if (nextAnswers.length >= prev.questions.length) {
-          return { kind: "submitting", today: prev.today };
-        }
+      if (nextAnswers.length >= prev.questions.length) {
+        return { kind: "submitting", today: prev.today };
+      }
 
-        return {
-          ...prev,
-          answers: nextAnswers,
-          currentIndex: prev.currentIndex + 1,
-          selectedIndex: null,
-          questionStartedAt: Date.now(),
-          secondsLeft: QUESTION_SECONDS,
-        };
-      });
-    },
-    [],
-  );
+      return {
+        ...prev,
+        answers: nextAnswers,
+        currentIndex: prev.currentIndex + 1,
+        selectedIndex: null,
+        questionStartedAt: Date.now(),
+        secondsLeft: QUESTION_SECONDS,
+        lockedAt: null,
+      };
+    });
+  }, []);
 
   // Run the countdown whenever we're playing.
   useEffect(() => {
@@ -243,9 +431,6 @@ export function GameSurface() {
         const elapsedMs = Date.now() - prev.questionStartedAt;
         const left = Math.max(0, QUESTION_SECONDS - elapsedMs / 1000);
         if (left <= 0) {
-          // Time expired -> count as a wrong answer.
-          // We schedule the lock via a microtask so we don't mutate inside
-          // setState directly; lockAnswer reads the latest state.
           queueMicrotask(() => lockAnswer(-1));
           return { ...prev, secondsLeft: 0 };
         }
@@ -254,7 +439,6 @@ export function GameSurface() {
     }, COUNTDOWN_MS);
 
     return clearQuestionTimer;
-    // We re-arm whenever the active question changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     phase.kind,
@@ -264,11 +448,10 @@ export function GameSurface() {
     lockAnswer,
   ]);
 
-  // ---------------------------------------------------------------------------
-  // Submit attempt when transitioning into `submitting`
-  // ---------------------------------------------------------------------------
+  /* ------------------------------------------------------------------ */
+  /* Submit attempt when transitioning into `submitting`                */
+  /* ------------------------------------------------------------------ */
 
-  // Stash the answers for the in-flight submission across the state transition.
   const pendingAnswersRef = useRef<QuizAttemptAnswer[] | null>(null);
 
   useEffect(() => {
@@ -315,12 +498,10 @@ export function GameSurface() {
         });
 
         if (e instanceof ApiError && e.status === 409) {
-          // Already played somewhere else (different tab) — refresh.
           void loadToday();
           return;
         }
 
-        // Soft fall-back: show the error state so the doctor isn't stuck.
         setPhase({ kind: "error", message });
       });
 
@@ -329,9 +510,9 @@ export function GameSurface() {
     };
   }, [phase, pushToast, refreshAttempts, loadToday]);
 
-  // ---------------------------------------------------------------------------
-  // Best-effort "leave page during quiz" guard
-  // ---------------------------------------------------------------------------
+  /* ------------------------------------------------------------------ */
+  /* Best-effort "leave page during quiz" guard                         */
+  /* ------------------------------------------------------------------ */
 
   useEffect(() => {
     if (phase.kind !== "playing") return;
@@ -343,9 +524,9 @@ export function GameSurface() {
     return () => window.removeEventListener("beforeunload", handler);
   }, [phase.kind]);
 
-  // ---------------------------------------------------------------------------
-  // Actions
-  // ---------------------------------------------------------------------------
+  /* ------------------------------------------------------------------ */
+  /* Actions                                                            */
+  /* ------------------------------------------------------------------ */
 
   const startQuiz = useCallback(async () => {
     if (phase.kind !== "lobby") return;
@@ -369,6 +550,7 @@ export function GameSurface() {
         selectedIndex: null,
         questionStartedAt: Date.now(),
         secondsLeft: QUESTION_SECONDS,
+        lockedAt: null,
       });
     } catch (e: unknown) {
       const message =
@@ -385,7 +567,6 @@ export function GameSurface() {
       });
 
       if (e instanceof ApiError && e.status === 409) {
-        // Backend says we've already played — re-sync.
         void loadToday();
         return;
       }
@@ -393,18 +574,32 @@ export function GameSurface() {
     }
   }, [phase, pushToast, loadToday]);
 
-  const submitSelection = useCallback(() => {
-    if (phase.kind !== "playing" || phase.selectedIndex === null) return;
-    lockAnswer(phase.selectedIndex);
-  }, [phase, lockAnswer]);
+  /**
+   * Click on an option: stash selection and trigger the 300ms "selected
+   * pulse" before locking in the answer. If the option matches what's
+   * already selected (and we're not mid-pulse) we treat the second click
+   * as confirm-and-advance.
+   */
+  const pickOption = useCallback(
+    (index: number) => {
+      setPhase((prev) => {
+        if (prev.kind !== "playing") return prev;
+        if (prev.lockedAt !== null) return prev;
+        return { ...prev, selectedIndex: index, lockedAt: Date.now() };
+      });
+      // Advance after the pulse settles.
+      window.setTimeout(() => lockAnswer(index), 320);
+    },
+    [lockAnswer],
+  );
 
   const backToToday = useCallback(() => {
     void loadToday();
   }, [loadToday]);
 
-  // ---------------------------------------------------------------------------
-  // Derived view-model
-  // ---------------------------------------------------------------------------
+  /* ------------------------------------------------------------------ */
+  /* Derived view-model                                                 */
+  /* ------------------------------------------------------------------ */
 
   const streakValue: number = useMemo(() => {
     if (phase.kind === "lobby" || phase.kind === "already-played") {
@@ -419,40 +614,46 @@ export function GameSurface() {
     return 0;
   }, [phase]);
 
-  // ---------------------------------------------------------------------------
-  // Render
-  // ---------------------------------------------------------------------------
+  /** Best score so far (across the doctor's attempt history). */
+  const bestAttempt = useMemo<QuizAttempt | null>(() => {
+    if (attempts.length === 0) return null;
+    let best = attempts[0];
+    for (const attempt of attempts) {
+      const a = attempt.total > 0 ? attempt.score / attempt.total : 0;
+      const b = best.total > 0 ? best.score / best.total : 0;
+      if (a > b) best = attempt;
+    }
+    return best;
+  }, [attempts]);
+
+  /* ------------------------------------------------------------------ */
+  /* Render                                                             */
+  /* ------------------------------------------------------------------ */
 
   return (
     <div className="space-y-5">
       <section className={panelInnerClass}>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="denty-kicker">Daily knowledge quiz</p>
-            <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
-              Toothy daily quiz
+            <p className="denty-kicker">{t("game.eyebrow")}</p>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              {t("game.title")}
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)]">
-              Ten timed questions, 30 seconds each. Server-scored. One run per
-              day per doctor — keep the streak going.
+              {t("game.description")}
             </p>
           </div>
-          {streakValue > 0 ? (
-            <span className="inline-flex items-center gap-2 rounded-full border border-[rgba(234,88,12,0.3)] bg-[rgba(254,215,170,0.4)] px-4 py-2 text-sm font-semibold text-[rgba(124,45,18,0.95)] shadow-[0_12px_28px_rgba(124,45,18,0.12)]">
-              <span aria-hidden>🔥</span>
-              <span>{streakValue}-day streak</span>
-            </span>
-          ) : null}
+          {streakValue > 0 ? <FlameStreak count={streakValue} size="md" /> : null}
         </div>
 
         {phase.kind === "loading" ? (
           <div className="mt-6 rounded-[20px] border border-white/12 bg-white/28 px-4 py-4 text-sm font-medium text-[rgba(10,22,40,0.74)]">
-            Loading today's quiz...
+            {t("game.loading")}
           </div>
         ) : null}
 
         {phase.kind === "error" ? (
-          <div className="mt-6 space-y-3">
+          <div className="mt-6 space-y-3 denty-card-in">
             <p className="rounded-[20px] border border-rose-400/30 bg-rose-100/40 px-4 py-3 text-sm text-rose-900">
               {phase.message}
             </p>
@@ -461,227 +662,60 @@ export function GameSurface() {
               onClick={backToToday}
               className="inline-flex min-h-[2.75rem] cursor-pointer items-center justify-center rounded-[16px] border border-white/14 bg-white/30 px-5 py-2 text-sm font-semibold text-[rgba(10,22,40,0.78)] transition hover:bg-white/45"
             >
-              Try again
+              {t("common.try_again")}
             </button>
           </div>
         ) : null}
 
         {phase.kind === "already-played" ? (
-          <div className="mt-6 space-y-5">
-            {phase.today.todayScore ? (
-              <div className="rounded-[24px] border border-[rgba(7,111,133,0.18)] bg-[linear-gradient(180deg,rgba(176,224,238,0.55),rgba(154,206,224,0.32))] px-5 py-5 shadow-[0_18px_42px_rgba(7,18,34,0.1)]">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgba(6,83,98,0.78)]">
-                  Today's run
-                </p>
-                <p className="mt-2 text-3xl font-semibold text-[var(--foreground)]">
-                  {phase.today.todayScore.score} / {phase.today.todayScore.total}
-                </p>
-                <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Earned {phase.today.todayScore.pointsEarned.toFixed(1)}{" "}
-                  leaderboard points · finished{" "}
-                  {formatAttemptDate(phase.today.todayScore.completedAt)}.
-                </p>
-              </div>
-            ) : (
-              <div className="rounded-[20px] border border-white/12 bg-white/28 px-4 py-4 text-sm font-medium text-[rgba(10,22,40,0.74)]">
-                You've already played today.
-              </div>
-            )}
-
-            <div className="rounded-[20px] border border-white/12 bg-white/24 px-5 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgba(10,22,40,0.58)]">
-                Next quiz unlocks in
-              </p>
-              <p className="mt-2 font-mono text-2xl font-semibold text-[var(--foreground)]">
-                {formatCountdown(resetIn)}
-              </p>
-            </div>
-          </div>
+          <AlreadyPlayedView
+            today={phase.today}
+            resetIn={resetIn}
+            attempts={attempts}
+            streakValue={streakValue}
+          />
         ) : null}
 
         {phase.kind === "lobby" ? (
-          <div className="mt-6 space-y-5">
-            <div className="rounded-[24px] border border-white/12 bg-white/24 px-5 py-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgba(10,22,40,0.58)]">
-                Today's challenge
-              </p>
-              <p className="mt-2 text-base font-semibold text-[var(--foreground)]">
-                10 questions · 30 seconds each
-              </p>
-              <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-                Once you start, you can't pause. Wrong answer if the timer
-                expires.
-              </p>
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={() => void startQuiz()}
-                className="inline-flex min-h-[3rem] cursor-pointer items-center justify-center rounded-[18px] border border-[rgba(137,219,255,0.28)] bg-[linear-gradient(135deg,rgba(12,32,54,0.95),rgba(9,68,94,0.92))] px-6 py-3 text-sm font-semibold text-white shadow-[0_24px_52px_rgba(6,17,34,0.28)] transition hover:brightness-110"
-              >
-                Play today's quiz
-              </button>
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.58)]">
-                Server-scored | one attempt per day
-              </span>
-            </div>
-          </div>
+          <LobbyView
+            today={phase.today}
+            streakValue={streakValue}
+            bestAttempt={bestAttempt}
+            onStart={() => void startQuiz()}
+          />
         ) : null}
 
-        {phase.kind === "playing"
-          ? (() => {
-              const question = phase.questions[phase.currentIndex];
-              if (!question) return null;
-              const total = phase.questions.length;
-              const completed = phase.answers.length;
-              const progressPct = (completed / total) * 100;
-              const seconds = Math.ceil(phase.secondsLeft);
-              const inDanger = seconds <= 5;
-              const timerPct = (phase.secondsLeft / QUESTION_SECONDS) * 100;
-
-              return (
-                <div className="mt-6 space-y-5">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <span className="rounded-full border border-white/20 bg-white/26 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[rgba(10,22,40,0.62)]">
-                      Q {phase.currentIndex + 1} / {total}
-                    </span>
-                    <span className="rounded-full border border-[rgba(7,111,133,0.16)] bg-[rgba(7,111,133,0.1)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-[rgba(6,83,98,0.96)]">
-                      {categoryLabel(question.category)}
-                    </span>
-                  </div>
-
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-white/30">
-                    <div
-                      className="h-full rounded-full bg-[linear-gradient(135deg,rgba(12,32,54,0.95),rgba(9,68,94,0.92))] transition-all duration-500 ease-out"
-                      style={{ width: `${progressPct}%` }}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgba(10,22,40,0.58)]">
-                        Time left
-                      </span>
-                      <span
-                        className={`font-mono text-2xl font-semibold ${
-                          inDanger
-                            ? "text-rose-600"
-                            : "text-[var(--foreground)]"
-                        }`}
-                      >
-                        {seconds}s
-                      </span>
-                    </div>
-                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/30">
-                      <div
-                        className={`h-full rounded-full transition-all duration-300 ease-out ${
-                          inDanger
-                            ? "bg-rose-500"
-                            : "bg-[linear-gradient(135deg,rgba(12,32,54,0.95),rgba(9,68,94,0.92))]"
-                        }`}
-                        style={{ width: `${timerPct}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  <p className="text-xl font-semibold leading-8 text-[var(--foreground)]">
-                    {question.prompt}
-                  </p>
-
-                  <div className="grid gap-3 md:grid-cols-2">
-                    {question.options.map((option, index) => {
-                      const isSelected = phase.selectedIndex === index;
-                      return (
-                        <button
-                          key={`${question.id}-${index}`}
-                          type="button"
-                          onClick={() =>
-                            setPhase((prev) =>
-                              prev.kind === "playing"
-                                ? { ...prev, selectedIndex: index }
-                                : prev,
-                            )
-                          }
-                          className={`rounded-[20px] border px-4 py-3 text-left text-sm font-medium transition ${
-                            isSelected
-                              ? "border-[rgba(7,111,133,0.5)] bg-[linear-gradient(180deg,rgba(176,224,238,0.6),rgba(154,206,224,0.32))] text-[rgba(6,83,98,0.96)] shadow-[0_18px_42px_rgba(7,18,34,0.12)]"
-                              : "border-white/12 bg-white/28 text-[rgba(10,22,40,0.82)] hover:bg-white/42"
-                          }`}
-                        >
-                          <span className="mr-2 text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.48)]">
-                            {String.fromCharCode(65 + index)}
-                          </span>
-                          {option}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={submitSelection}
-                      disabled={phase.selectedIndex === null}
-                      className="inline-flex min-h-[3rem] cursor-pointer items-center justify-center rounded-[18px] border border-[rgba(137,219,255,0.28)] bg-[linear-gradient(135deg,rgba(12,32,54,0.95),rgba(9,68,94,0.92))] px-6 py-3 text-sm font-semibold text-white shadow-[0_24px_52px_rgba(6,17,34,0.28)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
-                    >
-                      {phase.currentIndex + 1 === total
-                        ? "Finish quiz"
-                        : "Lock answer"}
-                    </button>
-                  </div>
-                </div>
-              );
-            })()
-          : null}
+        {phase.kind === "playing" ? (
+          <PlayingView
+            phase={phase}
+            onPick={pickOption}
+          />
+        ) : null}
 
         {phase.kind === "submitting" ? (
-          <div className="mt-6 rounded-[20px] border border-white/12 bg-white/28 px-4 py-4 text-sm font-medium text-[rgba(10,22,40,0.74)]">
-            Submitting your attempt to the server...
+          <div className="mt-6 rounded-[20px] border border-white/12 bg-white/28 px-4 py-4 text-sm font-medium text-[rgba(10,22,40,0.74)] denty-card-in">
+            {t("game.submitting")}
           </div>
         ) : null}
 
         {phase.kind === "results" ? (
-          <div className="mt-6 space-y-4">
-            <div className="rounded-[24px] border border-[rgba(7,111,133,0.18)] bg-[linear-gradient(180deg,rgba(176,224,238,0.55),rgba(154,206,224,0.32))] px-5 py-5 shadow-[0_18px_42px_rgba(7,18,34,0.1)]">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgba(6,83,98,0.78)]">
-                Result
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-[var(--foreground)]">
-                You scored {phase.result.score} / {phase.result.total}
-              </p>
-              <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                Earned {phase.result.pointsEarned.toFixed(1)} leaderboard
-                points from this attempt.
-              </p>
-              <p className="mt-1 text-sm leading-7 text-[var(--muted-foreground)]">
-                New streak: <span aria-hidden>🔥</span>{" "}
-                {phase.result.streak}-day streak.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={backToToday}
-                className="inline-flex min-h-[3rem] cursor-pointer items-center justify-center rounded-[18px] border border-[rgba(137,219,255,0.28)] bg-[linear-gradient(135deg,rgba(12,32,54,0.95),rgba(9,68,94,0.92))] px-6 py-3 text-sm font-semibold text-white shadow-[0_24px_52px_rgba(6,17,34,0.28)] transition hover:brightness-110"
-              >
-                Back to today
-              </button>
-            </div>
-          </div>
+          <ResultsView
+            result={phase.result}
+            onBack={backToToday}
+            onViewLeaderboard={onViewLeaderboard}
+          />
         ) : null}
       </section>
 
       <section className={panelInnerClass}>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="denty-kicker">Recent attempts</p>
-            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-              Your last quizzes
+            <p className="denty-kicker">{t("game.recent_attempts")}</p>
+            <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
+              {t("game.recent_attempts.title")}
             </h2>
             <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-              The server stores every attempt and uses them to compute your
-              leaderboard standing.
+              {t("game.recent_attempts.description")}
             </p>
           </div>
           <button
@@ -690,7 +724,7 @@ export function GameSurface() {
             disabled={attemptsLoading}
             className="inline-flex min-h-[2.5rem] cursor-pointer items-center justify-center rounded-[16px] border border-white/14 bg-white/30 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.7)] transition hover:bg-white/45 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {attemptsLoading ? "Refreshing..." : "Refresh"}
+            {attemptsLoading ? t("common.refreshing") : t("common.refresh")}
           </button>
         </div>
 
@@ -700,10 +734,38 @@ export function GameSurface() {
           </p>
         ) : null}
 
+        {/* Sparkline-style score timeline */}
+        {attempts.length > 0 ? (
+          <div className="mt-4 rounded-[20px] border border-white/12 bg-white/20 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgba(10,22,40,0.58)]">
+              {t("game.history_visual")}
+            </p>
+            <div className="mt-3 flex h-20 items-end gap-1.5">
+              {[...attempts].reverse().slice(-14).map((attempt, idx) => {
+                const ratio =
+                  attempt.total > 0 ? attempt.score / attempt.total : 0;
+                const height = Math.max(8, Math.round(ratio * 100));
+                return (
+                  <div
+                    key={attempt.id ?? idx}
+                    className="group relative flex-1"
+                    title={`${attempt.score}/${attempt.total}`}
+                  >
+                    <div
+                      className="w-full rounded-t-md bg-[linear-gradient(180deg,rgba(12,32,54,0.95),rgba(9,68,94,0.92))] transition-all"
+                      style={{ height: `${height}%` }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+
         <div className="mt-4 space-y-3">
           {attempts.length === 0 && !attemptsLoading ? (
             <p className="rounded-[20px] border border-dashed border-white/20 bg-white/14 px-4 py-3 text-sm text-[var(--muted-foreground)]">
-              No attempts yet. Play a round to populate your history.
+              {t("game.no_attempts")}
             </p>
           ) : null}
 
@@ -727,7 +789,7 @@ export function GameSurface() {
                     </p>
                     {typeof attempt.pointsEarned === "number" ? (
                       <p className="mt-1 text-xs font-medium text-[var(--muted-foreground)]">
-                        +{attempt.pointsEarned.toFixed(1)} leaderboard points
+                        +{attempt.pointsEarned.toFixed(1)} {t("game.points_suffix")}
                       </p>
                     ) : null}
                   </div>
@@ -740,6 +802,374 @@ export function GameSurface() {
           })}
         </div>
       </section>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Lobby view                                                                 */
+/* -------------------------------------------------------------------------- */
+
+function LobbyView({
+  today,
+  streakValue,
+  bestAttempt,
+  onStart,
+}: {
+  today: GameTodayStatus;
+  streakValue: number;
+  bestAttempt: QuizAttempt | null;
+  onStart: () => void;
+}) {
+  const t = useTranslation();
+
+  return (
+    <div className="mt-6 space-y-6 denty-card-in">
+      {/* Centerpiece: streak + best score */}
+      <div className="rounded-[26px] border border-white/14 bg-[linear-gradient(180deg,rgba(255,255,255,0.55),rgba(222,233,241,0.25))] p-6 text-center shadow-[0_24px_56px_rgba(7,18,34,0.1)]">
+        <p className="denty-kicker">{t("game.todays_challenge")}</p>
+        <p className="mt-2 text-base font-semibold text-[var(--foreground)]">
+          {t("game.challenge_summary")}
+        </p>
+        <p className="mt-1 text-sm text-[var(--muted-foreground)]">
+          {t("game.challenge_hint")}
+        </p>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          {streakValue > 0 ? (
+            <FlameStreak count={streakValue} size="lg" />
+          ) : null}
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/24 bg-white/40 px-5 py-3 text-sm font-semibold text-[rgba(10,22,40,0.78)]">
+            <span aria-hidden>⭐</span>
+            <span>
+              {bestAttempt
+                ? t("game.your_best", {
+                    score: bestAttempt.score,
+                    total: bestAttempt.total,
+                  })
+                : t("game.no_best_yet")}
+            </span>
+          </span>
+        </div>
+      </div>
+
+      {/* Category preview chips */}
+      <div className="rounded-[22px] border border-white/12 bg-white/22 p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgba(10,22,40,0.6)]">
+          {t("game.category_preview")}
+        </p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {CATEGORY_KEYS.map((key) => {
+            const style = CATEGORY_STYLE[key];
+            return (
+              <span
+                key={key}
+                className={`inline-flex items-center rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] shadow-sm transition hover:-translate-y-[1px] hover:shadow-md ${style.chip}`}
+              >
+                {t(style.key)}
+              </span>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Big start button */}
+      <div className="flex flex-col items-center gap-3">
+        <button
+          type="button"
+          onClick={onStart}
+          disabled={!today.canPlay}
+          className="group inline-flex h-16 w-full max-w-md cursor-pointer items-center justify-center gap-3 rounded-[20px] border border-[rgba(137,219,255,0.32)] bg-[linear-gradient(135deg,rgba(12,32,54,0.96),rgba(9,68,94,0.92))] px-6 text-base font-bold uppercase tracking-[0.16em] text-white shadow-[0_24px_52px_rgba(6,17,34,0.32)] transition-all duration-200 hover:scale-[1.02] hover:shadow-[0_28px_64px_rgba(6,17,34,0.42),0_0_24px_rgba(56,189,248,0.35)] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-none"
+        >
+          <span>{t("game.start_button")}</span>
+          <svg
+            viewBox="0 0 24 24"
+            className="h-5 w-5 transition-transform group-hover:translate-x-1"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M9 6l6 6-6 6"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </button>
+        <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[rgba(10,22,40,0.55)]">
+          {t("game.server_scored")}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Playing view                                                               */
+/* -------------------------------------------------------------------------- */
+
+function PlayingView({
+  phase,
+  onPick,
+}: {
+  phase: Extract<QuizPhase, { kind: "playing" }>;
+  onPick: (index: number) => void;
+}) {
+  const t = useTranslation();
+  const question = phase.questions[phase.currentIndex];
+  if (!question) return null;
+
+  const total = phase.questions.length;
+  const completed = phase.answers.length;
+  const progressPct = ((completed + (phase.lockedAt !== null ? 1 : 0)) / total) * 100;
+  const style = CATEGORY_STYLE[question.category] ?? {
+    chip: "bg-white/30 text-[rgba(10,22,40,0.7)] border-white/20",
+    border: "border-l-[rgba(10,22,40,0.4)]",
+    key: question.category,
+  };
+
+  return (
+    // Keyed on `currentIndex` so React fully remounts the card → CSS keyframe
+    // re-runs and we get a clean fade-in between questions.
+    <div
+      key={phase.currentIndex}
+      className="mt-6 space-y-5 denty-card-in"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <CountdownRing
+            secondsLeft={phase.secondsLeft}
+            totalSeconds={QUESTION_SECONDS}
+            questionNumber={phase.currentIndex + 1}
+          />
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[rgba(10,22,40,0.5)]">
+              {t("game.question_of", {
+                n: phase.currentIndex + 1,
+                total,
+              })}
+            </p>
+            <p className="mt-0.5 text-sm font-semibold text-[var(--foreground)]">
+              {t("game.time_left")}
+            </p>
+          </div>
+        </div>
+        <span
+          className={`inline-flex items-center rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] ${style.chip}`}
+        >
+          {t(style.key)}
+        </span>
+      </div>
+
+      {/* Progress bar */}
+      <div className="h-2 w-full overflow-hidden rounded-full bg-white/30">
+        <div
+          className="h-full rounded-full bg-[linear-gradient(135deg,rgba(12,32,54,0.95),rgba(9,68,94,0.92))] transition-all duration-500 ease-out"
+          style={{ width: `${progressPct}%` }}
+        />
+      </div>
+
+      {/* Question card with category-coloured left border */}
+      <div
+        className={`rounded-[20px] border border-white/14 ${style.border} border-l-[6px] bg-[linear-gradient(180deg,rgba(255,255,255,0.6),rgba(222,233,241,0.22))] p-5 shadow-[0_18px_42px_rgba(7,18,34,0.1)]`}
+      >
+        <p className="text-xl font-semibold leading-8 text-[var(--foreground)]">
+          {question.prompt}
+        </p>
+      </div>
+
+      {/* Option grid */}
+      <div className="grid gap-3 md:grid-cols-2">
+        {question.options.map((option, index) => {
+          const isSelected = phase.selectedIndex === index;
+          const isPulsing = isSelected && phase.lockedAt !== null;
+          const locked = phase.lockedAt !== null;
+          return (
+            <button
+              key={`${question.id}-${index}`}
+              type="button"
+              disabled={locked}
+              onClick={() => onPick(index)}
+              className={`group flex h-14 w-full items-center gap-3 rounded-[18px] border px-4 text-left text-sm font-medium transition-all duration-200 ${
+                isSelected
+                  ? "border-[rgba(7,111,133,0.6)] bg-[linear-gradient(180deg,rgba(176,224,238,0.7),rgba(154,206,224,0.4))] text-[rgba(6,83,98,0.96)] shadow-[0_18px_42px_rgba(7,18,34,0.18)]"
+                  : "border-white/14 bg-white/30 text-[rgba(10,22,40,0.84)] hover:-translate-y-[2px] hover:bg-white/48 hover:shadow-[0_16px_36px_rgba(7,18,34,0.14)]"
+              } ${isPulsing ? "denty-option-pulse" : ""} ${
+                locked && !isSelected ? "opacity-50" : ""
+              } disabled:cursor-not-allowed`}
+            >
+              <span
+                className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold tracking-wide ${
+                  isSelected
+                    ? "bg-[rgba(6,83,98,0.95)] text-white"
+                    : "bg-white/40 text-[rgba(10,22,40,0.7)] group-hover:bg-white/60"
+                }`}
+              >
+                {String.fromCharCode(65 + index)}
+              </span>
+              <span className="flex-1">{option}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Results view                                                               */
+/* -------------------------------------------------------------------------- */
+
+function ResultsView({
+  result,
+  onBack,
+  onViewLeaderboard,
+}: {
+  result: QuizAttemptResult;
+  onBack: () => void;
+  onViewLeaderboard?: () => void;
+}) {
+  const t = useTranslation();
+  const points = useCountUp(result.pointsEarned, 800);
+
+  return (
+    <div className="mt-6 space-y-5 denty-card-in">
+      <div className="relative overflow-hidden rounded-[28px] border border-[rgba(7,111,133,0.18)] bg-[linear-gradient(180deg,rgba(176,224,238,0.55),rgba(154,206,224,0.32))] p-8 text-center shadow-[0_24px_56px_rgba(7,18,34,0.12)]">
+        <StarBurst />
+        <p className="denty-kicker relative">{t("game.result")}</p>
+        <p className="relative mt-4 font-bold leading-none text-[var(--foreground)]">
+          <span className="text-7xl tabular-nums">{result.score}</span>
+          <span className="mx-1 text-3xl text-[rgba(10,22,40,0.4)]">/</span>
+          <span className="text-4xl tabular-nums text-[rgba(10,22,40,0.65)]">
+            {result.total}
+          </span>
+        </p>
+        <p className="relative mt-4 text-base font-semibold text-[rgba(6,83,98,0.95)]">
+          {t("game.points_earned_animated")}{" "}
+          <span className="text-xl text-[var(--foreground)] tabular-nums">
+            +{points.toFixed(1)}
+          </span>{" "}
+          {t("game.points_unit")}
+        </p>
+        <div className="relative mt-5 flex justify-center">
+          <FlameStreak count={result.streak} size="md" />
+        </div>
+      </div>
+
+      <div className="flex flex-wrap justify-end gap-3">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex min-h-[3rem] cursor-pointer items-center justify-center rounded-[18px] border border-white/16 bg-white/35 px-6 py-3 text-sm font-semibold text-[rgba(10,22,40,0.8)] transition hover:bg-white/55"
+        >
+          {t("game.back_to_lobby")}
+        </button>
+        {onViewLeaderboard ? (
+          <button
+            type="button"
+            onClick={onViewLeaderboard}
+            className="inline-flex min-h-[3rem] cursor-pointer items-center justify-center rounded-[18px] border border-[rgba(137,219,255,0.28)] bg-[linear-gradient(135deg,rgba(12,32,54,0.95),rgba(9,68,94,0.92))] px-6 py-3 text-sm font-semibold text-white shadow-[0_24px_52px_rgba(6,17,34,0.28)] transition hover:brightness-110"
+          >
+            {t("game.view_leaderboard")}
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Already-played view                                                        */
+/* -------------------------------------------------------------------------- */
+
+function AlreadyPlayedView({
+  today,
+  resetIn,
+  attempts,
+  streakValue,
+}: {
+  today: GameTodayStatus;
+  resetIn: number;
+  attempts: QuizAttempt[];
+  streakValue: number;
+}) {
+  const t = useTranslation();
+
+  return (
+    <div className="mt-6 space-y-5 denty-card-in">
+      {/* Calm "come back tomorrow" centerpiece */}
+      <div className="rounded-[26px] border border-white/16 bg-[linear-gradient(180deg,rgba(248,250,252,0.66),rgba(226,232,240,0.32))] p-7 text-center shadow-[0_20px_48px_rgba(7,18,34,0.08)]">
+        <div className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full bg-white/55 text-[rgba(10,22,40,0.7)] shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+          <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" aria-hidden="true">
+            <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.6" />
+            <path
+              d="M12 7v5l3 2"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
+          </svg>
+        </div>
+        <p className="mt-4 text-lg font-semibold text-[var(--foreground)]">
+          {t("game.come_back_tomorrow")}
+        </p>
+        <p className="mt-1 text-xs font-semibold uppercase tracking-[0.22em] text-[rgba(10,22,40,0.55)]">
+          {t("game.next_quiz_in")}
+        </p>
+        <p className="mt-3 font-mono text-3xl font-bold tabular-nums text-[var(--foreground)]">
+          {formatCountdown(resetIn)}
+        </p>
+        {streakValue > 0 ? (
+          <div className="mt-5 flex justify-center">
+            <FlameStreak count={streakValue} size="md" />
+          </div>
+        ) : null}
+      </div>
+
+      {today.todayScore ? (
+        <div className="rounded-[22px] border border-[rgba(7,111,133,0.18)] bg-[linear-gradient(180deg,rgba(176,224,238,0.42),rgba(154,206,224,0.25))] p-5 shadow-[0_14px_32px_rgba(7,18,34,0.08)]">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgba(6,83,98,0.78)]">
+            {t("game.todays_recap")}
+          </p>
+          <p className="mt-2 text-2xl font-semibold text-[var(--foreground)]">
+            {today.todayScore.score} / {today.todayScore.total}
+          </p>
+          <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
+            {t("game.points_earned_today", {
+              points: today.todayScore.pointsEarned.toFixed(1),
+              when: formatAttemptDate(today.todayScore.completedAt),
+            })}
+          </p>
+        </div>
+      ) : null}
+
+      {/* Mini sparkline of last attempts even on already-played day */}
+      {attempts.length > 0 ? (
+        <div className="rounded-[20px] border border-white/12 bg-white/20 p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[rgba(10,22,40,0.58)]">
+            {t("game.history_visual")}
+          </p>
+          <div className="mt-3 flex h-16 items-end gap-1.5">
+            {[...attempts].reverse().slice(-14).map((attempt, idx) => {
+              const ratio =
+                attempt.total > 0 ? attempt.score / attempt.total : 0;
+              const height = Math.max(8, Math.round(ratio * 100));
+              return (
+                <div
+                  key={attempt.id ?? idx}
+                  className="flex-1"
+                  title={`${attempt.score}/${attempt.total}`}
+                >
+                  <div
+                    className="w-full rounded-t-md bg-[linear-gradient(180deg,rgba(12,32,54,0.92),rgba(9,68,94,0.88))]"
+                    style={{ height: `${height}%` }}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

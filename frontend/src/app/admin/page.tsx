@@ -15,10 +15,10 @@ import type {
 } from "@/features/admin/types/admin";
 
 const panelClass =
-  "overflow-hidden rounded-[32px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.76),rgba(225,234,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.14)] backdrop-blur-[24px] md:p-7";
+  "overflow-hidden rounded-[24px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.76),rgba(225,234,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.14)] backdrop-blur-[24px] md:p-5";
 
 const softCardClass =
-  "rounded-[26px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.52),rgba(232,240,246,0.22))] p-5 shadow-[0_20px_50px_rgba(7,18,34,0.1)] backdrop-blur-[22px]";
+  "rounded-[20px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.52),rgba(232,240,246,0.22))] p-5 shadow-[0_20px_50px_rgba(7,18,34,0.1)] backdrop-blur-[22px]";
 
 type AdminLaneCard = {
   href: string;
@@ -123,7 +123,7 @@ export default function AdminPage() {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="denty-kicker">Queue</p>
-              <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)] md:text-4xl">
+              <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)] md:text-xl">
                 All pending requests
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)] md:text-base">
@@ -135,7 +135,7 @@ export default function AdminPage() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/62">
                 Total pending
               </p>
-              <p className="mt-3 text-4xl font-semibold">{pendingTotal}</p>
+              <p className="mt-3 text-2xl font-semibold">{pendingTotal}</p>
             </div>
           </div>
 
@@ -145,7 +145,7 @@ export default function AdminPage() {
             <div className="mt-6 grid gap-4 md:grid-cols-3">
               <div className={softCardClass}>
                 <p className="denty-kicker !tracking-[0.18em]">Supervisor queue</p>
-                <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {pendingSupervisor}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">
@@ -155,7 +155,7 @@ export default function AdminPage() {
 
               <div className={softCardClass}>
                 <p className="denty-kicker !tracking-[0.18em]">Doctor queue</p>
-                <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {pendingDoctor}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">
@@ -165,7 +165,7 @@ export default function AdminPage() {
 
               <div className={softCardClass}>
                 <p className="denty-kicker !tracking-[0.18em]">Blocked users</p>
-                <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {blockedUsers}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">
@@ -178,7 +178,7 @@ export default function AdminPage() {
 
         <div className={panelClass}>
           <p className="denty-kicker">Accounts</p>
-          <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+          <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
             Platform users
           </h2>
           <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
@@ -191,25 +191,25 @@ export default function AdminPage() {
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <div className={softCardClass}>
                 <p className="denty-kicker !tracking-[0.18em]">Doctors</p>
-                <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {doctorCount}
                 </p>
               </div>
               <div className={softCardClass}>
                 <p className="denty-kicker !tracking-[0.18em]">Supervisors</p>
-                <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {supervisorCount}
                 </p>
               </div>
               <div className={softCardClass}>
                 <p className="denty-kicker !tracking-[0.18em]">Patients</p>
-                <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {patientCount}
                 </p>
               </div>
               <div className={softCardClass}>
                 <p className="denty-kicker !tracking-[0.18em]">All accounts</p>
-                <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {visibleUsers.length}
                 </p>
               </div>
@@ -218,7 +218,7 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2 2xl:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
         {cards.map((card) => (
           <Link
             key={card.href}
@@ -228,7 +228,7 @@ export default function AdminPage() {
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="denty-kicker">{card.eyebrow}</p>
-                <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {card.title}
                 </h2>
               </div>

@@ -41,7 +41,7 @@ export function UsersRoleSections({
             >
               <div>
                 <p className="denty-kicker !tracking-[0.18em]">{group.label}</p>
-                <p className="mt-2 text-2xl font-semibold text-[var(--foreground)]">
+                <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                   {group.count} accounts
                 </p>
               </div>

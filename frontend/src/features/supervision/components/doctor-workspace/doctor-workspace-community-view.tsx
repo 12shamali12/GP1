@@ -25,7 +25,7 @@ export function DoctorWorkspaceCommunityView({
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="denty-kicker">Group identity</p>
-            <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Group overview</h3>
+            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Group overview</h3>
           </div>
           {workspace?.groupMembership?.group ? (
             <span className="denty-pill">{workspace.groupMembership.group.members.length} students</span>
@@ -34,7 +34,7 @@ export function DoctorWorkspaceCommunityView({
         {workspace?.groupMembership?.group ? (
           <div className="mt-5 space-y-4">
             <div className="denty-dashboard-card p-5">
-              <p className="text-2xl font-semibold text-[var(--foreground)]">{workspace.groupMembership.group.name}</p>
+              <p className="text-xl font-semibold text-[var(--foreground)]">{workspace.groupMembership.group.name}</p>
               <p className="mt-2 text-sm text-[var(--muted-foreground)]">{workspace.groupMembership.group.semesterLabel}</p>
               {workspace.groupMembership.group.description ? (
                 <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">{workspace.groupMembership.group.description}</p>
@@ -63,11 +63,11 @@ export function DoctorWorkspaceCommunityView({
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="denty-kicker">Publishing lane</p>
-                <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Share to the group feed</h3>
+                <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Share to the group feed</h3>
               </div>
               <span className="denty-pill">Social feed</span>
             </div>
-            <div className="mt-5 rounded-[30px] border border-white/12 bg-white/34 p-5">
+            <div className="mt-5 rounded-[22px] border border-white/12 bg-white/34 p-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/12 bg-[rgba(10,22,40,0.08)] text-lg font-semibold text-[var(--foreground)]">
                   {(workspace.doctor.name || "D").charAt(0).toUpperCase()}
@@ -102,7 +102,7 @@ export function DoctorWorkspaceCommunityView({
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <p className="denty-kicker">Feed</p>
-              <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Student posts</h3>
+              <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Student posts</h3>
             </div>
             <span className="denty-pill">{workspace?.feed.length || 0} posts</span>
           </div>

@@ -40,6 +40,7 @@ import type { LeaderboardSnapshot } from "@/features/admin/types/admin";
 import { usePublicProfile } from "@/features/profiles/hooks/use-public-profile";
 import { SettingsPanel } from "@/features/settings/components/settings-panel";
 import { ComingSoonModal } from "@/features/ui/components/coming-soon-modal";
+import { RoleShellLayout } from "@/features/ui/components/role-shell-layout";
 import type { DoctorWorkspaceData } from "@/features/supervision/types";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 import { useToast } from "@/features/ui/components/toast-provider";
@@ -521,7 +522,7 @@ export default function DoctorPage() {
 
   return (
     <>
-      <main className="denty-screen admin-suite-screen relative px-4 py-5 lg:pl-0 lg:pr-5 lg:py-6">
+      <main className="denty-screen admin-suite-screen relative px-3 py-3 sm:px-4 sm:py-4 lg:pl-0 lg:pr-5 lg:py-6">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(95,113,132,0.28),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(18,30,47,0.24),transparent_34%)]" />
           <div className="frozen-float absolute left-[8%] top-[12%] h-40 w-40 rounded-full bg-[rgba(95,113,132,0.22)] blur-3xl" />
@@ -535,26 +536,33 @@ export default function DoctorPage() {
           />
         </div>
 
-        <div className="denty-shell denty-dashboard-layout relative mx-0 max-w-none space-y-6 lg:space-y-0">
-          <DoctorSideRail
-            userName={user.name || "Doctor"}
-            activeView={activeSurface}
-            unreadNotifications={unreadNotifications}
-            chatUnreadCount={chatUnreadCount}
-            streakCount={gameStreak}
-            onOverview={() => setActiveSurface("overview")}
-            onProfile={() => setActiveSurface("profile")}
-            onNotifications={() => setActiveSurface("notifications")}
-            onApprovals={() => setActiveSurface("approvals")}
-            onReport={() => setActiveSurface("report")}
-            onChat={() => setActiveSurface("chat")}
-            onGame={() => setActiveSurface("game")}
-            onLeaderboard={() => setActiveSurface("leaderboard")}
-            onSettings={() => setActiveSurface("settings")}
-            onComingSoon={setComingSoon}
-          />
-
-          <section className="min-w-0 space-y-5">
+        <div className="denty-shell denty-dashboard-layout relative mx-0 max-w-none space-y-4 lg:space-y-0">
+          <RoleShellLayout
+            topbarEyebrow="Doctor"
+            notificationCount={unreadNotifications}
+            onNotificationsClick={() => setActiveSurface("notifications")}
+            onProfileClick={() => setActiveSurface("profile")}
+            sideRail={
+              <DoctorSideRail
+                userName={user.name || "Doctor"}
+                activeView={activeSurface}
+                unreadNotifications={unreadNotifications}
+                chatUnreadCount={chatUnreadCount}
+                streakCount={gameStreak}
+                onOverview={() => setActiveSurface("overview")}
+                onProfile={() => setActiveSurface("profile")}
+                onNotifications={() => setActiveSurface("notifications")}
+                onApprovals={() => setActiveSurface("approvals")}
+                onReport={() => setActiveSurface("report")}
+                onChat={() => setActiveSurface("chat")}
+                onGame={() => setActiveSurface("game")}
+                onLeaderboard={() => setActiveSurface("leaderboard")}
+                onSettings={() => setActiveSurface("settings")}
+                onComingSoon={setComingSoon}
+              />
+            }
+          >
+          <section className="min-w-0 space-y-4 lg:space-y-5">
             <DoctorPageHeader meta={currentSurfaceMeta} />
 
             <div className={activeSurface === "overview" ? "space-y-6" : "hidden"}>
@@ -713,7 +721,9 @@ export default function DoctorPage() {
 
             <div className={activeSurface === "game" ? "" : "hidden"}>
               <div className="denty-panel p-6 md:p-7">
-                <GameSurface />
+                <GameSurface
+                  onViewLeaderboard={() => setActiveSurface("leaderboard")}
+                />
               </div>
             </div>
 
@@ -752,6 +762,7 @@ export default function DoctorPage() {
               />
             </div>
           </section>
+          </RoleShellLayout>
         </div>
 
         <DoctorConfirmExitModal

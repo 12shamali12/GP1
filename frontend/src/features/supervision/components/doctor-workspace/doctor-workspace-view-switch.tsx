@@ -22,7 +22,7 @@ export function DoctorWorkspaceViewSwitch({
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <p className="denty-kicker">Workspace views</p>
-          <h3 className="mt-2 text-2xl font-semibold text-[var(--foreground)]">
+          <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
             Switch focus without leaving the page
           </h3>
         </div>

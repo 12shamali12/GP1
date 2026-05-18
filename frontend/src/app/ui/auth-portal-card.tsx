@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import { BrandMark } from "@/features/ui/components/brand-mark";
 import type { Role } from "../hooks/use-auth-portal";
 
@@ -92,12 +93,13 @@ export function AuthPortalCard({
   onSubmit,
   onResend,
 }: AuthPortalCardProps) {
+  const tr = useTranslation();
   return (
-    <section className="pointer-events-auto w-full max-w-[45rem] xl:mr-24 xl:translate-y-5 xl:justify-self-end xl:self-end xl:pb-8 2xl:mr-28 2xl:max-w-[49rem]">
-      <div className="rounded-[34px] border border-white/16 bg-[linear-gradient(180deg,rgba(255,255,255,0.34),rgba(255,255,255,0.16))] p-6 shadow-[0_24px_62px_rgba(7,18,44,0.12)] backdrop-blur-[34px] sm:p-7 xl:min-h-[43rem] xl:p-9">
-        <div className="flex flex-col gap-7 xl:min-h-[37rem] xl:justify-between">
+    <section className="pointer-events-auto w-full max-w-[40rem] xl:mr-16 xl:translate-y-5 xl:justify-self-end xl:self-end xl:pb-6 2xl:mr-24 2xl:max-w-[44rem]">
+      <div className="rounded-[26px] border border-white/16 bg-[linear-gradient(180deg,rgba(255,255,255,0.34),rgba(255,255,255,0.16))] p-4 shadow-[0_22px_56px_rgba(7,18,44,0.12)] backdrop-blur-[34px] sm:p-5 xl:min-h-[38rem] xl:p-6">
+        <div className="flex flex-col gap-5 xl:min-h-[32rem] xl:justify-between">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <p className="denty-kicker">Access portal</p>
+            <p className="denty-kicker">{tr("auth.portal")}</p>
             <div className="rounded-full border border-white/26 bg-[rgba(255,255,255,0.18)] p-1 shadow-[0_14px_30px_rgba(7,18,44,0.06)] backdrop-blur-xl">
               <button
                 onClick={() => onModeChange("login")}
@@ -124,7 +126,7 @@ export function AuthPortalCard({
 
           <div className="flex items-start justify-between gap-4">
             <div className="space-y-2">
-              <h3 className="text-3xl font-semibold tracking-[-0.05em] text-[var(--foreground)] sm:text-[2.15rem]">
+              <h3 className="text-2xl font-semibold tracking-[-0.05em] text-[var(--foreground)] sm:text-[2.15rem]">
                 {mode === "login" ? t.welcome : t.create}
               </h3>
               <p className="max-w-lg text-sm leading-6 text-[var(--muted-foreground)]">
@@ -207,14 +209,14 @@ export function AuthPortalCard({
                   <div className="grid gap-4 sm:col-span-2 md:grid-cols-2">
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-[var(--foreground)]">
-                        Semester
+                        {tr("auth.semester")}
                       </label>
                       <select
                         value={semesterId}
                         onChange={(e) => onSemesterChange(e.target.value)}
                         className="denty-field cursor-pointer text-sm"
                       >
-                        <option value="">Choose semester</option>
+                        <option value="">{tr("auth.semester_choose")}</option>
                         {semesterOptions.map((semester) => (
                           <option key={semester.id} value={semester.id}>
                             {semester.label}
@@ -225,7 +227,7 @@ export function AuthPortalCard({
 
                     <div className="space-y-2">
                       <label className="text-sm font-semibold text-[var(--foreground)]">
-                        {t.doctorId || "Doctor ID"}
+                        {t.doctorId || tr("auth.doctor_id")}
                       </label>
                       <input
                         type="text"
@@ -240,7 +242,7 @@ export function AuthPortalCard({
 
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-[var(--foreground)]">
-                    Phone (required)
+                    {tr("auth.phone_required")}
                   </label>
                   <input
                     type="text"
@@ -252,7 +254,9 @@ export function AuthPortalCard({
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-semibold text-[var(--foreground)]">
-                    Email {role === "patient" ? "(optional)" : "(required)"}
+                    {role === "patient"
+                      ? tr("auth.email_optional")
+                      : tr("auth.email_required")}
                   </label>
                   <input
                     type="text"
@@ -266,7 +270,8 @@ export function AuthPortalCard({
             ) : (
               <div className="space-y-2 sm:col-span-2">
                 <label className="text-sm font-semibold text-[var(--foreground)]">
-                  {t.emailOrPhone} {role === "doctor" ? "or Doctor ID" : ""}
+                  {t.emailOrPhone}
+                  {role === "doctor" ? ` ${tr("auth.doctor_id")}` : ""}
                 </label>
                 <input
                   type="text"
@@ -308,15 +313,19 @@ export function AuthPortalCard({
               onClick={onSubmit}
               disabled={loading}
             >
-              {loading ? "Working..." : mode === "login" ? t.login : t.register}
+              {loading
+                ? tr("common.working")
+                : mode === "login"
+                  ? t.login
+                  : t.register}
             </button>
 
             {mode === "login" && resendInfo ? (
               <div className="denty-placeholder space-y-3 p-4 sm:col-span-2">
                 <p className="text-sm leading-6 text-[var(--muted-foreground)]">
                   {resendInfo.role === "supervisor"
-                    ? "Supervisor login denied. Resend your approval request?"
-                    : "Doctor login denied. Resend your approval request?"}
+                    ? tr("auth.resend_supervisor")
+                    : tr("auth.resend_doctor")}
                 </p>
                 <button
                   type="button"
@@ -324,7 +333,7 @@ export function AuthPortalCard({
                   onClick={onResend}
                   disabled={loading}
                 >
-                  Resend for approval
+                  {tr("auth.resend_for_approval")}
                 </button>
               </div>
             ) : null}

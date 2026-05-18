@@ -47,7 +47,7 @@ export function AdminChatInboxPanel({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="denty-kicker">Inbox</p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+          <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
             Conversations
           </h2>
         </div>

@@ -60,7 +60,7 @@ export function PatientChatWorkspace({
     <div className="grid gap-5 xl:grid-cols-[360px_minmax(0,1fr)]">
       <div className="denty-dashboard-card overflow-hidden p-5">
         <p className="denty-kicker">Communication</p>
-        <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+        <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
           Chats and rooms
         </h2>
         <input

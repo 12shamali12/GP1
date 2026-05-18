@@ -123,11 +123,11 @@ export function DoctorReportWorkspace({
 
   return (
     <div className="space-y-5">
-      <div className="denty-dashboard-card overflow-hidden p-6 md:p-7">
+      <div className="denty-dashboard-card overflow-hidden p-5 md:p-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="denty-kicker">Case reporting</p>
-            <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               Clinical completion studio
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
@@ -232,7 +232,7 @@ export function DoctorReportWorkspace({
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="denty-kicker">Report form</p>
-                  <h3 className="mt-2 text-2xl font-semibold text-[var(--foreground)]">
+                  <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                     Complete case report
                   </h3>
                 </div>

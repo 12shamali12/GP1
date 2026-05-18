@@ -146,7 +146,7 @@ export default function PublicProfilePage() {
 
         {loading ? (
           <div className={mainPanel}>
-            <div className="px-8 py-12">
+            <div className="px-6 py-12">
               <p className="text-sm text-[var(--muted-foreground)]">Loading profile...</p>
             </div>
           </div>
@@ -155,10 +155,10 @@ export default function PublicProfilePage() {
         {profile ? (
           <>
             <div className={mainPanel}>
-              <div className="border-b border-white/12 px-7 py-7 md:px-9 md:py-8">
+              <div className="border-b border-white/12 px-5 py-5 md:px-7 md:py-6">
                 <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                   <div className="flex items-center gap-5">
-                    <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[28px] border border-white/18 bg-[linear-gradient(180deg,rgba(8,18,34,0.78),rgba(11,24,42,0.58))] text-4xl font-bold text-white shadow-[0_18px_34px_rgba(4,11,26,0.22)]">
+                    <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[22px] border border-white/18 bg-[linear-gradient(180deg,rgba(8,18,34,0.78),rgba(11,24,42,0.58))] text-3xl font-bold text-white shadow-[0_18px_34px_rgba(4,11,26,0.22)]">
                       {profile.profile.avatar ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -179,7 +179,7 @@ export default function PublicProfilePage() {
                         </span>
                       </div>
                       <div>
-                        <h1 className="text-4xl font-semibold text-[var(--foreground)] md:text-5xl">
+                        <h1 className="text-3xl font-semibold text-[var(--foreground)] md:text-3xl">
                           {profile.profile.name}
                         </h1>
                         <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
@@ -211,19 +211,19 @@ export default function PublicProfilePage() {
                 </div>
               </div>
 
-              <div className="grid gap-6 px-7 py-7 md:px-9 md:py-8 xl:grid-cols-[1.08fr_0.92fr]">
+              <div className="grid gap-4 px-5 py-5 md:px-7 md:py-6 xl:grid-cols-[1.08fr_0.92fr]">
                 <div className="space-y-5">
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="denty-dashboard-card-soft p-5">
                       <p className="denty-kicker">Role</p>
-                      <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+                      <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                         {profile.profile.role}
                       </p>
                     </div>
                     {profile.profile.semester ? (
                       <div className="denty-dashboard-card-soft p-5">
                         <p className="denty-kicker">Semester</p>
-                        <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+                        <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                           {profile.profile.semester.label}
                         </p>
                       </div>
@@ -231,7 +231,7 @@ export default function PublicProfilePage() {
                     {profile.profile.groupMembership ? (
                       <div className="denty-dashboard-card-soft p-5">
                         <p className="denty-kicker">Group</p>
-                        <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+                        <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                           {profile.profile.groupMembership.name}
                         </p>
                         <p className="mt-2 text-sm text-[var(--muted-foreground)]">
@@ -244,7 +244,7 @@ export default function PublicProfilePage() {
                         <p className="denty-kicker">Partner</p>
                         <Link
                           href={`/profiles/${profile.profile.partner.id}`}
-                          className="mt-3 inline-block text-2xl font-semibold text-[var(--foreground)] hover:text-[rgba(7,111,133,0.96)]"
+                          className="mt-3 inline-block text-xl font-semibold text-[var(--foreground)] hover:text-[rgba(7,111,133,0.96)]"
                         >
                           {profile.profile.partner.name}
                         </Link>
@@ -316,36 +316,36 @@ export default function PublicProfilePage() {
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="denty-stat-card p-5">
                       <p className="denty-kicker !tracking-[0.18em]">Patient avg</p>
-                      <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                      <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                         {profile.stats.patientRatingAverage?.toFixed(1) || "-"}
                       </p>
                     </div>
                     <div className="denty-stat-card p-5">
                       <p className="denty-kicker !tracking-[0.18em]">Supervisor avg</p>
-                      <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                      <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                         {profile.stats.supervisorRatingAverage?.toFixed(1) || "-"}
                       </p>
                     </div>
                     <div className="denty-stat-card p-5">
                       <p className="denty-kicker !tracking-[0.18em]">Completed</p>
-                      <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                      <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                         {profile.stats.completedCases}
                       </p>
                     </div>
                     <div className="denty-stat-card p-5">
                       <p className="denty-kicker !tracking-[0.18em]">Assisted</p>
-                      <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+                      <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                         {profile.stats.assistedCases}
                       </p>
                     </div>
                   </div>
 
                   {profile.stats.leaderboard ? (
-                    <div className="rounded-[28px] border border-white/12 bg-[linear-gradient(180deg,rgba(9,20,38,0.82),rgba(11,30,52,0.56))] p-5 text-white shadow-[0_20px_52px_rgba(6,17,34,0.22)]">
+                    <div className="rounded-[22px] border border-white/12 bg-[linear-gradient(180deg,rgba(9,20,38,0.82),rgba(11,30,52,0.56))] p-5 text-white shadow-[0_20px_52px_rgba(6,17,34,0.22)]">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/56">
                         Academic ranking
                       </p>
-                      <p className="mt-3 text-4xl font-semibold text-white">
+                      <p className="mt-3 text-3xl font-semibold text-white">
                         #{profile.stats.leaderboard.rank}
                       </p>
                       <p className="mt-2 text-sm text-white/72">
@@ -516,11 +516,11 @@ export default function PublicProfilePage() {
 
             {reportOpen ? (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(4,10,18,0.62)] px-4 backdrop-blur-[10px]">
-                <div className="w-full max-w-xl rounded-[30px] border border-white/14 bg-[linear-gradient(180deg,rgba(249,252,255,0.94),rgba(228,236,242,0.88))] p-6 shadow-[0_32px_80px_rgba(7,18,34,0.24)]">
+                <div className="w-full max-w-xl rounded-[22px] border border-white/14 bg-[linear-gradient(180deg,rgba(249,252,255,0.94),rgba(228,236,242,0.88))] p-6 shadow-[0_32px_80px_rgba(7,18,34,0.24)]">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="denty-kicker">Safety</p>
-                      <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+                      <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                         Report profile
                       </h2>
                     </div>
@@ -570,7 +570,7 @@ export default function PublicProfilePage() {
           </>
         ) : !loading ? (
           <div className={mainPanel}>
-            <div className="px-8 py-12">
+            <div className="px-6 py-12">
               <p className="text-sm text-[var(--muted-foreground)]">
                 Profile could not be loaded.
               </p>

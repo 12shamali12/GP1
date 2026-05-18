@@ -73,7 +73,7 @@ export function AdminChatConversationPanel({
               #
             </div>
             <div>
-              <p className="text-2xl font-semibold text-[var(--foreground)]">
+              <p className="text-xl font-semibold text-[var(--foreground)]">
                 {title}
               </p>
               <p className="mt-1 text-sm text-[var(--muted-foreground)]">
@@ -98,7 +98,7 @@ export function AdminChatConversationPanel({
               </div>
             )}
             <div>
-              <p className="text-2xl font-semibold text-[var(--foreground)] hover:text-[rgba(7,111,133,0.96)]">
+              <p className="text-xl font-semibold text-[var(--foreground)] hover:text-[rgba(7,111,133,0.96)]">
                 {title}
               </p>
               <p className="mt-1 text-sm text-[var(--muted-foreground)]">
@@ -112,7 +112,7 @@ export function AdminChatConversationPanel({
               {(selectedConversation.otherUser?.name || "U")[0]}
             </div>
             <div>
-              <p className="text-2xl font-semibold text-[var(--foreground)]">
+              <p className="text-xl font-semibold text-[var(--foreground)]">
                 {title}
               </p>
               <p className="mt-1 text-sm text-[var(--muted-foreground)]">

@@ -51,11 +51,11 @@ export function PatientAppointmentModal({
 
   return (
     <div className="fixed inset-0 z-30 flex items-center justify-center bg-[rgba(19,37,58,0.22)] p-4 backdrop-blur-md">
-      <div className="denty-modal w-full max-w-2xl space-y-5 rounded-[30px] p-6">
+      <div className="denty-modal w-full max-w-2xl space-y-5 rounded-[22px] p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="denty-kicker">Appointment history</p>
-            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+            <h3 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
               {caseTitle}
             </h3>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">

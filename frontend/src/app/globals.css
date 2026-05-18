@@ -92,15 +92,15 @@ body {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     align-items: start;
-    gap: 1.5rem;
+    gap: 1.15rem;
   }
 
   .denty-collapsible-rail {
     position: sticky;
-    top: 1.25rem;
+    top: 1rem;
     align-self: start;
-    width: 5.25rem;
-    height: calc(100vh - 2.5rem);
+    width: 4.5rem;
+    height: calc(100vh - 2rem);
     z-index: 30;
     overflow-x: hidden;
     scrollbar-width: none;
@@ -118,19 +118,19 @@ body {
   }
 
   .denty-collapsible-rail:hover {
-    width: 20.5rem;
+    width: 17.5rem;
   }
 
   .denty-collapsible-rail .denty-rail-action {
     justify-content: center;
-    padding-left: 0.7rem;
-    padding-right: 0.7rem;
+    padding-left: 0.55rem;
+    padding-right: 0.55rem;
   }
 
   .denty-collapsible-rail:hover .denty-rail-action {
     justify-content: flex-start;
-    padding-left: 0.95rem;
-    padding-right: 0.95rem;
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
   }
 
   .denty-collapsible-rail .denty-rail-copy {
@@ -146,7 +146,7 @@ body {
   }
 
   .denty-collapsible-rail:hover .denty-rail-copy {
-    max-width: 17rem;
+    max-width: 14rem;
     opacity: 1;
     transform: translateX(0);
   }
@@ -252,6 +252,177 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* --------------------------------------------------------------------
+ * Mobile shell — below the lg breakpoint we hide the desktop side rail
+ * and let the RoleShellLayout component render its own top bar +
+ * slide-out drawer. The drawer reuses the existing rail component but
+ * un-collapses it via the .denty-rail-in-drawer override.
+ * -------------------------------------------------------------------- */
+@media (max-width: 1023px) {
+  .denty-collapsible-rail {
+    display: none;
+  }
+}
+
+.denty-rail-in-drawer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.denty-rail-in-drawer .denty-collapsible-rail {
+  display: flex !important;
+  flex-direction: column;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 100%;
+  position: relative !important;
+  top: auto !important;
+  align-self: stretch !important;
+  overflow-y: visible !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.denty-rail-in-drawer .denty-rail-action {
+  justify-content: flex-start !important;
+  padding-left: 0.8rem !important;
+  padding-right: 0.8rem !important;
+}
+
+.denty-rail-in-drawer .denty-rail-copy {
+  max-width: 100% !important;
+  opacity: 1 !important;
+  transform: none !important;
+  overflow: visible !important;
+}
+
+.denty-rail-in-drawer .denty-rail-search {
+  max-height: 5rem !important;
+  opacity: 1 !important;
+  margin-top: 0.65rem !important;
+  margin-bottom: 0.15rem !important;
+  transform: none !important;
+}
+
+.denty-rail-in-drawer .denty-rail-section-label {
+  max-height: 2rem !important;
+  opacity: 1 !important;
+  padding-top: 0.5rem !important;
+  margin-left: 0.25rem !important;
+}
+
+.denty-rail-in-drawer .denty-rail-panel {
+  max-height: 12rem !important;
+  opacity: 1 !important;
+  margin-top: 1rem !important;
+  padding-top: 0.75rem !important;
+  padding-bottom: 0.75rem !important;
+  border-width: 1px !important;
+}
+
+.denty-rail-in-drawer .denty-rail-badge-mini {
+  display: none !important;
+}
+
+.denty-rail-in-drawer .denty-rail-badge-full {
+  display: inline-flex !important;
+}
+
+.denty-rail-in-drawer .denty-rail-user {
+  max-height: 7rem !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Mobile top bar */
+.denty-mobile-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  height: 3.5rem;
+  padding: 0 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  background: linear-gradient(180deg, rgba(12, 24, 40, 0.72), rgba(9, 19, 34, 0.62));
+  color: rgba(250, 252, 255, 0.96);
+  backdrop-filter: blur(20px);
+}
+
+.denty-mobile-topbar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  cursor: pointer;
+}
+
+.denty-mobile-topbar-button:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+@media (min-width: 1024px) {
+  .denty-mobile-topbar {
+    display: none;
+  }
+}
+
+/* Slide-out drawer container */
+.denty-mobile-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(10, 22, 40, 0.45);
+  backdrop-filter: blur(6px);
+  animation: frozenReveal 220ms ease both;
+}
+
+.denty-mobile-drawer-sheet {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 61;
+  width: min(20rem, 86vw);
+  padding: 0.85rem;
+  background: transparent;
+  animation: frozenSlideUp 280ms ease both;
+}
+
+/* In RTL the drawer should slide in from the RIGHT edge so it matches the
+   natural reading direction. The mobile burger button lives on the right
+   side of the topbar in RTL too. */
+html[dir="rtl"] .denty-mobile-drawer-sheet {
+  left: auto;
+  right: 0;
+}
+
+.denty-mobile-drawer-inner {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: linear-gradient(180deg, rgba(82, 85, 103, 0.96), rgba(67, 71, 88, 0.94));
+  box-shadow: 0 34px 90px rgba(4, 11, 26, 0.34);
+  backdrop-filter: blur(28px);
+  color: rgba(250, 252, 255, 0.96);
 }
 
 @keyframes frozenFloat {
@@ -435,7 +606,7 @@ body {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 1680px;
+    max-width: 1480px;
     margin: 0 auto;
   }
 
@@ -444,9 +615,9 @@ body {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(246, 250, 252, 0.74));
     box-shadow:
-      0 24px 58px rgba(10, 22, 40, 0.1),
+      0 18px 46px rgba(10, 22, 40, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.44);
-    border-radius: 28px;
+    border-radius: 22px;
     backdrop-filter: blur(18px);
     color: var(--foreground);
     animation: frozenReveal 520ms ease both;
@@ -457,9 +628,9 @@ body {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(238, 245, 249, 0.78));
     box-shadow:
-      0 30px 76px rgba(10, 22, 40, 0.14),
+      0 24px 60px rgba(10, 22, 40, 0.12),
       inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    border-radius: 32px;
+    border-radius: 26px;
     backdrop-filter: blur(20px);
     color: var(--foreground);
     animation: frozenReveal 620ms ease both;
@@ -470,9 +641,9 @@ body {
     background:
       linear-gradient(180deg, rgba(12, 24, 40, 0.84), rgba(8, 18, 32, 0.72));
     box-shadow:
-      0 30px 76px rgba(7, 18, 34, 0.24),
+      0 24px 60px rgba(7, 18, 34, 0.22),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    border-radius: 32px;
+    border-radius: 26px;
     color: rgba(250, 252, 255, 0.96);
     backdrop-filter: blur(22px);
     animation: frozenReveal 620ms ease both;
@@ -482,9 +653,9 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.28);
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(240, 246, 249, 0.56));
-    border-radius: 22px;
+    border-radius: 18px;
     box-shadow:
-      0 16px 34px rgba(10, 22, 40, 0.07),
+      0 12px 26px rgba(10, 22, 40, 0.06),
       inset 0 1px 0 rgba(255, 255, 255, 0.42);
     backdrop-filter: blur(16px);
     color: var(--foreground);
@@ -494,9 +665,9 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.3);
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(242, 247, 250, 0.68));
-    border-radius: 26px;
+    border-radius: 21px;
     box-shadow:
-      0 22px 46px rgba(10, 22, 40, 0.08),
+      0 18px 36px rgba(10, 22, 40, 0.07),
       inset 0 1px 0 rgba(255, 255, 255, 0.45);
     backdrop-filter: blur(16px);
     color: var(--foreground);
@@ -506,9 +677,9 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.26);
     background:
       linear-gradient(180deg, rgba(247, 251, 252, 0.84), rgba(235, 243, 247, 0.58));
-    border-radius: 22px;
+    border-radius: 18px;
     box-shadow:
-      0 16px 32px rgba(10, 22, 40, 0.06),
+      0 12px 26px rgba(10, 22, 40, 0.05),
       inset 0 1px 0 rgba(255, 255, 255, 0.34);
     backdrop-filter: blur(14px);
     color: var(--foreground);
@@ -518,10 +689,10 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.24);
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(241, 247, 250, 0.62));
-    border-radius: 20px;
+    border-radius: 16px;
     color: var(--foreground);
     box-shadow:
-      0 14px 28px rgba(10, 22, 40, 0.055),
+      0 10px 22px rgba(10, 22, 40, 0.05),
       inset 0 1px 0 rgba(255, 255, 255, 0.34);
     backdrop-filter: blur(14px);
   }
@@ -529,10 +700,10 @@ body {
   .denty-stat-card {
     border: 1px solid rgba(255, 255, 255, 0.28);
     background: linear-gradient(180deg, rgba(224, 240, 246, 0.74), rgba(255, 255, 255, 0.78));
-    border-radius: 18px;
+    border-radius: 14px;
     color: var(--foreground);
     box-shadow:
-      0 16px 30px rgba(10, 22, 40, 0.06),
+      0 12px 24px rgba(10, 22, 40, 0.05),
       inset 0 1px 0 rgba(255, 255, 255, 0.38);
     backdrop-filter: blur(12px);
   }
@@ -541,19 +712,20 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
-    border-radius: 14px;
+    gap: 0.35rem;
+    border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.26);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(240, 246, 249, 0.64));
-    padding: 0.55rem 0.8rem;
-    font-size: 0.75rem;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.72rem;
     font-weight: 700;
     color: var(--foreground);
     cursor: pointer;
     box-shadow:
-      0 12px 24px rgba(10, 22, 40, 0.055),
+      0 10px 20px rgba(10, 22, 40, 0.05),
       inset 0 1px 0 rgba(255, 255, 255, 0.35);
     backdrop-filter: blur(12px);
+    min-height: 2.25rem;
   }
 
   .denty-action:hover {
@@ -639,15 +811,16 @@ body {
 
   .denty-field {
     width: 100%;
-    border-radius: 18px;
+    border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.28);
     background: rgba(255, 255, 255, 0.72);
     color: var(--foreground);
-    padding: 0.92rem 1rem;
+    padding: 0.72rem 0.9rem;
     outline: none;
+    min-height: 2.6rem;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.62),
-      0 12px 24px rgba(10, 22, 40, 0.05);
+      0 10px 20px rgba(10, 22, 40, 0.05);
     backdrop-filter: blur(12px);
   }
 
@@ -719,9 +892,9 @@ body {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(239, 246, 249, 0.6));
     box-shadow:
-      0 28px 60px rgba(10, 22, 40, 0.12),
+      0 22px 50px rgba(10, 22, 40, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.38);
-    border-radius: 28px;
+    border-radius: 22px;
     backdrop-filter: blur(18px);
   }
 
@@ -729,15 +902,16 @@ body {
     display: flex;
     width: 100%;
     align-items: center;
-    gap: 0.82rem;
-    border-radius: 18px;
+    gap: 0.7rem;
+    border-radius: 14px;
     border: 1px solid rgba(255, 255, 255, 0.14);
     background: rgba(255, 255, 255, 0.42);
     color: var(--foreground);
-    padding: 0.88rem 0.95rem;
-    font-size: 1rem;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.92rem;
     font-weight: 700;
     cursor: pointer;
+    min-height: 2.6rem;
   }
 
   .denty-sidebar-button:hover {
@@ -1535,5 +1709,176 @@ html[data-reduced-motion="true"] *::after {
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
   scroll-behavior: auto !important;
+}
+
+/* ----------------------------------------------------------------------- *
+ * Game + smile-streak animations (Day 2 — gaming polish)
+ * ----------------------------------------------------------------------- */
+
+@keyframes denty-flame-pulse {
+  0%,
+  100% {
+    transform: scale(1) translateY(0);
+    filter: drop-shadow(0 2px 4px rgba(234, 88, 12, 0.4));
+  }
+  50% {
+    transform: scale(1.08) translateY(-1px);
+    filter: drop-shadow(0 6px 10px rgba(234, 88, 12, 0.6));
+  }
+}
+
+@keyframes denty-flame-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes denty-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes denty-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes denty-star-burst {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--burst-rot, 0deg)) translateY(0) scale(0.4);
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--burst-rot, 0deg))
+      translateY(-70px) scale(1);
+  }
+}
+
+@keyframes denty-quadrant-glow {
+  0% {
+    filter: drop-shadow(0 0 0 rgba(34, 197, 94, 0));
+    opacity: 1;
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(34, 197, 94, 0.85));
+    opacity: 1;
+  }
+  100% {
+    filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.45));
+    opacity: 1;
+  }
+}
+
+@keyframes denty-spark {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.2);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) translateY(-24px) scale(1.4);
+  }
+}
+
+@keyframes denty-option-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.03);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.denty-flame-pulse {
+  animation: denty-flame-pulse 1.4s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+.denty-flame-bounce {
+  animation: denty-flame-bounce 1.8s ease-in-out infinite;
+}
+
+.denty-card-in {
+  animation: denty-card-in 320ms ease-out both;
+}
+
+.denty-shake {
+  animation: denty-shake 320ms ease-in-out;
+}
+
+.denty-option-pulse {
+  animation: denty-option-pulse 280ms ease-out;
+}
+
+.denty-burst-star {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  animation: denty-star-burst 900ms ease-out forwards;
+  pointer-events: none;
+}
+
+.denty-quadrant-glow {
+  animation: denty-quadrant-glow 600ms ease-out forwards;
+}
+
+.denty-spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: radial-gradient(circle, #fef9c3 0%, #fbbf24 60%, transparent 70%);
+  animation: denty-spark 700ms ease-out forwards;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .denty-flame-pulse,
+  .denty-flame-bounce,
+  .denty-card-in,
+  .denty-shake,
+  .denty-option-pulse,
+  .denty-burst-star,
+  .denty-quadrant-glow,
+  .denty-spark {
+    animation: none !important;
+  }
 }
 

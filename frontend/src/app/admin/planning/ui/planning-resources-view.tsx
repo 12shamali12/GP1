@@ -170,7 +170,7 @@ export function PlanningResourcesView({
     <div className="grid gap-5 xl:grid-cols-[0.68fr_1.32fr]">
       <div className={panelClass}>
         <p className="denty-kicker">Setup wall</p>
-        <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+        <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
           Clinics and shifts
         </h2>
         <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
@@ -217,7 +217,7 @@ export function PlanningResourcesView({
         </div>
 
         {showClinicForm ? (
-          <div className="mt-5 space-y-3 rounded-[26px] border border-white/12 bg-white/34 p-4">
+          <div className="mt-5 space-y-3 rounded-[20px] border border-white/12 bg-white/34 p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.62)]">
                 {editingClinicId ? "Edit clinic" : "New clinic"}
@@ -258,7 +258,7 @@ export function PlanningResourcesView({
         ) : null}
 
         {showShiftForm ? (
-          <div className="mt-5 grid gap-3 rounded-[26px] border border-white/12 bg-white/34 p-4 md:grid-cols-2">
+          <div className="mt-5 grid gap-3 rounded-[20px] border border-white/12 bg-white/34 p-4 md:grid-cols-2">
             <div className="flex items-center justify-between gap-3 md:col-span-2">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.62)]">
                 {editingShiftId ? "Edit shift" : "New shift"}
@@ -314,7 +314,7 @@ export function PlanningResourcesView({
         ) : null}
 
         {showSemesterForm ? (
-          <div className="mt-5 grid gap-3 rounded-[26px] border border-white/12 bg-white/34 p-4 md:grid-cols-2">
+          <div className="mt-5 grid gap-3 rounded-[20px] border border-white/12 bg-white/34 p-4 md:grid-cols-2">
             <div className="flex items-center justify-between gap-3 md:col-span-2">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.62)]">
                 {editingSemesterId ? "Edit semester" : "New semester"}
@@ -359,7 +359,7 @@ export function PlanningResourcesView({
         ) : null}
 
         {showClinicCaseForm ? (
-          <div className="mt-5 grid gap-3 rounded-[26px] border border-white/12 bg-white/34 p-4 md:grid-cols-2">
+          <div className="mt-5 grid gap-3 rounded-[20px] border border-white/12 bg-white/34 p-4 md:grid-cols-2">
             <div className="flex items-center justify-between gap-3 md:col-span-2">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.62)]">
                 {editingClinicCaseId ? "Edit clinic case" : "New clinic case"}
@@ -432,13 +432,13 @@ export function PlanningResourcesView({
           </div>
         ) : null}
 
-        <div className="mt-5 rounded-[28px] border border-white/12 bg-[linear-gradient(180deg,rgba(8,18,34,0.84),rgba(12,30,51,0.64))] p-5 text-white shadow-[0_24px_48px_rgba(6,17,34,0.22)]">
+        <div className="mt-5 rounded-[22px] border border-white/12 bg-[linear-gradient(180deg,rgba(8,18,34,0.84),rgba(12,30,51,0.64))] p-5 text-white shadow-[0_24px_48px_rgba(6,17,34,0.22)]">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/58">
                 Progression desk
               </p>
-              <h3 className="mt-3 text-2xl font-semibold text-white">
+              <h3 className="mt-3 text-xl font-semibold text-white">
                 Semester progression
               </h3>
               <p className="mt-3 text-sm leading-7 text-white/70">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { BrandMark } from "@/features/ui/components/brand-mark";
 import { DashboardIcon } from "@/features/ui/components/dashboard-icon";
 import { logout } from "@/lib/api/auth";
@@ -128,17 +129,18 @@ export function DoctorSideRail({
   onComingSoon,
 }: DoctorSideRailProps) {
   const router = useRouter();
+  const t = useTranslation();
   return (
-    <aside className="frozen-stage denty-collapsible-rail overflow-y-auto rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(82,85,103,0.96),rgba(67,71,88,0.94))] px-4 py-5 text-white shadow-[0_34px_90px_rgba(4,11,26,0.34)] backdrop-blur-[28px]">
+    <aside className="frozen-stage denty-collapsible-rail overflow-y-auto rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(82,85,103,0.96),rgba(67,71,88,0.94))] px-4 py-5 text-white shadow-[0_34px_90px_rgba(4,11,26,0.34)] backdrop-blur-[28px]">
       <div className="flex min-h-full flex-col gap-3">
-        <div className="rounded-[26px] px-1">
+        <div className="rounded-[20px] px-1">
           <div className="flex items-center gap-3">
             <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] bg-white text-slate-900 shadow-[0_14px_28px_rgba(4,11,26,0.22)]">
               <BrandMark className="h-8 w-8 shrink-0" />
             </span>
             <div className="denty-rail-copy min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/54">
-                Doctor suite
+                {t("nav.suite.doctor")}
               </p>
               <h2 className="mt-1 text-[1.65rem] font-semibold text-white">DentyHub</h2>
             </div>
@@ -147,19 +149,19 @@ export function DoctorSideRail({
             <div className="flex items-center gap-3 rounded-[14px] bg-white/8 px-3 py-3 text-sm text-white/58">
               <DashboardIcon name="search" />
               <span className="denty-rail-copy text-sm font-medium text-white/62">
-                Search workspace
+                {t("common.search")}
               </span>
             </div>
           </div>
         </div>
 
         <div className="denty-rail-section-label pl-2 pt-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/42">
-          Workspaces
+          {t("nav.section.workspaces")}
         </div>
 
         <RailAction
           eyebrow="Overview"
-          label="Clinical desk"
+          label={t("nav.dashboard")}
           compactLabel="Desk"
           icon="calendar"
           active={activeView === "overview"}
@@ -167,7 +169,7 @@ export function DoctorSideRail({
         />
         <RailAction
           eyebrow="Profile"
-          label="Identity and account"
+          label={t("nav.profile")}
           compactLabel="Profile"
           icon="profile"
           active={activeView === "profile"}
@@ -175,7 +177,7 @@ export function DoctorSideRail({
         />
         <RailAction
           eyebrow="Alerts"
-          label="Notifications"
+          label={t("nav.notifications")}
           compactLabel="Alerts"
           icon="notifications"
           active={activeView === "notifications"}
@@ -184,7 +186,7 @@ export function DoctorSideRail({
         />
         <RailAction
           eyebrow="Review"
-          label="Approvals"
+          label={t("nav.approvals")}
           compactLabel="Review"
           icon="approvals"
           active={activeView === "approvals"}
@@ -192,7 +194,7 @@ export function DoctorSideRail({
         />
         <RailAction
           eyebrow="Reports"
-          label="Appointment report"
+          label={t("nav.report")}
           compactLabel="Report"
           icon="report"
           active={activeView === "report"}
@@ -200,12 +202,12 @@ export function DoctorSideRail({
         />
 
         <div className="denty-rail-section-label pl-2 pt-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/42">
-          Communication
+          {t("nav.section.communication")}
         </div>
 
         <RailAction
           eyebrow="Direct"
-          label="Chats and rooms"
+          label={t("nav.chat")}
           compactLabel="Chats"
           icon="chat"
           active={activeView === "chat"}
@@ -214,13 +216,13 @@ export function DoctorSideRail({
         />
 
         <div className="denty-rail-section-label pl-2 pt-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-white/42">
-          Later
+          {t("nav.section.later")}
         </div>
 
         <div className="relative">
           <RailAction
             eyebrow="Practice"
-            label="Toothy Game"
+            label={t("nav.game")}
             compactLabel="Game"
             icon="game"
             active={activeView === "game"}
@@ -228,7 +230,7 @@ export function DoctorSideRail({
           />
           {streakCount > 0 ? (
             <span
-              title={`${streakCount}-day streak`}
+              title={t("game.streak", { n: streakCount })}
               className="pointer-events-none absolute right-3 top-1/2 inline-flex -translate-y-1/2 items-center gap-1 rounded-full border border-[rgba(234,88,12,0.35)] bg-[rgba(254,215,170,0.92)] px-2 py-0.5 text-[11px] font-semibold text-[rgba(124,45,18,0.95)] shadow-[0_8px_18px_rgba(124,45,18,0.18)]"
             >
               <span aria-hidden>🔥</span>
@@ -238,7 +240,7 @@ export function DoctorSideRail({
         </div>
         <RailAction
           eyebrow="Standings"
-          label="Leaderboard"
+          label={t("nav.leaderboard")}
           compactLabel="Rank"
           icon="leaderboard"
           active={activeView === "leaderboard"}
@@ -246,7 +248,7 @@ export function DoctorSideRail({
         />
         <RailAction
           eyebrow="Preferences"
-          label="Settings"
+          label={t("nav.settings")}
           compactLabel="Prefs"
           icon="settings"
           active={activeView === "settings"}
@@ -254,9 +256,9 @@ export function DoctorSideRail({
         />
 
         <div className="denty-rail-user rounded-[20px] border border-white/8 bg-white/7 px-3 py-3">
-          <p className="text-sm font-semibold text-white">{userName || "Doctor"}</p>
+          <p className="text-sm font-semibold text-white">{userName || t("auth.role.doctor")}</p>
           <p className="mt-1 text-sm leading-6 text-white/60">
-            Clinical desk, reporting, communication, and review actions.
+            {t("nav.footer.doctor")}
           </p>
         </div>
 
@@ -272,7 +274,9 @@ export function DoctorSideRail({
             <DashboardIcon name="logout" />
           </span>
           <span className="denty-rail-copy min-w-0 flex-1">
-            <span className="block text-[0.98rem] font-semibold text-white">Logout</span>
+            <span className="block text-[0.98rem] font-semibold text-white">
+              {t("common.logout")}
+            </span>
           </span>
         </button>
       </div>

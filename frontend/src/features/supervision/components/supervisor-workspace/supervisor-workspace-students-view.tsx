@@ -37,7 +37,7 @@ export function SupervisorWorkspaceStudentsView({
     <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
       <div className="denty-panel-strong p-6">
         <p className="denty-kicker">Tasks</p>
-        <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Assign tasks</h2>
+        <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Assign tasks</h2>
         <div className="mt-5 grid gap-3">
           <select value={taskForm.targetType} onChange={(e) => setTaskForm((prev) => ({ ...prev, targetType: e.target.value as "doctor" | "group" }))} className="denty-field text-sm">
             <option value="doctor">Single student</option>
@@ -85,13 +85,13 @@ export function SupervisorWorkspaceStudentsView({
 
       <div className="denty-panel-strong p-6">
         <p className="denty-kicker">Group directory</p>
-        <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">Browse groups and pairs</h2>
+        <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Browse groups and pairs</h2>
         <div className="mt-5 space-y-4">
           {workspace?.groupDirectory.map((group) => (
             <div key={group.id} className="denty-dashboard-card p-5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-2xl font-semibold text-[var(--foreground)]">{group.name}</p>
+                  <p className="text-xl font-semibold text-[var(--foreground)]">{group.name}</p>
                   <p className="mt-2 text-sm text-[var(--muted-foreground)]">{group.semesterLabel}</p>
                 </div>
                 <span className="denty-pill">{group.members.length} students</span>

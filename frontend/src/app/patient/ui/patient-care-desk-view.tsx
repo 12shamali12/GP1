@@ -79,11 +79,11 @@ export function PatientCareDeskView({
   return (
     <div className="space-y-5">
       <div className="grid gap-5 xl:grid-cols-[1.2fr_0.8fr]">
-        <div className="denty-panel-strong space-y-5 px-6 py-7 md:px-8 md:py-8">
+        <div className="denty-panel-strong space-y-5 px-6 py-5 md:px-6 md:py-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
               <p className="denty-kicker">Upcoming care</p>
-              <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+              <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 Reservations and requests
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)]">
@@ -210,7 +210,7 @@ export function PatientCareDeskView({
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
           <div className="denty-stat-card p-4">
             <p className="denty-kicker !tracking-[0.18em]">Upcoming</p>
-            <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               {uniqueUpcoming.length}
             </p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
@@ -219,7 +219,7 @@ export function PatientCareDeskView({
           </div>
           <div className="denty-stat-card p-4">
             <p className="denty-kicker !tracking-[0.18em]">Availability</p>
-            <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               {availableSlots.length}
             </p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
@@ -228,7 +228,7 @@ export function PatientCareDeskView({
           </div>
           <div className="denty-stat-card p-4">
             <p className="denty-kicker !tracking-[0.18em]">History</p>
-            <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               {history.length}
             </p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
@@ -237,7 +237,7 @@ export function PatientCareDeskView({
           </div>
           <div className="denty-stat-card p-4">
             <p className="denty-kicker !tracking-[0.18em]">Alerts</p>
-            <p className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               {unreadNotifications}
             </p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
@@ -247,11 +247,11 @@ export function PatientCareDeskView({
         </div>
       </div>
 
-      <div ref={reservationRef} className="denty-dashboard-card space-y-5 p-6 md:p-7">
+      <div ref={reservationRef} className="denty-dashboard-card space-y-5 p-5 md:p-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="denty-kicker">Booking planner</p>
-            <h3 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
+            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               Reserve an appointment
             </h3>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
