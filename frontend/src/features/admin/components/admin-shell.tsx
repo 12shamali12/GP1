@@ -142,6 +142,42 @@ const emptyCounts: AdminShellCounts = {
   chat: 0,
 };
 
+const ADMIN_ACCENT = {
+  bar: "rgba(251,191,36,0.95)",
+  dotBg: "rgba(251,191,36,0.95)",
+  chipBg: "rgba(251,191,36,0.18)",
+  chipText: "rgba(254,243,199,0.96)",
+};
+
+/**
+ * Best-effort initials from a free-form name (matches the helper used in
+ * the doctor/patient/supervisor rails — kept duplicated to avoid a shared
+ * util file for what is currently one small four-line function).
+ */
+function initialsOf(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  const first = parts[0][0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase() || "?";
+}
+
+type StoredUser = {
+  name?: string | null;
+  email?: string | null;
+};
+
+const readStoredUser = (): StoredUser => {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = sessionStorage.getItem("currentUser");
+    if (!raw) return {};
+    return JSON.parse(raw) as StoredUser;
+  } catch {
+    return {};
+  }
+};
+
 type AdminShellProps = {
   title: string;
   description: string;
@@ -158,6 +194,15 @@ export function AdminShell({
   const t = useTranslation();
   const [counts, setCounts] = useState<AdminShellCounts>(emptyCounts);
   const [navSearch, setNavSearch] = useState("");
+  const [adminName, setAdminName] = useState<string>("");
+
+  useEffect(() => {
+    // sessionStorage is only available in the browser; read once on mount
+    // so the identity card can show the actual admin's name + initials.
+    const stored = readStoredUser();
+    if (stored.name) setAdminName(stored.name);
+    else if (stored.email) setAdminName(stored.email);
+  }, []);
 
   const filteredNavItems = useMemo(() => {
     const query = navSearch.trim().toLowerCase();
@@ -188,23 +233,56 @@ export function AdminShell({
     };
   }, [pathname]);
 
+  const displayName = adminName.trim() || t("nav.role_chip.admin");
+  const initials = initialsOf(displayName);
+
   const sideRail = (
-    <aside className="frozen-stage denty-collapsible-rail overflow-y-auto rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(82,85,103,0.96),rgba(67,71,88,0.94))] px-3 py-4 text-white shadow-[0_28px_72px_rgba(4,11,26,0.3)] backdrop-blur-[28px]">
-          <div className="flex min-h-full flex-col gap-5">
-            <Link href="/admin" className="flex items-center gap-3 rounded-[22px] px-1 py-1">
-              <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-[18px] bg-white text-slate-900 shadow-[0_14px_28px_rgba(4,11,26,0.22)]">
-                <BrandMark className="h-8 w-8" />
-              </span>
-              <div className="denty-rail-copy">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/54">
-                  {t("nav.suite.admin")}
-                </p>
-                <h2 className="mt-1 text-[1.65rem] font-semibold text-white">DentyHub</h2>
+    <aside className="frozen-stage denty-collapsible-rail overflow-y-auto rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(82,85,103,0.96),rgba(67,71,88,0.94))] px-3 py-4 text-white backdrop-blur-[28px]">
+          <div className="flex min-h-full flex-col gap-3">
+            {/* Identity card — same shape as the other three rails. Linked to
+                /admin so clicking the brand still acts as a "home" jump. */}
+            <Link
+              href="/admin"
+              className="block rounded-[20px] border border-white/10 bg-white/6 px-3 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition-colors hover:bg-white/8"
+            >
+              <div className="flex items-center gap-3">
+                <span
+                  aria-hidden
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/16 bg-[linear-gradient(140deg,rgba(255,255,255,0.18),rgba(255,255,255,0.06))] text-base font-semibold text-white shadow-[0_8px_18px_rgba(4,11,26,0.25)]"
+                >
+                  {initials}
+                </span>
+                <div className="denty-rail-copy min-w-0 flex-1">
+                  <p className="truncate text-base font-semibold text-white">{displayName}</p>
+                  <span
+                    className="mt-1 inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em]"
+                    style={{ backgroundColor: ADMIN_ACCENT.chipBg, color: ADMIN_ACCENT.chipText }}
+                  >
+                    <span
+                      aria-hidden
+                      className="inline-block h-1.5 w-1.5 rounded-full"
+                      style={{ backgroundColor: ADMIN_ACCENT.dotBg }}
+                    />
+                    {t("nav.role_chip.admin")}
+                  </span>
+                </div>
+              </div>
+              <div className="mt-3 flex items-center gap-2 border-t border-white/8 pt-3">
+                <span className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-[8px] bg-white text-slate-900 shadow-[0_4px_10px_rgba(4,11,26,0.18)]">
+                  <BrandMark className="h-4 w-4" />
+                </span>
+                <span className="denty-rail-copy truncate text-[11px] font-medium tracking-[0.04em] text-white/60">
+                  {t("nav.brand.subtitle.admin")}
+                </span>
               </div>
             </Link>
 
-            <div className="denty-rail-search rounded-[18px] border border-white/8 bg-white/8 p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-              <label className="flex items-center gap-3 rounded-[14px] bg-white/8 px-3 py-3 text-sm text-white/58">
+            {/* Admin's nav search is load-bearing (filters real nav items
+                across 11 destinations), so it stays — restyled to match the
+                rest of the rail. The other three rails dropped their stub
+                search since it was non-functional. */}
+            <div className="denty-rail-search rounded-[16px] border border-white/8 bg-white/6 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+              <label className="flex items-center gap-2 rounded-[12px] bg-white/8 px-2.5 py-2 text-sm text-white/58">
                 <DashboardIcon name="search" />
                 <input
                   type="search"
@@ -216,7 +294,12 @@ export function AdminShell({
               </label>
             </div>
 
-            <nav className="grid gap-2.5">
+            <div className="mx-2 my-1 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
+            <div className="denty-rail-section-label mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/56">
+              {t("nav.section.workspaces")}
+            </div>
+
+            <nav className="grid gap-2">
               {filteredNavItems.map((item, index) => {
                 const active =
                   pathname === item.href ||
@@ -227,16 +310,23 @@ export function AdminShell({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`denty-rail-action group flex items-center gap-3 rounded-[22px] border p-3 transition ${
+                    className={`denty-rail-action relative flex items-center gap-3 rounded-[22px] border p-3 transition-all duration-200 ease-out ${
                       active
-                        ? "border-white/70 bg-white text-slate-900 shadow-[0_20px_34px_rgba(4,11,26,0.22)]"
-                        : "border-transparent bg-transparent text-white/78 hover:border-white/10 hover:bg-white/8"
+                        ? "border-white/12 bg-[rgba(255,255,255,0.96)] text-slate-900 shadow-[0_8px_22px_rgba(4,11,26,0.18)]"
+                        : "border-transparent bg-transparent text-white/82 hover:translate-x-0.5 hover:border-white/10 hover:bg-white/8"
                     }`}
                     style={{ animationDelay: `${index * 55}ms` }}
                   >
                     <span
-                      className={`relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] ${
-                        active ? "bg-slate-900 text-white" : "bg-white/8 text-white/86"
+                      aria-hidden
+                      className={`pointer-events-none absolute left-0 top-2 bottom-2 w-1 rounded-r-full transition-opacity duration-200 ${
+                        active ? "opacity-100" : "opacity-0"
+                      }`}
+                      style={{ backgroundColor: ADMIN_ACCENT.bar }}
+                    />
+                    <span
+                      className={`relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-[16px] transition-colors duration-200 ${
+                        active ? "bg-slate-900 text-white" : "bg-white/8 text-white/82"
                       }`}
                     >
                         <DashboardIcon name={item.icon} />
@@ -281,13 +371,13 @@ export function AdminShell({
                 logout();
                 router.push("/");
               }}
-              className="denty-rail-action mt-auto flex w-full cursor-pointer items-center gap-3 rounded-[18px] border border-white/8 bg-white/8 px-3 py-2.5 text-left text-white transition hover:border-white/16 hover:bg-white/12"
+              className="denty-rail-action mt-auto flex w-full cursor-pointer items-center gap-3 rounded-[18px] border border-rose-200/20 bg-rose-500/10 px-3 py-2.5 text-left text-rose-100 transition-all duration-200 ease-out hover:border-rose-200/30 hover:bg-rose-500/18"
             >
-              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-white/12 text-white">
+              <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[14px] bg-rose-500/16 text-rose-100">
                 <DashboardIcon name="logout" />
               </span>
               <span className="denty-rail-copy min-w-0 flex-1">
-                <span className="block text-[0.92rem] font-semibold text-white">
+                <span className="block text-[0.92rem] font-semibold text-rose-100">
                   {t("common.logout")}
                 </span>
               </span>

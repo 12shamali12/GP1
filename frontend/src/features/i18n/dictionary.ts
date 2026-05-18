@@ -123,6 +123,21 @@ const EN: Dictionary = {
 
   "nav.empty_search": "No sections match this search.",
 
+  // role chips shown in the side-rail identity card. Localized separately
+  // from auth.role.* because the rail uses shorter "role chip" copy.
+  "nav.role_chip.doctor": "Doctor",
+  "nav.role_chip.patient": "Patient",
+  "nav.role_chip.supervisor": "Supervisor",
+  "nav.role_chip.admin": "Admin",
+
+  // brand strip below the identity card. Doctor gets a slightly richer
+  // subtitle that hints at the academic year context; everyone else just
+  // sees the DentyHub wordmark.
+  "nav.brand.subtitle.doctor": "DentyHub - Clinical suite",
+  "nav.brand.subtitle.patient": "DentyHub - Patient suite",
+  "nav.brand.subtitle.supervisor": "DentyHub - Supervisor suite",
+  "nav.brand.subtitle.admin": "DentyHub - Admin suite",
+
   // settings -------------------------------------------------------------
   "settings.title": "Settings",
   "settings.appearance": "Appearance",
@@ -447,6 +462,18 @@ const AR: Dictionary = {
     "المراجعة السريرية والجدولة والمهام والتواصل من مكتب واحد.",
 
   "nav.empty_search": "لا توجد أقسام مطابقة لهذا البحث.",
+
+  // role chips (side rail identity card)
+  "nav.role_chip.doctor": "طبيب",
+  "nav.role_chip.patient": "مريض",
+  "nav.role_chip.supervisor": "مشرف",
+  "nav.role_chip.admin": "مسؤول",
+
+  // brand strip subtitle
+  "nav.brand.subtitle.doctor": "DentyHub - واجهة الطبيب",
+  "nav.brand.subtitle.patient": "DentyHub - واجهة المريض",
+  "nav.brand.subtitle.supervisor": "DentyHub - واجهة المشرف",
+  "nav.brand.subtitle.admin": "DentyHub - واجهة المسؤول",
 
   // settings
   "settings.title": "الإعدادات",

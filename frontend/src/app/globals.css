@@ -101,7 +101,12 @@ body {
 
   /* Side rail: always-expanded at a comfortable 16.5rem width. The previous
    * hover-to-expand created a "label flicker" feel users hated; a fixed
-   * width is calmer for a workspace where the rail is in constant use. */
+   * width is calmer for a workspace where the rail is in constant use.
+   *
+   * The inset box-shadow on the rail adds a 1px highlight along the top
+   * edge that catches light and gives the dark gradient a sense of depth.
+   * Combined with the existing border + outer drop-shadow, the rail reads
+   * as a raised glass panel rather than a flat painted strip. */
   .denty-collapsible-rail {
     position: sticky;
     top: 1rem;
@@ -112,16 +117,32 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+    box-shadow:
+      0 34px 90px rgba(4, 11, 26, 0.34),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04);
   }
 
+  /* Custom webkit scrollbar — only visible on hover/scroll on Windows
+   * Chrome so the rail stays calm at rest. */
   .denty-collapsible-rail::-webkit-scrollbar {
     width: 6px;
+  }
+
+  .denty-collapsible-rail::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 0.5rem 0;
   }
 
   .denty-collapsible-rail::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.18);
     border-radius: 999px;
+    transition: background 200ms ease;
+  }
+
+  .denty-collapsible-rail:hover::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
   }
 
   /* All rail children are visible by default — no hover gymnastics. */
@@ -435,7 +456,9 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   .denty-screen {
     position: relative;
     min-height: 100vh;
-    overflow: hidden;
+    /* Do NOT add overflow:hidden here — it would break position:sticky on
+     * the side rail. Decorative background blobs are clipped by their own
+     * absolute container in each role page. */
     color: var(--foreground);
     background:
       radial-gradient(circle at 8% 12%, rgba(11, 123, 138, 0.09), transparent 22%),
