@@ -1,5 +1,35 @@
 @import "tailwindcss";
 
+/* ======================================================================
+ * DENTYHUB — "Frozen Lake" design system
+ * ----------------------------------------------------------------------
+ * DESIGN-SYSTEM CHEAT-SHEET (single source of truth — refer to these
+ * tokens instead of hand-rolling values in component files).
+ *
+ *  RADIUS SCALE        --radius-sm  12px  chips, small actions, inputs-inner
+ *                      --radius-md  16px  fields, list rows, sub-cards
+ *                      --radius-lg  22px  panels, cards, sidebars, nav items
+ *                      --radius-xl  28px  modals, drawers, hero surfaces
+ *                      999px            pills / fully-round buttons
+ *
+ *  SHADOW SCALE        --shadow-soft    resting list rows / stat cards
+ *                      --shadow-panel   default panels & cards
+ *                      --shadow-strong  raised panels, modals, drawers
+ *                      --shadow-button  primary (teal) buttons
+ *                      --shadow-hover   hover-lift for cards/buttons
+ *
+ *  MOTION STANDARD     --ease           cubic-bezier(0.22, 1, 0.36, 1)
+ *                      --dur-fast       140ms   micro (press feedback)
+ *                      --dur            200ms   STANDARD — hover/focus/state
+ *                      --dur-slow       320ms   enter animations
+ *                      Use:  transition: <props> var(--dur) var(--ease);
+ *
+ *  FOCUS RING          --focus-ring  → applied via :focus-visible everywhere
+ *                      2px teal outline + 4px translucent halo.
+ *
+ *  COLOR TOKENS        --color-navy (teal accent), --color-success,
+ *                      --color-danger, --color-warning, --color-info.
+ * ====================================================================== */
 :root {
   --background: #fafbfc;
   --foreground: #0a1628;
@@ -24,9 +54,28 @@
   --color-danger: #dc2626;
   --color-warning: #f59e0b;
   --color-info: #3b82f6;
+
+  /* Radius scale — one coherent ramp (see cheat-sheet above). */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+
+  /* Shadow scale — every .denty-* surface references one of these. */
+  --shadow-soft: 0 10px 24px rgba(10, 22, 40, 0.05);
   --shadow-panel: 0 18px 40px rgba(10, 22, 40, 0.08);
-  --shadow-strong: 0 24px 55px rgba(10, 22, 40, 0.12);
+  --shadow-strong: 0 24px 60px rgba(10, 22, 40, 0.14);
   --shadow-button: 0 16px 32px rgba(11, 123, 138, 0.18);
+  --shadow-hover: 0 22px 44px rgba(11, 123, 138, 0.2);
+
+  /* Motion standard — ONE easing curve + a three-step duration ramp. */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur: 200ms;
+  --dur-slow: 320ms;
+
+  /* Focus ring — defined once, picked up by the global :focus-visible rule. */
+  --focus-ring: 0 0 0 2px var(--background), 0 0 0 4px var(--color-navy);
 }
 
 @theme inline {
@@ -289,7 +338,7 @@ body {
   justify-content: center;
   height: 2.5rem;
   width: 2.5rem;
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(255, 255, 255, 0.08);
   color: inherit;
@@ -342,7 +391,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   width: 100%;
   flex-direction: column;
   overflow: hidden;
-  border-radius: 24px;
+  border-radius: var(--radius-xl);
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: linear-gradient(180deg, rgba(82, 85, 103, 0.96), rgba(67, 71, 88, 0.94));
   box-shadow: 0 34px 90px rgba(4, 11, 26, 0.34);
@@ -416,17 +465,23 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     letter-spacing: -0.03em;
   }
 
+  /* Standard transition — every interactive element animates the same set
+   * of properties on the same 200ms / var(--ease) curve. */
   input,
   select,
   textarea,
-  button {
+  button,
+  a[href],
+  summary,
+  [role="button"],
+  [role="tab"] {
     transition:
-      color 180ms ease,
-      background-color 180ms ease,
-      border-color 180ms ease,
-      box-shadow 180ms ease,
-      transform 180ms ease,
-      opacity 180ms ease;
+      color var(--dur) var(--ease),
+      background-color var(--dur) var(--ease),
+      border-color var(--dur) var(--ease),
+      box-shadow var(--dur) var(--ease),
+      transform var(--dur) var(--ease),
+      opacity var(--dur) var(--ease);
   }
 
   button:active {
@@ -449,6 +504,42 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   input:disabled,
   textarea:disabled {
     cursor: not-allowed;
+  }
+
+  /* ------------------------------------------------------------------
+   * Accessibility — unified keyboard focus ring.
+   * Mouse clicks do NOT show the ring (:focus-visible only fires for
+   * keyboard / programmatic focus), so the app stays calm for pointer
+   * users while remaining fully navigable by keyboard. This single rule
+   * covers every interactive element so component files never need to
+   * ship their own focus styling — and any leftover `focus:outline-none`
+   * in a .tsx no longer leaves an element with NO visible focus state.
+   * ------------------------------------------------------------------ */
+  :focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-sm);
+  }
+
+  /* Elements that already carry a larger radius keep their own shape so
+   * the halo hugs the component instead of clipping square corners. */
+  .denty-panel:focus-visible,
+  .denty-panel-strong:focus-visible,
+  .denty-sidebar:focus-visible,
+  .denty-modal:focus-visible,
+  .denty-rail-action:focus-visible,
+  .denty-button-primary:focus-visible,
+  .denty-button-secondary:focus-visible,
+  .denty-pill:focus-visible {
+    border-radius: inherit;
+  }
+
+  /* Fully-round controls get a round halo. */
+  .denty-button-primary:focus-visible,
+  .denty-button-secondary:focus-visible,
+  .denty-pill:focus-visible,
+  .denty-toast-close:focus-visible {
+    border-radius: 999px;
   }
 }
 
@@ -542,12 +633,12 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(246, 250, 252, 0.74));
     box-shadow:
-      0 18px 46px rgba(10, 22, 40, 0.08),
+      var(--shadow-panel),
       inset 0 1px 0 rgba(255, 255, 255, 0.44);
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
     backdrop-filter: blur(18px);
     color: var(--foreground);
-    animation: frozenReveal 520ms ease both;
+    animation: frozenReveal var(--dur-slow) var(--ease) both;
   }
 
   .denty-panel-strong {
@@ -555,12 +646,12 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(238, 245, 249, 0.78));
     box-shadow:
-      0 24px 60px rgba(10, 22, 40, 0.12),
+      var(--shadow-strong),
       inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    border-radius: 26px;
+    border-radius: var(--radius-xl);
     backdrop-filter: blur(20px);
     color: var(--foreground);
-    animation: frozenReveal 620ms ease both;
+    animation: frozenReveal var(--dur-slow) var(--ease) both;
   }
 
   .denty-night-panel {
@@ -568,21 +659,21 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     background:
       linear-gradient(180deg, rgba(12, 24, 40, 0.84), rgba(8, 18, 32, 0.72));
     box-shadow:
-      0 24px 60px rgba(7, 18, 34, 0.22),
+      var(--shadow-strong),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    border-radius: 26px;
+    border-radius: var(--radius-xl);
     color: rgba(250, 252, 255, 0.96);
     backdrop-filter: blur(22px);
-    animation: frozenReveal 620ms ease both;
+    animation: frozenReveal var(--dur-slow) var(--ease) both;
   }
 
   .denty-subpanel {
     border: 1px solid rgba(255, 255, 255, 0.28);
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(240, 246, 249, 0.56));
-    border-radius: 18px;
+    border-radius: var(--radius-md);
     box-shadow:
-      0 12px 26px rgba(10, 22, 40, 0.06),
+      var(--shadow-soft),
       inset 0 1px 0 rgba(255, 255, 255, 0.42);
     backdrop-filter: blur(16px);
     color: var(--foreground);
@@ -592,9 +683,9 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     border: 1px solid rgba(255, 255, 255, 0.3);
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(242, 247, 250, 0.68));
-    border-radius: 21px;
+    border-radius: var(--radius-lg);
     box-shadow:
-      0 18px 36px rgba(10, 22, 40, 0.07),
+      var(--shadow-panel),
       inset 0 1px 0 rgba(255, 255, 255, 0.45);
     backdrop-filter: blur(16px);
     color: var(--foreground);
@@ -604,9 +695,9 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     border: 1px solid rgba(255, 255, 255, 0.26);
     background:
       linear-gradient(180deg, rgba(247, 251, 252, 0.84), rgba(235, 243, 247, 0.58));
-    border-radius: 18px;
+    border-radius: var(--radius-md);
     box-shadow:
-      0 12px 26px rgba(10, 22, 40, 0.05),
+      var(--shadow-soft),
       inset 0 1px 0 rgba(255, 255, 255, 0.34);
     backdrop-filter: blur(14px);
     color: var(--foreground);
@@ -616,10 +707,10 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     border: 1px solid rgba(255, 255, 255, 0.24);
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(241, 247, 250, 0.62));
-    border-radius: 16px;
+    border-radius: var(--radius-md);
     color: var(--foreground);
     box-shadow:
-      0 10px 22px rgba(10, 22, 40, 0.05),
+      var(--shadow-soft),
       inset 0 1px 0 rgba(255, 255, 255, 0.34);
     backdrop-filter: blur(14px);
   }
@@ -627,10 +718,10 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   .denty-stat-card {
     border: 1px solid rgba(255, 255, 255, 0.28);
     background: linear-gradient(180deg, rgba(224, 240, 246, 0.74), rgba(255, 255, 255, 0.78));
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     color: var(--foreground);
     box-shadow:
-      0 12px 24px rgba(10, 22, 40, 0.05),
+      var(--shadow-soft),
       inset 0 1px 0 rgba(255, 255, 255, 0.38);
     backdrop-filter: blur(12px);
   }
@@ -640,7 +731,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     align-items: center;
     justify-content: center;
     gap: 0.35rem;
-    border-radius: 12px;
+    border-radius: var(--radius-sm);
     border: 1px solid rgba(255, 255, 255, 0.26);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(240, 246, 249, 0.64));
     padding: 0.45rem 0.7rem;
@@ -649,7 +740,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     color: var(--foreground);
     cursor: pointer;
     box-shadow:
-      0 10px 20px rgba(10, 22, 40, 0.05),
+      var(--shadow-soft),
       inset 0 1px 0 rgba(255, 255, 255, 0.35);
     backdrop-filter: blur(12px);
     min-height: 2.25rem;
@@ -659,6 +750,18 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     transform: translateY(-1px);
     border-color: rgba(11, 123, 138, 0.18);
     background: rgba(230, 244, 246, 0.94);
+  }
+
+  .denty-action:active {
+    transform: translateY(0);
+  }
+
+  .denty-action:disabled,
+  .denty-action[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 
   .denty-action-primary {
@@ -738,7 +841,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
 
   .denty-field {
     width: 100%;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     border: 1px solid rgba(255, 255, 255, 0.28);
     background: rgba(255, 255, 255, 0.72);
     color: var(--foreground);
@@ -747,12 +850,16 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     min-height: 2.6rem;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.62),
-      0 10px 20px rgba(10, 22, 40, 0.05);
+      var(--shadow-soft);
     backdrop-filter: blur(12px);
   }
 
   .denty-field::placeholder {
     color: rgba(100, 116, 139, 0.82);
+  }
+
+  .denty-field:hover:not(:disabled):not(:focus) {
+    border-color: rgba(11, 123, 138, 0.2);
   }
 
   .denty-field:focus {
@@ -763,6 +870,21 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     background: rgba(255, 255, 255, 0.88);
   }
 
+  /* A field is itself an interactive control, so a keyboard focus already
+   * shows the teal halo above — suppress the generic navy ring to avoid a
+   * double outline. */
+  .denty-field:focus-visible {
+    box-shadow:
+      0 0 0 4px rgba(11, 123, 138, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  }
+
+  .denty-field:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: rgba(241, 245, 248, 0.6);
+  }
+
   .denty-button-primary {
     border-radius: 999px;
     border: 1px solid rgba(11, 123, 138, 0.14);
@@ -771,9 +893,22 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     box-shadow: var(--shadow-button);
   }
 
-  .denty-button-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 22px 36px rgba(11, 123, 138, 0.22);
+  .denty-button-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .denty-button-primary:active:not(:disabled) {
+    transform: translateY(1px) scale(0.99);
+    box-shadow: var(--shadow-button);
+  }
+
+  .denty-button-primary:disabled,
+  .denty-button-primary[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 
   .denty-button-secondary {
@@ -782,15 +917,26 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     background: rgba(255, 255, 255, 0.58);
     color: var(--foreground);
     box-shadow:
-      0 12px 26px rgba(10, 22, 40, 0.07),
+      var(--shadow-soft),
       inset 0 1px 0 rgba(255, 255, 255, 0.3);
     backdrop-filter: blur(14px);
   }
 
-  .denty-button-secondary:hover {
+  .denty-button-secondary:hover:not(:disabled) {
     transform: translateY(-1px);
     border-color: rgba(11, 123, 138, 0.16);
     background: rgba(244, 245, 247, 0.92);
+  }
+
+  .denty-button-secondary:active:not(:disabled) {
+    transform: translateY(1px) scale(0.99);
+  }
+
+  .denty-button-secondary:disabled,
+  .denty-button-secondary[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
   }
 
   .denty-pill {
@@ -819,9 +965,9 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(239, 246, 249, 0.6));
     box-shadow:
-      0 22px 50px rgba(10, 22, 40, 0.1),
+      var(--shadow-strong),
       inset 0 1px 0 rgba(255, 255, 255, 0.38);
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
     backdrop-filter: blur(18px);
   }
 
@@ -830,7 +976,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     width: 100%;
     align-items: center;
     gap: 0.7rem;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     border: 1px solid rgba(255, 255, 255, 0.14);
     background: rgba(255, 255, 255, 0.42);
     color: var(--foreground);
@@ -847,6 +993,17 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     transform: translateX(3px);
   }
 
+  .denty-sidebar-button:active {
+    transform: translateX(1px);
+  }
+
+  .denty-sidebar-button:disabled,
+  .denty-sidebar-button[aria-disabled="true"] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
   .denty-sidebar-ghost {
     background: rgba(255, 255, 255, 0.3);
   }
@@ -860,11 +1017,12 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     border: 1px solid rgba(255, 255, 255, 0.34);
     background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(241, 247, 250, 0.76));
     box-shadow:
-      0 28px 76px rgba(10, 22, 40, 0.16),
+      var(--shadow-strong),
       inset 0 1px 0 rgba(255, 255, 255, 0.42);
+    border-radius: var(--radius-xl);
     backdrop-filter: blur(20px);
     color: var(--foreground);
-    animation: frozenSlideUp 360ms ease both;
+    animation: frozenSlideUp var(--dur-slow) var(--ease) both;
   }
 
   .denty-toast-stack {
@@ -881,16 +1039,16 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
 
   .denty-toast {
     pointer-events: auto;
-    border-radius: 24px;
+    border-radius: var(--radius-xl);
     border: 1px solid rgba(255, 255, 255, 0.18);
     background: linear-gradient(180deg, rgba(12, 24, 40, 0.9), rgba(8, 18, 32, 0.82));
     box-shadow:
-      0 24px 54px rgba(4, 11, 26, 0.22),
+      var(--shadow-strong),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
     padding: 1rem 1rem 1rem 1.1rem;
     color: rgba(250, 252, 255, 0.98);
     backdrop-filter: blur(24px);
-    animation: frozenSlideUp 280ms ease both;
+    animation: frozenSlideUp var(--dur-slow) var(--ease) both;
   }
 
   .denty-toast-success {
@@ -941,7 +1099,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   .denty-placeholder {
     border: 1px dashed rgba(255, 255, 255, 0.24);
     background: rgba(241, 247, 250, 0.52);
-    border-radius: 24px;
+    border-radius: var(--radius-lg);
     backdrop-filter: blur(14px);
     color: var(--foreground);
   }
@@ -964,15 +1122,20 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   .denty-drawer-shell {
     height: 100%;
     width: 100%;
-    border-radius: 30px 0 0 30px;
+    border-radius: var(--radius-xl) 0 0 var(--radius-xl);
     border: 1px solid rgba(255, 255, 255, 0.22);
     background:
       linear-gradient(180deg, rgba(12, 24, 40, 0.84), rgba(9, 19, 34, 0.72));
     box-shadow:
-      0 28px 76px rgba(7, 18, 34, 0.24),
+      var(--shadow-strong),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
     color: rgba(250, 252, 255, 0.96);
     backdrop-filter: blur(24px);
+  }
+
+  /* RTL: the drawer enters from the right, so round the LEFT edge instead. */
+  html[dir="rtl"] .denty-drawer-shell {
+    border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
   }
 
   .denty-drawer-shell-chat {
@@ -1018,9 +1181,9 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   .denty-drawer-card {
     border: 1px solid rgba(255, 255, 255, 0.14);
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     box-shadow:
-      0 16px 32px rgba(7, 18, 34, 0.14),
+      var(--shadow-panel),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(14px);
   }
@@ -1030,15 +1193,15 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     width: 100%;
     align-items: center;
     gap: 0.75rem;
-    border-radius: 18px;
+    border-radius: var(--radius-md);
     border: 1px solid rgba(255, 255, 255, 0.12);
     background: rgba(255, 255, 255, 0.08);
     padding: 0.7rem 0.8rem;
     text-align: left;
     transition:
-      transform 180ms ease,
-      background-color 180ms ease,
-      border-color 180ms ease;
+      transform var(--dur) var(--ease),
+      background-color var(--dur) var(--ease),
+      border-color var(--dur) var(--ease);
   }
 
   .denty-drawer-list-item:hover {
@@ -1064,12 +1227,19 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     box-shadow: 0 0 0 4px rgba(173, 216, 230, 0.12);
   }
 
+  /* The drawer field sits on a dark glass surface, so its keyboard ring is
+   * a pale-ice halo rather than the navy ring used on light surfaces. */
+  .denty-drawer-field:focus-visible {
+    box-shadow: 0 0 0 4px rgba(173, 216, 230, 0.18);
+    border-radius: var(--radius-md);
+  }
+
   .denty-bubble {
     max-width: 75%;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     padding: 0.82rem 0.95rem;
     box-shadow:
-      0 14px 28px rgba(7, 18, 34, 0.14),
+      var(--shadow-panel),
       inset 0 1px 0 rgba(255, 255, 255, 0.06);
   }
 
@@ -1119,7 +1289,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     position: relative;
     min-height: 148px;
     overflow: hidden;
-    border-radius: 28px;
+    border-radius: var(--radius-xl);
   }
 
   .frozen-swatch::after {
@@ -1128,13 +1298,13 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
     inset: auto 18px 16px auto;
     height: 42px;
     width: 42px;
-    border-radius: 14px;
+    border-radius: var(--radius-sm);
     border: 1px solid rgba(255, 255, 255, 0.55);
     background: rgba(255, 255, 255, 0.4);
   }
 
   .frozen-fade {
-    animation: frozenReveal 620ms ease both;
+    animation: frozenReveal var(--dur-slow) var(--ease) both;
   }
 
   .frozen-float {
@@ -1605,10 +1775,19 @@ html.dark .denty-field::placeholder {
   color: rgba(148, 163, 184, 0.72);
 }
 
+html.dark .denty-field:hover:not(:disabled):not(:focus) {
+  border-color: rgba(45, 212, 191, 0.4);
+}
+
 html.dark .denty-button-secondary {
   background: rgba(20, 34, 58, 0.72);
   color: var(--foreground);
   border-color: rgba(148, 163, 184, 0.28);
+}
+
+html.dark .denty-button-secondary:hover:not(:disabled) {
+  background: rgba(28, 46, 74, 0.86);
+  border-color: rgba(45, 212, 191, 0.32);
 }
 
 html.dark .denty-action {
@@ -1617,16 +1796,115 @@ html.dark .denty-action {
   border-color: rgba(148, 163, 184, 0.24);
 }
 
+html.dark .denty-action:hover {
+  background: rgba(28, 46, 74, 0.92);
+  border-color: rgba(45, 212, 191, 0.3);
+}
+
+/* Tinted action variants — the light build uses near-opaque pastel fills
+ * that would glow harshly on a dark surface, so re-tint with translucent
+ * accent washes that read as "subtly colored" on the dark panel. */
+html.dark .denty-action-primary {
+  background: rgba(11, 123, 138, 0.22);
+  border-color: rgba(45, 212, 191, 0.32);
+  color: rgba(186, 240, 244, 0.96);
+}
+
+html.dark .denty-action-success {
+  background: rgba(16, 185, 129, 0.18);
+  border-color: rgba(16, 185, 129, 0.34);
+  color: rgba(167, 243, 208, 0.96);
+}
+
+html.dark .denty-action-danger {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: rgba(248, 113, 113, 0.34);
+  color: rgba(254, 202, 202, 0.96);
+}
+
+/* Sub-card / list-row hover lift needs a lighter wash in dark mode. */
+html.dark .denty-list-row:hover,
+html.dark .denty-dashboard-card:hover,
+html.dark .denty-dashboard-card-soft:hover {
+  border-color: rgba(45, 212, 191, 0.24);
+}
+
 html.dark .denty-placeholder {
   background: rgba(12, 22, 40, 0.5);
   border-color: rgba(148, 163, 184, 0.24);
   color: var(--foreground);
 }
 
+html.dark .denty-placeholder-note {
+  color: rgba(148, 163, 184, 0.82);
+}
+
 html.dark .denty-status-chip {
   background: rgba(20, 34, 58, 0.78);
   border-color: rgba(148, 163, 184, 0.28);
   color: rgba(220, 232, 244, 0.92);
+}
+
+html.dark .denty-status-chip-strong {
+  background: rgba(11, 123, 138, 0.24);
+  border-color: rgba(45, 212, 191, 0.3);
+  color: rgba(186, 240, 244, 0.96);
+}
+
+/* Pills + kicker — teal accent reads dim on a dark panel, so lift it. */
+html.dark .denty-pill {
+  background: rgba(11, 123, 138, 0.2);
+  border-color: rgba(45, 212, 191, 0.26);
+  color: rgba(153, 232, 238, 0.94);
+}
+
+html.dark .denty-pill-soon {
+  background: rgba(245, 158, 11, 0.18);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: rgba(253, 224, 161, 0.96);
+}
+
+html.dark .denty-kicker {
+  color: rgba(94, 214, 226, 0.9);
+}
+
+html.dark .denty-link-button {
+  color: rgba(94, 214, 226, 0.92);
+}
+
+html.dark .denty-link-button:hover {
+  color: rgba(153, 232, 238, 0.98);
+}
+
+html.dark .denty-divider {
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+html.dark .denty-sidebar-button {
+  background: rgba(20, 34, 58, 0.5);
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+html.dark .denty-sidebar-button:hover {
+  background: rgba(28, 46, 74, 0.72);
+  border-color: rgba(45, 212, 191, 0.24);
+}
+
+html.dark .denty-avatar-shell {
+  background: linear-gradient(180deg, rgba(20, 34, 58, 0.92), rgba(12, 22, 40, 0.88));
+  border-color: rgba(148, 163, 184, 0.24);
+  color: var(--foreground);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+html.dark .denty-stat-card {
+  background: linear-gradient(180deg, rgba(18, 36, 60, 0.9), rgba(12, 22, 40, 0.8));
+}
+
+/* Plain <hr>/border dividers built with Tailwind slate utilities. */
+html.dark ::selection {
+  background: rgba(45, 212, 191, 0.32);
+  color: var(--foreground);
 }
 
 html[data-reduced-motion="true"] *,
@@ -1796,6 +2074,16 @@ html[data-reduced-motion="true"] *::after {
   pointer-events: none;
 }
 
+/* ----------------------------------------------------------------------- *
+ * Motion safety — OS-level "reduce motion" preference.
+ * The in-app Settings toggle uses html[data-reduced-motion="true"] (handled
+ * separately above with a blanket * selector). This block covers users who
+ * set the preference at the OS level WITHOUT touching the app toggle, so
+ * every decorative / looping animation in the design system is neutralised:
+ * the looping background blobs (frozenDrift), floating cards (frozenFloat),
+ * the live status-dot pulse, the auth-media slow zoom, and all the
+ * game / smile-streak flourishes.
+ * ----------------------------------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   .denty-flame-pulse,
   .denty-flame-bounce,
@@ -1804,8 +2092,25 @@ html[data-reduced-motion="true"] *::after {
   .denty-option-pulse,
   .denty-burst-star,
   .denty-quadrant-glow,
-  .denty-spark {
+  .denty-spark,
+  .frozen-float,
+  .frozen-fade,
+  .denty-status-dot,
+  .denty-screen::after,
+  .admin-suite-screen::after,
+  .frozen-stage::before,
+  .auth-background-media img,
+  .auth-showcase-media img,
+  .denty-panel,
+  .denty-panel-strong,
+  .denty-night-panel,
+  .denty-modal,
+  .denty-toast {
     animation: none !important;
+  }
+
+  html {
+    scroll-behavior: auto;
   }
 }
 
