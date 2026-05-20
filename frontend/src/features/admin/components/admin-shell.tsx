@@ -242,7 +242,7 @@ export function AdminShell({
             {/* Identity card — a separate panel pinned above the nav rail. */}
             <Link
               href="/admin"
-              className="denty-rail-identity block rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(82,85,103,0.96),rgba(67,71,88,0.94))] px-3 py-3 text-white backdrop-blur-[28px] transition-colors hover:border-white/18"
+              className="denty-rail-identity block rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,70,76,0.97),rgba(9,42,48,0.97))] px-3 py-3 text-white backdrop-blur-[28px] transition-colors hover:border-white/18"
             >
               <div className="flex items-center gap-3">
                 <span
@@ -276,7 +276,7 @@ export function AdminShell({
               </div>
             </Link>
 
-            <aside className="frozen-stage denty-collapsible-rail rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(82,85,103,0.96),rgba(67,71,88,0.94))] px-3 py-4 text-white backdrop-blur-[28px]">
+            <aside className="frozen-stage denty-collapsible-rail rounded-[24px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,70,76,0.97),rgba(9,42,48,0.97))] px-3 py-4 text-white backdrop-blur-[28px]">
             <div className="flex min-h-full flex-col gap-3">
             {/* Admin's nav search is load-bearing (filters real nav items
                 across 11 destinations), so it stays — restyled to match the

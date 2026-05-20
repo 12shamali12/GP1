@@ -232,7 +232,7 @@ function RailIdentityCard({
   const displayName = userName?.trim() || fallbackName;
   const initials = initialsOf(displayName);
   return (
-    <div className="denty-rail-identity rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(82,85,103,0.96),rgba(67,71,88,0.94))] px-3 py-3 text-white backdrop-blur-[28px]">
+    <div className="denty-rail-identity rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,70,76,0.97),rgba(9,42,48,0.97))] px-3 py-3 text-white backdrop-blur-[28px]">
       <div className="flex items-center gap-3">
         <span
           aria-hidden
@@ -296,7 +296,7 @@ export function DoctorSideRail({
           accent={accent}
         />
 
-      <aside className="frozen-stage denty-collapsible-rail rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(82,85,103,0.96),rgba(67,71,88,0.94))] px-4 py-5 text-white backdrop-blur-[28px]">
+      <aside className="frozen-stage denty-collapsible-rail rounded-[22px] border border-white/10 bg-[linear-gradient(180deg,rgba(15,70,76,0.97),rgba(9,42,48,0.97))] px-4 py-5 text-white backdrop-blur-[28px]">
       <div className="flex min-h-full flex-col gap-3">
         <div className="mx-2 my-2 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
         <div className="denty-rail-section-label mb-1 px-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-white/56">

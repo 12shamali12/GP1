@@ -150,6 +150,7 @@ body {
      * Reserve its lane here (rail width + edge inset + gap). The rail sits
      * on the right by default; admin overrides to the left below. */
     padding-right: calc(5rem + 1.5rem);
+    padding-left: 1.75rem;
   }
 
   /* Side rail: always-expanded at a comfortable 16.5rem width. The previous
@@ -256,13 +257,22 @@ body {
   }
 
   /* Collapsed: the active tab's highlight wraps just the icon — drop the
-   * full-width white pill so it doesn't look like a stray box. The icon's
-   * own dark active fill + the accent bar still mark the selection. */
+   * full-width white pill so it doesn't look like a stray box. */
   .denty-rail-column:not(:hover)
     .denty-rail-action:has(.denty-rail-accent[data-active="true"]) {
     background-color: transparent;
     border-color: transparent;
     box-shadow: none;
+  }
+
+  /* ...and make the active icon itself bright so it clearly pops against
+   * the dark teal rail (the icon span is the 2nd child of the row). */
+  .denty-rail-column:not(:hover)
+    .denty-rail-action:has(.denty-rail-accent[data-active="true"])
+    > :nth-child(2) {
+    background-color: #ffffff;
+    color: #0c3b41;
+    box-shadow: 0 6px 16px rgba(4, 11, 26, 0.34);
   }
 
   .denty-rail-column:not(:hover) .denty-rail-section-label,
@@ -732,10 +742,10 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
 
   .admin-suite-screen {
     background:
-      radial-gradient(circle at 12% 18%, rgba(94, 113, 133, 0.34), transparent 24%),
-      radial-gradient(circle at 86% 10%, rgba(20, 34, 54, 0.3), transparent 20%),
-      radial-gradient(circle at 72% 76%, rgba(78, 96, 117, 0.18), transparent 26%),
-      linear-gradient(135deg, #49586b 0%, #5f7184 22%, #7e8f9e 44%, #b6c2cb 72%, #dfe7ec 100%);
+      radial-gradient(circle at 14% 16%, rgba(13, 148, 136, 0.42), transparent 30%),
+      radial-gradient(circle at 88% 12%, rgba(8, 47, 73, 0.5), transparent 26%),
+      radial-gradient(circle at 78% 84%, rgba(34, 211, 238, 0.24), transparent 32%),
+      linear-gradient(150deg, #0b2b33 0%, #103f49 22%, #1b6064 45%, #3f8b86 70%, #93c7c0 100%);
   }
 
   .admin-suite-screen::before {
@@ -776,7 +786,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   .denty-panel {
     border: 1px solid rgba(255, 255, 255, 0.34);
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(246, 250, 252, 0.74));
+      linear-gradient(180deg, rgba(250, 255, 254, 0.9), rgba(229, 247, 246, 0.78));
     box-shadow:
       var(--shadow-panel),
       inset 0 1px 0 rgba(255, 255, 255, 0.44);
@@ -789,7 +799,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   .denty-panel-strong {
     border: 1px solid rgba(255, 255, 255, 0.4);
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(238, 245, 249, 0.78));
+      linear-gradient(180deg, rgba(251, 255, 254, 0.95), rgba(227, 246, 245, 0.83));
     box-shadow:
       var(--shadow-strong),
       inset 0 1px 0 rgba(255, 255, 255, 0.5);
@@ -827,7 +837,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   .denty-dashboard-card {
     border: 1px solid rgba(255, 255, 255, 0.3);
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(242, 247, 250, 0.68));
+      linear-gradient(180deg, rgba(250, 255, 254, 0.92), rgba(228, 246, 245, 0.74));
     border-radius: var(--radius-lg);
     box-shadow:
       var(--shadow-panel),
@@ -839,7 +849,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   .denty-dashboard-card-soft {
     border: 1px solid rgba(255, 255, 255, 0.26);
     background:
-      linear-gradient(180deg, rgba(247, 251, 252, 0.84), rgba(235, 243, 247, 0.58));
+      linear-gradient(180deg, rgba(244, 253, 252, 0.86), rgba(224, 243, 244, 0.64));
     border-radius: var(--radius-md);
     box-shadow:
       var(--shadow-soft),
@@ -851,7 +861,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
   .denty-list-row {
     border: 1px solid rgba(255, 255, 255, 0.24);
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(241, 247, 250, 0.62));
+      linear-gradient(180deg, rgba(249, 255, 254, 0.84), rgba(228, 245, 246, 0.66));
     border-radius: var(--radius-md);
     color: var(--foreground);
     box-shadow:
@@ -862,7 +872,7 @@ html[dir="rtl"] .denty-mobile-drawer-sheet {
 
   .denty-stat-card {
     border: 1px solid rgba(255, 255, 255, 0.28);
-    background: linear-gradient(180deg, rgba(224, 240, 246, 0.74), rgba(255, 255, 255, 0.78));
+    background: linear-gradient(160deg, rgba(205, 238, 232, 0.92), rgba(234, 249, 250, 0.86));
     border-radius: var(--radius-md);
     color: var(--foreground);
     box-shadow:
@@ -2488,5 +2498,11 @@ button:not(:disabled):active,
 .denty-pill:not(:disabled):active {
   transform: scale(0.97);
   transition: transform 0.07s ease;
+}
+
+/* Slightly larger base type across the app (rem-based, so it scales the
+ * whole UI proportionally). */
+html {
+  font-size: 17px;
 }
 
