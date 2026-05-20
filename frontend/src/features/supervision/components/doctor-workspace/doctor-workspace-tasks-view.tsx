@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { DoctorWorkspaceData } from "../../types";
 
 type Props = {
@@ -7,13 +8,18 @@ type Props = {
 };
 
 export function DoctorWorkspaceTasksView({ workspace }: Props) {
+  const t = useTranslation();
   return (
     <div className="grid gap-5 xl:grid-cols-[0.96fr_1.04fr]">
       <div className="denty-panel-strong p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="denty-kicker">Clinic tasks</p>
-            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Semester checklist</h3>
+            <p className="denty-kicker">
+              {t("supervision.tasks.checklist_eyebrow")}
+            </p>
+            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              {t("supervision.tasks.checklist_title")}
+            </h3>
           </div>
           <span className="denty-pill">{workspace?.clinicTasks.length || 0}</span>
         </div>
@@ -29,7 +35,9 @@ export function DoctorWorkspaceTasksView({ workspace }: Props) {
               </div>
               {task.description ? <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">{task.description}</p> : null}
               {task.progress?.mark !== undefined && task.progress?.mark !== null ? (
-                <p className="mt-3 text-sm font-semibold text-[var(--foreground)]">Mark: {task.progress.mark}</p>
+                <p className="mt-3 text-sm font-semibold text-[var(--foreground)]">
+                  {t("supervision.tasks.task_mark", { value: task.progress.mark })}
+                </p>
               ) : null}
             </div>
           ))}
@@ -39,8 +47,12 @@ export function DoctorWorkspaceTasksView({ workspace }: Props) {
       <div className="denty-panel-strong p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="denty-kicker">Report history</p>
-            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Reviewed work</h3>
+            <p className="denty-kicker">
+              {t("supervision.tasks.history_eyebrow")}
+            </p>
+            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              {t("supervision.tasks.history_title")}
+            </h3>
           </div>
           <span className="denty-pill">{workspace?.reports.length || 0}</span>
         </div>
@@ -57,7 +69,10 @@ export function DoctorWorkspaceTasksView({ workspace }: Props) {
               <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">{report.description}</p>
               {(report.mark !== undefined && report.mark !== null) || (report.rating !== undefined && report.rating !== null) ? (
                 <p className="mt-3 text-sm font-semibold text-[var(--foreground)]">
-                  Mark: {report.mark ?? "-"} - Rating: {report.rating ?? "-"}
+                  {t("supervision.tasks.report_mark_rating", {
+                    mark: report.mark ?? "-",
+                    rating: report.rating ?? "-",
+                  })}
                 </p>
               ) : null}
               {report.feedback ? <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">{report.feedback}</p> : null}

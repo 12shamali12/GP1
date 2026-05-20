@@ -2,12 +2,14 @@
 
 import { AdminShell } from "@/features/admin/components/admin-shell";
 import { ADMIN_USERNAME } from "@/features/admin/lib/admin-config";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 import { useAdminChatWorkspace } from "./hooks/use-admin-chat-workspace";
 import { AdminChatConversationPanel } from "./ui/admin-chat-conversation-panel";
 import { AdminChatInboxPanel } from "./ui/admin-chat-inbox-panel";
 
 export default function AdminChatPage() {
+  const t = useTranslation();
   const {
     apiUrl,
     conversations,
@@ -37,14 +39,14 @@ export default function AdminChatPage() {
     error,
     clearMessage: () => setMessage(null),
     clearError: () => setError(null),
-    messageTitle: "Admin chat",
-    errorTitle: "Chat issue",
+    messageTitle: t("admin.chat.toast_title"),
+    errorTitle: t("admin.chat.toast_issue"),
   });
 
   return (
     <AdminShell
-      title="Admin Chat Desk"
-      description="The admin account now has a real direct-message workspace, so approvals can move into conversation when needed."
+      title={t("admin.chat.title")}
+      description={t("admin.chat.description")}
     >
       <div className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr]">
         <AdminChatInboxPanel

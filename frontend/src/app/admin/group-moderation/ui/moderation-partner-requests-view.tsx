@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { AlphabetSection } from "@/features/admin/utils/collection";
 import type { ModeratedPartnerRequest } from "../hooks/use-admin-group-moderation-workspace";
 
@@ -14,18 +15,21 @@ export function ModerationPartnerRequestsView({
   total,
   onDecide,
 }: ModerationPartnerRequestsViewProps) {
+  const t = useTranslation();
   return (
     <div className="denty-panel-strong max-h-[48rem] overflow-hidden p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-[var(--foreground)]">
-            Partner requests
+            {t("admin.mod.partner_title")}
           </h2>
           <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-            Pairing requests waiting for admin approval.
+            {t("admin.mod.partner_subtitle")}
           </p>
         </div>
-        <span className="denty-pill">{total} pending</span>
+        <span className="denty-pill">
+          {t("admin.mod.pending_count", { count: total })}
+        </span>
       </div>
 
       <div className="mt-5 max-h-[38rem] overflow-y-auto pr-2">
@@ -42,17 +46,20 @@ export function ModerationPartnerRequestsView({
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-lg font-semibold text-[var(--foreground)]">
-                            {request.sender.name} to {request.receiver.name}
+                            {t("admin.mod.partner_to", {
+                              sender: request.sender.name,
+                              receiver: request.receiver.name,
+                            })}
                           </p>
                           <p className="mt-1 text-sm text-[var(--muted-foreground)]">
                             {request.group.name} - {request.group.semesterLabel}
                           </p>
                         </div>
-                        <span className="denty-pill">Pairing</span>
+                        <span className="denty-pill">{t("admin.mod.pairing")}</span>
                       </div>
                       <div className="mt-3 grid gap-3 sm:grid-cols-2">
                         <div className="rounded-[20px] border border-white/10 bg-white/24 p-3">
-                          <p className="denty-kicker">Sender</p>
+                          <p className="denty-kicker">{t("admin.mod.sender")}</p>
                           <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
                             {request.sender.name}
                           </p>
@@ -62,7 +69,7 @@ export function ModerationPartnerRequestsView({
                           </p>
                         </div>
                         <div className="rounded-[20px] border border-white/10 bg-white/24 p-3">
-                          <p className="denty-kicker">Receiver</p>
+                          <p className="denty-kicker">{t("admin.mod.receiver")}</p>
                           <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
                             {request.receiver.name}
                           </p>
@@ -83,14 +90,14 @@ export function ModerationPartnerRequestsView({
                           onClick={() => onDecide(request.id, true)}
                           className="rounded-full border border-emerald-600/32 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700"
                         >
-                          Confirm pair
+                          {t("admin.mod.confirm_pair")}
                         </button>
                         <button
                           type="button"
                           onClick={() => onDecide(request.id, false)}
                           className="rounded-full border border-rose-600/24 bg-rose-50 px-4 py-2 text-xs font-semibold text-rose-700"
                         >
-                          Reject
+                          {t("admin.common.reject")}
                         </button>
                       </div>
                     </div>
@@ -101,9 +108,9 @@ export function ModerationPartnerRequestsView({
           </div>
         ) : (
           <div className="denty-placeholder p-5">
-            <p className="denty-kicker">Partner queue</p>
+            <p className="denty-kicker">{t("admin.mod.partner_queue")}</p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              No partner requests match the current filter.
+              {t("admin.mod.partner_empty")}
             </p>
           </div>
         )}

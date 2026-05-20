@@ -1,12 +1,14 @@
 "use client";
 
 import { AdminShell } from "@/features/admin/components/admin-shell";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 import { useAdminNotificationsWorkspace } from "./hooks/use-admin-notifications-workspace";
 import { NotificationsFilterPanel } from "./ui/notifications-filter-panel";
 import { NotificationsStream } from "./ui/notifications-stream";
 
 export default function AdminNotificationsPage() {
+  const t = useTranslation();
   const {
     items,
     loading,
@@ -28,14 +30,14 @@ export default function AdminNotificationsPage() {
     error,
     clearMessage: () => setMessage(null),
     clearError: () => setError(null),
-    messageTitle: "Notifications updated",
-    errorTitle: "Notifications issue",
+    messageTitle: t("admin.notif.toast_updated"),
+    errorTitle: t("admin.notif.toast_issue"),
   });
 
   return (
     <AdminShell
-      title="Admin Notifications"
-      description="Unread approvals, join requests, and moderation events now land in a dedicated admin inbox instead of getting lost inside status text."
+      title={t("admin.notif.title")}
+      description={t("admin.notif.description")}
     >
       <NotificationsFilterPanel
         itemsCount={items.length}

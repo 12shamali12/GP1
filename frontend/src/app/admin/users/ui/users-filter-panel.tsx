@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { RoleFilter } from "../hooks/use-admin-users-workspace";
 
 type UsersFilterPanelProps = {
@@ -17,41 +18,44 @@ export function UsersFilterPanel({
   onQueryChange,
   onRoleFilterChange,
 }: UsersFilterPanelProps) {
+  const t = useTranslation();
   return (
     <div className="denty-panel-strong px-6 py-6 md:px-6 md:py-6">
       <div className="grid gap-3 md:grid-cols-3">
         <div className="md:col-span-2">
           <label className="denty-kicker !tracking-[0.18em]">
-            Search by name, username, email, phone, or student ID
+            {t("admin.users.search_label")}
           </label>
           <input
             type="text"
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
-            placeholder="Type to filter..."
+            placeholder={t("admin.users.search_placeholder")}
             className="denty-field mt-2 text-sm"
           />
         </div>
         <div>
           <label className="denty-kicker !tracking-[0.18em]">
-            Filter by role
+            {t("admin.users.filter_label")}
           </label>
           <select
             value={roleFilter}
             onChange={(e) => onRoleFilterChange(e.target.value as RoleFilter)}
             className="denty-field mt-2 cursor-pointer text-sm"
           >
-            <option value="ALL">All</option>
-            <option value="SUPERVISOR">Supervisors</option>
-            <option value="DOCTOR">Doctors</option>
-            <option value="PATIENT">Patients</option>
+            <option value="ALL">{t("admin.users.filter_all")}</option>
+            <option value="SUPERVISOR">
+              {t("admin.users.filter_supervisors")}
+            </option>
+            <option value="DOCTOR">{t("admin.users.filter_doctors")}</option>
+            <option value="PATIENT">{t("admin.users.filter_patients")}</option>
           </select>
         </div>
       </div>
 
       {loading ? (
         <p className="mt-3 text-sm text-[var(--muted-foreground)]">
-          Loading...
+          {t("admin.common.loading")}
         </p>
       ) : null}
     </div>

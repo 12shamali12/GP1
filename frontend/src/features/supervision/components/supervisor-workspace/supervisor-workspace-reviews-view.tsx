@@ -1,6 +1,7 @@
 "use client";
 
 import type { Dispatch, SetStateAction } from "react";
+import { useTranslation, type Translator } from "@/features/i18n/language-provider";
 import type { FlexibleCaseReportFormData, SupervisorWorkspaceData } from "../../types";
 
 const STAR_OPTIONS = [0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5];
@@ -46,7 +47,10 @@ function textValue(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function collectSections(formData?: FlexibleCaseReportFormData | null) {
+function collectSections(
+  t: Translator,
+  formData?: FlexibleCaseReportFormData | null,
+) {
   if (!formData) return [];
 
   const diagnosis = Array.isArray(formData.diagnosisLines)
@@ -65,50 +69,52 @@ function collectSections(formData?: FlexibleCaseReportFormData | null) {
 
   return [
     {
-      label: "Chief complaint",
+      label: t("supervision.sup.reviews.section.chief_complaint"),
       value: textValue(formData.chiefComplaint),
     },
     {
-      label: "Medical history",
+      label: t("supervision.sup.reviews.section.medical_history"),
       value: textValue(formData.medicalHistory),
     },
     {
-      label: "Dental history",
+      label: t("supervision.sup.reviews.section.dental_history"),
       value: textValue(formData.dentalHistory),
     },
     {
-      label: "Social history",
+      label: t("supervision.sup.reviews.section.social_history"),
       value: textValue(formData.socialHistory),
     },
     {
-      label: "Extra-oral findings",
+      label: t("supervision.sup.reviews.section.extra_oral"),
       value: textValue(formData.extraOralFindings),
     },
     {
-      label: "Intra-oral findings",
+      label: t("supervision.sup.reviews.section.intra_oral"),
       value: textValue(formData.intraOralFindings),
     },
     {
-      label: "Radiographic views",
+      label: t("supervision.sup.reviews.section.radiographic_views"),
       value: radiographicViews.join(", "),
     },
     {
-      label: "Radiographic findings",
+      label: t("supervision.sup.reviews.section.radiographic_findings"),
       value: textValue(formData.radiographicFindings),
     },
     {
-      label: "Diagnosis",
+      label: t("supervision.sup.reviews.section.diagnosis"),
       value: diagnosis.join(" | "),
     },
     {
-      label: "Faculty notes",
+      label: t("supervision.sup.reviews.section.faculty_notes"),
       value: textValue(formData.facultyNotes),
     },
     {
-      label: "Treatment visits",
+      label: t("supervision.sup.reviews.section.treatment_visits"),
       value: treatment
         .map((visit) => {
-          const label = textValue(visit?.visitLabel) || "Visit";
+          const label =
+            textValue(visit?.visitLabel) ||
+            t("supervision.sup.reviews.visit_fallback");
           const tooth = textValue(visit?.tooth);
           const procedure = textValue(visit?.procedure);
           return [label, tooth, procedure].filter(Boolean).join(": ");
@@ -131,18 +137,20 @@ export function SupervisorWorkspaceReviewsView({
   submitExamGrade,
   submitReview,
 }: Props) {
+  const t = useTranslation();
   return (
     <div className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
       <div className="denty-panel-strong p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="denty-kicker">Reports</p>
+            <p className="denty-kicker">
+              {t("supervision.sup.reviews.reports_eyebrow")}
+            </p>
             <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-              Report review lane
+              {t("supervision.sup.reviews.reports_title")}
             </h2>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)]">
-              Inspect the completed visit, read the structured case report, and decide whether the
-              student passes the case, needs edits, or must repeat the case entirely.
+              {t("supervision.sup.reviews.reports_description")}
             </p>
           </div>
           <span className="denty-pill">{workspace?.reports.length || 0}</span>
@@ -159,7 +167,7 @@ export function SupervisorWorkspaceReviewsView({
                   ? report.status
                   : "REVIEWED",
             };
-            const sections = collectSections(report.formData);
+            const sections = collectSections(t, report.formData);
 
             return (
               <div key={report.id} className="denty-dashboard-card space-y-5 p-5">
@@ -172,7 +180,7 @@ export function SupervisorWorkspaceReviewsView({
                       {report.doctor?.name} ·{" "}
                       {report.appointment?.clinicCase?.clinic?.name ||
                         report.appointment?.slot?.purpose ||
-                        "Clinic"}
+                        t("supervision.sup.reviews.clinic_fallback")}
                     </p>
                   </div>
                   <div className="flex flex-wrap gap-2">
@@ -186,37 +194,41 @@ export function SupervisorWorkspaceReviewsView({
                 <div className="grid gap-3 md:grid-cols-3">
                   <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                      Patient
+                      {t("supervision.sup.reviews.patient")}
                     </p>
                     <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
-                      {report.appointment?.patient?.name || report.patientName || "Unknown"}
+                      {report.appointment?.patient?.name ||
+                        report.patientName ||
+                        t("supervision.sup.reviews.unknown_patient")}
                     </p>
                     <p className="mt-1 text-xs text-[var(--muted-foreground)]">
-                      {report.appointment?.patient?.phone || report.patientPhone || "No phone"}
+                      {report.appointment?.patient?.phone ||
+                        report.patientPhone ||
+                        t("supervision.sup.reviews.no_phone")}
                     </p>
                   </div>
                   <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                      Case
+                      {t("supervision.sup.reviews.case")}
                     </p>
                     <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
                       {report.appointment?.clinicCase?.title ||
                         report.appointment?.slot?.purpose ||
-                        "General"}
+                        t("supervision.sup.reviews.case_general")}
                     </p>
                     <p className="mt-1 text-xs text-[var(--muted-foreground)]">
                       {report.appointment?.slot?.startTime
                         ? new Date(report.appointment.slot.startTime).toLocaleString()
-                        : "No time"}
+                        : t("supervision.sup.reviews.no_time")}
                     </p>
                   </div>
                   <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                      Doctor notes
+                      {t("supervision.sup.reviews.doctor_notes")}
                     </p>
                     <p className="mt-2 text-sm leading-7 text-[var(--foreground)]">
                       {report.appointment?.doctorCompletionNotes ||
-                        "No post-visit notes were attached."}
+                        t("supervision.sup.reviews.no_post_visit_notes")}
                     </p>
                   </div>
                 </div>
@@ -224,7 +236,7 @@ export function SupervisorWorkspaceReviewsView({
                 {report.description ? (
                   <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                      Case summary
+                      {t("supervision.sup.reviews.case_summary")}
                     </p>
                     <p className="mt-3 text-sm leading-7 text-[var(--foreground)]">
                       {report.description}
@@ -235,12 +247,14 @@ export function SupervisorWorkspaceReviewsView({
                 {report.taskLinks?.length ? (
                   <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                      Tasks linked to the report
+                      {t("supervision.sup.reviews.tasks_linked")}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {report.taskLinks.map((link) => (
                         <span key={link.id} className="denty-pill">
-                          {link.clinicTask?.title || "Clinic task"} · {link.role}
+                          {link.clinicTask?.title ||
+                            t("supervision.sup.reviews.clinic_task_fallback")}{" "}
+                          · {link.role}
                         </span>
                       ))}
                     </div>
@@ -275,7 +289,7 @@ export function SupervisorWorkspaceReviewsView({
                       }))
                     }
                     className="denty-field text-sm"
-                    placeholder="Mark / 100"
+                    placeholder={t("supervision.sup.reviews.mark_placeholder")}
                   />
                   <select
                     value={draft.rating}
@@ -305,9 +319,15 @@ export function SupervisorWorkspaceReviewsView({
                     }
                     className="denty-field cursor-pointer text-sm"
                   >
-                    <option value="REVIEWED">Approve case</option>
-                    <option value="NEEDS_EDIT">Needs edit</option>
-                    <option value="CASE_REJECTED">Reject case</option>
+                    <option value="REVIEWED">
+                      {t("supervision.sup.reviews.outcome_approve")}
+                    </option>
+                    <option value="NEEDS_EDIT">
+                      {t("supervision.sup.reviews.outcome_needs_edit")}
+                    </option>
+                    <option value="CASE_REJECTED">
+                      {t("supervision.sup.reviews.outcome_reject")}
+                    </option>
                   </select>
                   <textarea
                     value={draft.feedback}
@@ -318,13 +338,13 @@ export function SupervisorWorkspaceReviewsView({
                       }))
                     }
                     className="denty-field min-h-[96px] text-sm"
-                    placeholder="Supervisor feedback, requested edits, or rejection reason"
+                    placeholder={t("supervision.sup.reviews.feedback_placeholder")}
                   />
                   <button
                     onClick={() => submitReview(report.id)}
                     className="denty-button-secondary px-4 py-3 text-sm font-semibold"
                   >
-                    Save review
+                    {t("supervision.sup.reviews.save_review")}
                   </button>
                 </div>
               </div>
@@ -336,9 +356,11 @@ export function SupervisorWorkspaceReviewsView({
       <div className="denty-panel-strong p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="denty-kicker">Exams</p>
+            <p className="denty-kicker">
+              {t("supervision.sup.reviews.exams_eyebrow")}
+            </p>
             <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-              Schedule and grade exams
+              {t("supervision.sup.reviews.exams_title")}
             </h2>
           </div>
           <span className="denty-pill">{workspace?.upcomingExams.length || 0}</span>
@@ -348,7 +370,7 @@ export function SupervisorWorkspaceReviewsView({
             value={selectedStudentName}
             readOnly
             className="denty-field text-sm"
-            placeholder="Choose a student from Student finder"
+            placeholder={t("supervision.sup.reviews.choose_student")}
           />
           <select
             value={examForm.clinicId}
@@ -357,7 +379,9 @@ export function SupervisorWorkspaceReviewsView({
             }
             className="denty-field text-sm"
           >
-            <option value="">Choose clinic</option>
+            <option value="">
+              {t("supervision.sup.reviews.choose_clinic")}
+            </option>
             {workspace?.clinics.map((clinic) => (
               <option key={clinic.id} value={clinic.id}>
                 {clinic.name}
@@ -371,7 +395,9 @@ export function SupervisorWorkspaceReviewsView({
             }
             className="denty-field text-sm"
           >
-            <option value="">Optional shift</option>
+            <option value="">
+              {t("supervision.sup.reviews.optional_shift")}
+            </option>
             {workspace?.shifts.map((shift) => (
               <option key={shift.id} value={shift.id}>
                 {shift.name} - {shift.startsAt} - {shift.endsAt}
@@ -392,7 +418,7 @@ export function SupervisorWorkspaceReviewsView({
               setExamForm((prev) => ({ ...prev, title: e.target.value }))
             }
             className="denty-field text-sm"
-            placeholder="Exam title"
+            placeholder={t("supervision.sup.reviews.exam_title_placeholder")}
           />
           <textarea
             value={examForm.cases}
@@ -400,13 +426,13 @@ export function SupervisorWorkspaceReviewsView({
               setExamForm((prev) => ({ ...prev, cases: e.target.value }))
             }
             className="denty-field min-h-[110px] text-sm"
-            placeholder="Cases or procedures"
+            placeholder={t("supervision.sup.reviews.exam_cases_placeholder")}
           />
           <button
             onClick={submitExam}
             className="denty-button-primary px-4 py-3 text-sm font-semibold"
           >
-            Schedule exam
+            {t("supervision.sup.reviews.schedule_exam")}
           </button>
         </div>
         <div className="mt-5 space-y-3">
@@ -436,7 +462,7 @@ export function SupervisorWorkspaceReviewsView({
                       }))
                     }
                     className="denty-field text-sm"
-                    placeholder="Mark / 100"
+                    placeholder={t("supervision.sup.reviews.mark_placeholder")}
                   />
                   <input
                     value={draft.notes}
@@ -447,13 +473,13 @@ export function SupervisorWorkspaceReviewsView({
                       }))
                     }
                     className="denty-field text-sm"
-                    placeholder="Notes"
+                    placeholder={t("supervision.sup.reviews.notes_placeholder")}
                   />
                   <button
                     onClick={() => submitExamGrade(exam.id)}
                     className="denty-button-secondary px-4 py-3 text-sm font-semibold"
                   >
-                    Grade
+                    {t("supervision.sup.reviews.grade")}
                   </button>
                 </div>
               </div>

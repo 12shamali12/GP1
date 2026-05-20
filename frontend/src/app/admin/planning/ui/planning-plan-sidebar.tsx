@@ -1,6 +1,7 @@
 "use client";
 
 import type { ChangeEvent } from "react";
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { PlanningWorkspaceData, ShiftTemplateItem } from "@/features/supervision/types";
 
 type PlanningPlan = PlanningWorkspaceData["plans"][number];
@@ -55,6 +56,7 @@ export function PlanningPlanSidebar({
   onPlanFieldChange,
   formatDateLabel,
 }: PlanningPlanSidebarProps) {
+  const t = useTranslation();
   const handleInputChange =
     (field: "label" | "startsOn" | "shiftId") =>
     (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -67,17 +69,17 @@ export function PlanningPlanSidebar({
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="denty-kicker">
-              {planDraftMode === "edit" ? "Selected plan" : "New plan"}
+              {planDraftMode === "edit"
+                ? t("admin.plan.selected_plan")
+                : t("admin.plan.new_plan")}
             </p>
             <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               {planDraftMode === "edit"
-                ? "Edit two-week plan"
-                : "Create a two-week plan"}
+                ? t("admin.plan.edit_two_week")
+                : t("admin.plan.create_two_week")}
             </h2>
             <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
-              Each plan starts on Sunday, ends on Thursday of the following
-              week, uses one fixed shift, and can mark any day as clinic duty or
-              free time.
+              {t("admin.plan.plan_intro")}
             </p>
           </div>
           {planDraftMode === "edit" ? (
@@ -86,7 +88,7 @@ export function PlanningPlanSidebar({
               onClick={onStartNewPlan}
               className={accentAction}
             >
-              New plan
+              {t("admin.plan.new_plan")}
             </button>
           ) : null}
         </div>
@@ -96,14 +98,17 @@ export function PlanningPlanSidebar({
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/56">
-                  Published window
+                  {t("admin.plan.published_window")}
                 </p>
                 <p className="mt-3 text-xl font-semibold text-white">
                   {selectedPlan.label}
                 </p>
               </div>
               <span className="rounded-full border border-white/12 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/74">
-                {selectedPlan.days.filter((day) => !day.isVacation).length} duty days
+                {t("admin.plan.duty_days_count", {
+                  count: selectedPlan.days.filter((day) => !day.isVacation)
+                    .length,
+                })}
               </span>
             </div>
             <p className="mt-3 text-sm text-white/70">
@@ -121,18 +126,22 @@ export function PlanningPlanSidebar({
             </p>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/72">
-                {selectedPlan.days.filter((day) => day.isVacation).length} free days
+                {t("admin.plan.free_days_count", {
+                  count: selectedPlan.days.filter((day) => day.isVacation)
+                    .length,
+                })}
               </span>
               <span className="rounded-full border border-white/10 bg-white/8 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-white/72">
-                {selectedPlan.assignedGroups.length} group views
+                {t("admin.plan.group_views_count", {
+                  count: selectedPlan.assignedGroups.length,
+                })}
               </span>
             </div>
           </div>
         ) : (
           <div className="mt-5 rounded-[20px] border border-dashed border-white/18 bg-white/18 p-5">
             <p className="text-sm text-[var(--muted-foreground)]">
-              Save the plan shell first, then the 10 working days will open on
-              the right side.
+              {t("admin.plan.shell_hint")}
             </p>
           </div>
         )}
@@ -142,7 +151,7 @@ export function PlanningPlanSidebar({
             value={planForm.label}
             onChange={handleInputChange("label")}
             className="denty-field text-sm"
-            placeholder="Group A | first two weeks"
+            placeholder={t("admin.plan.label_placeholder")}
           />
           <input
             type="date"
@@ -155,7 +164,7 @@ export function PlanningPlanSidebar({
             onChange={handleInputChange("shiftId")}
             className="denty-field cursor-pointer text-sm"
           >
-            <option value="">Choose fixed shift</option>
+            <option value="">{t("admin.plan.choose_fixed_shift")}</option>
             {sortedShifts.map((shift) => (
               <option key={shift.id} value={shift.id}>
                 {shift.name} | {shift.startsAt} - {shift.endsAt}
@@ -167,8 +176,8 @@ export function PlanningPlanSidebar({
         <div className="mt-5 flex flex-wrap gap-3">
           <button type="button" onClick={onSavePlanShell} className={primaryAction}>
             {planDraftMode === "edit"
-              ? "Save plan shell changes"
-              : "Create plan shell"}
+              ? t("admin.plan.save_shell_changes")
+              : t("admin.plan.create_shell")}
           </button>
           {planDraftMode === "edit" && selectedPlan ? (
             <button
@@ -178,7 +187,7 @@ export function PlanningPlanSidebar({
               }
               className={dangerAction}
             >
-              Delete plan
+              {t("admin.plan.delete_plan")}
             </button>
           ) : null}
         </div>
@@ -187,12 +196,14 @@ export function PlanningPlanSidebar({
       <div className={panelClass}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="denty-kicker">Plan library</p>
+            <p className="denty-kicker">{t("admin.plan.plan_library")}</p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              The signal column stays fixed so the wall on the right can focus on the currently selected two-week window.
+              {t("admin.plan.library_intro")}
             </p>
           </div>
-          <span className="denty-pill">{sortedPlans.length} saved</span>
+          <span className="denty-pill">
+            {t("admin.plan.saved_count", { count: sortedPlans.length })}
+          </span>
         </div>
 
         <div className="mt-4 max-h-[26rem] min-h-[26rem] space-y-3 overflow-y-auto pr-2">
@@ -230,14 +241,21 @@ export function PlanningPlanSidebar({
                   </div>
                   <div className={`mt-3 flex flex-wrap gap-2 text-xs uppercase tracking-[0.14em] ${selectedPlanId === plan.id ? "text-white/58" : "text-[rgba(10,22,40,0.48)]"}`}>
                     <span>
-                      {plan.days.filter((day) => !day.isVacation).length} clinic
-                      days
+                      {t("admin.plan.clinic_days_count", {
+                        count: plan.days.filter((day) => !day.isVacation)
+                          .length,
+                      })}
                     </span>
                     <span>
-                      {plan.days.filter((day) => day.isVacation).length} free
-                      days
+                      {t("admin.plan.free_days_count", {
+                        count: plan.days.filter((day) => day.isVacation).length,
+                      })}
                     </span>
-                    <span>{plan.assignedGroups.length} assigned groups</span>
+                    <span>
+                      {t("admin.plan.assigned_groups_count", {
+                        count: plan.assignedGroups.length,
+                      })}
+                    </span>
                   </div>
                 </button>
                 <button
@@ -245,7 +263,7 @@ export function PlanningPlanSidebar({
                   onClick={() => onDeletePlan({ id: plan.id, label: plan.label })}
                   className={smallDanger}
                 >
-                  Delete
+                  {t("admin.common.delete")}
                 </button>
               </div>
             </div>
@@ -253,7 +271,7 @@ export function PlanningPlanSidebar({
           {!sortedPlans.length ? (
             <div className="denty-placeholder p-4">
               <p className="text-sm text-[var(--muted-foreground)]">
-                No plans have been created yet.
+                {t("admin.plan.no_plans_created")}
               </p>
             </div>
           ) : null}

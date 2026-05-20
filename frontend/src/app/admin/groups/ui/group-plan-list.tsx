@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { AdminGroupItem } from "@/features/supervision/types";
 
 type GroupPlanListProps = {
@@ -11,13 +12,14 @@ export function GroupPlanList({
   currentPlan,
   nextPlans,
 }: GroupPlanListProps) {
+  const t = useTranslation();
   return (
     <div className="space-y-3">
       {currentPlan ? (
         <div className="denty-dashboard-card-soft p-4">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="denty-kicker">Current plan</p>
+              <p className="denty-kicker">{t("admin.groups.plan_current")}</p>
               <p className="mt-2 text-lg font-semibold text-[var(--foreground)]">
                 {currentPlan.plan.label}
               </p>
@@ -34,15 +36,19 @@ export function GroupPlanList({
       ) : (
         <div className="denty-placeholder p-4">
           <p className="text-sm text-[var(--muted-foreground)]">
-            No active plan right now.
+            {t("admin.groups.plan_none_now")}
           </p>
         </div>
       )}
 
       <div className="rounded-[24px] border border-white/12 bg-white/30 p-4">
         <div className="flex items-center justify-between gap-3">
-          <p className="denty-kicker">Next plans</p>
-          <span className="denty-pill">{nextPlans?.length || 0} queued</span>
+          <p className="denty-kicker">{t("admin.groups.plan_next")}</p>
+          <span className="denty-pill">
+            {t("admin.groups.plan_queued_count", {
+              count: nextPlans?.length || 0,
+            })}
+          </span>
         </div>
         <div className="mt-3 space-y-3">
           {(nextPlans || []).slice(0, 3).map((entry) => (
@@ -68,7 +74,7 @@ export function GroupPlanList({
           ))}
           {!nextPlans?.length ? (
             <p className="text-sm text-[var(--muted-foreground)]">
-              No queued plans after the current window.
+              {t("admin.groups.plan_none_queued")}
             </p>
           ) : null}
         </div>

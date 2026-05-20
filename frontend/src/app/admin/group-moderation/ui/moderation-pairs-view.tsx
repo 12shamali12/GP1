@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { AlphabetSection } from "@/features/admin/utils/collection";
 import type { PairModerationGroup } from "../hooks/use-admin-group-moderation-workspace";
 
@@ -14,18 +15,21 @@ export function ModerationPairsView({
   total,
   onRemovePair,
 }: ModerationPairsViewProps) {
+  const t = useTranslation();
   return (
     <div className="denty-panel-strong max-h-[48rem] overflow-hidden p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-[var(--foreground)]">
-            Active partnerships
+            {t("admin.mod.pairs_title")}
           </h2>
           <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-            Dissolve confirmed pairs when needed.
+            {t("admin.mod.pairs_subtitle")}
           </p>
         </div>
-        <span className="denty-pill">{total} pairs</span>
+        <span className="denty-pill">
+          {t("admin.mod.pairs_count", { count: total })}
+        </span>
       </div>
 
       <div className="mt-5 max-h-[38rem] overflow-y-auto pr-2">
@@ -49,7 +53,9 @@ export function ModerationPairsView({
                           </p>
                         </div>
                         <span className="denty-pill">
-                          {group.partnerPairs?.length || 0} pairs
+                          {t("admin.mod.pairs_in_count", {
+                            count: group.partnerPairs?.length || 0,
+                          })}
                         </span>
                       </div>
                       <div className="mt-4 grid gap-3 xl:grid-cols-2">
@@ -61,7 +67,10 @@ export function ModerationPairsView({
                             <div className="flex items-center justify-between gap-3">
                               <div>
                                 <p className="text-base font-semibold text-[var(--foreground)]">
-                                  {pair.doctorOne.name} and {pair.doctorTwo.name}
+                                  {t("admin.mod.pair_and", {
+                                    first: pair.doctorOne.name,
+                                    second: pair.doctorTwo.name,
+                                  })}
                                 </p>
                                 <p className="mt-1 text-sm text-[var(--muted-foreground)]">
                                   {pair.doctorOne.doctorIdNumber ||
@@ -76,7 +85,7 @@ export function ModerationPairsView({
                                 onClick={() => onRemovePair(pair.id)}
                                 className="rounded-full border border-rose-600/24 bg-rose-50 px-4 py-2 text-xs font-semibold text-rose-700"
                               >
-                                Unpair
+                                {t("admin.mod.unpair")}
                               </button>
                             </div>
                           </div>
@@ -90,9 +99,9 @@ export function ModerationPairsView({
           </div>
         ) : (
           <div className="denty-placeholder p-5">
-            <p className="denty-kicker">Partnership desk</p>
+            <p className="denty-kicker">{t("admin.mod.partnership_desk")}</p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              No active pairs match the current filter.
+              {t("admin.mod.pairs_empty")}
             </p>
           </div>
         )}

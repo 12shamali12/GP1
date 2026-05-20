@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { SupervisorWorkspaceData } from "@/features/supervision/types";
 
 type SupervisorCalendarViewProps = {
@@ -17,6 +18,7 @@ export function SupervisorCalendarView({
   workspace,
   loading = false,
 }: SupervisorCalendarViewProps) {
+  const t = useTranslation();
   const duties = [...(workspace?.clinicOverview || [])].sort(
     (a, b) => new Date(a.assignmentDate).getTime() - new Date(b.assignmentDate).getTime(),
   );
@@ -29,27 +31,29 @@ export function SupervisorCalendarView({
       <div className="denty-dashboard-card overflow-hidden p-5 md:p-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="denty-kicker">Calendar</p>
+            <p className="denty-kicker">{t("supervisor.calendar.eyebrow")}</p>
             <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-              Clinic duties
+              {t("supervisor.calendar.title")}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-              Review upcoming clinic coverage, groups on duty, and the shift assigned for each day.
+              {t("supervisor.calendar.description")}
             </p>
           </div>
-          <span className="denty-pill">{duties.length} duties</span>
+          <span className="denty-pill">
+            {t("supervisor.calendar.duties_count", { count: duties.length })}
+          </span>
         </div>
 
         <div className="mt-6 max-h-[42rem] space-y-4 overflow-y-auto pr-1">
           {loading ? (
             <div className="denty-dashboard-card-soft p-5 text-sm text-[var(--muted-foreground)]">
-              Loading schedule...
+              {t("supervisor.calendar.loading")}
             </div>
           ) : null}
 
           {!loading && duties.length === 0 ? (
             <div className="denty-dashboard-card-soft p-5 text-sm text-[var(--muted-foreground)]">
-              No clinic duties are assigned yet.
+              {t("supervisor.calendar.empty")}
             </div>
           ) : null}
 
@@ -68,14 +72,22 @@ export function SupervisorCalendarView({
                   </p>
                   {duty.plan?.label ? (
                     <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                      Plan: {duty.plan.label}
+                      {t("supervisor.calendar.plan", { value: duty.plan.label })}
                     </p>
                   ) : null}
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  <span className="denty-pill">{duty.groupAssignments.length} groups</span>
-                  <span className="denty-pill">{duty.supervisors.length} supervisors</span>
+                  <span className="denty-pill">
+                    {t("supervisor.calendar.groups_count", {
+                      count: duty.groupAssignments.length,
+                    })}
+                  </span>
+                  <span className="denty-pill">
+                    {t("supervisor.calendar.supervisors_count", {
+                      count: duty.supervisors.length,
+                    })}
+                  </span>
                 </div>
               </div>
 
@@ -92,12 +104,17 @@ export function SupervisorCalendarView({
                         </p>
                       </div>
                       <span className="text-xs text-[var(--muted-foreground)]">
-                        {assignment.group.members.length} students
+                        {t("supervisor.calendar.students_count", {
+                          count: assignment.group.members.length,
+                        })}
                       </span>
                     </div>
                     <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
-                      {assignment.slots.filter((slot) => slot.appointment).length} booked slots •{" "}
-                      {assignment.group.partnerPairs.length} pairs on file
+                      {t("supervisor.calendar.slots_summary", {
+                        slots: assignment.slots.filter((slot) => slot.appointment)
+                          .length,
+                        pairs: assignment.group.partnerPairs.length,
+                      })}
                     </p>
                   </div>
                 ))}
@@ -111,18 +128,20 @@ export function SupervisorCalendarView({
         <div className="denty-dashboard-card overflow-hidden p-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="denty-kicker">Assessments</p>
+              <p className="denty-kicker">{t("supervisor.calendar.assessments")}</p>
               <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
-                Upcoming exams
+                {t("supervisor.calendar.upcoming_exams")}
               </h2>
             </div>
-            <span className="denty-pill">{exams.length} scheduled</span>
+            <span className="denty-pill">
+              {t("supervisor.calendar.scheduled_count", { count: exams.length })}
+            </span>
           </div>
 
           <div className="mt-5 max-h-[20rem] space-y-3 overflow-y-auto pr-1">
             {exams.length === 0 ? (
               <div className="denty-dashboard-card-soft p-5 text-sm text-[var(--muted-foreground)]">
-                No exams are scheduled yet.
+                {t("supervisor.calendar.exams_empty")}
               </div>
             ) : null}
 
@@ -132,7 +151,8 @@ export function SupervisorCalendarView({
                   <div>
                     <p className="font-semibold text-[var(--foreground)]">{exam.title}</p>
                     <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-                      {exam.student?.name || "Student"} • {exam.clinic.name}
+                      {exam.student?.name || t("supervisor.calendar.student_fallback")}{" "}
+                      • {exam.clinic.name}
                     </p>
                   </div>
                   <span className="denty-pill">{exam.status}</span>
@@ -146,12 +166,14 @@ export function SupervisorCalendarView({
         </div>
 
         <div className="denty-dashboard-card overflow-hidden p-6">
-          <p className="denty-kicker">Coverage</p>
-          <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">Clinic snapshot</h2>
+          <p className="denty-kicker">{t("supervisor.calendar.coverage")}</p>
+          <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
+            {t("supervisor.calendar.clinic_snapshot")}
+          </h2>
           <div className="mt-5 grid gap-3 md:grid-cols-2">
             <div className="denty-dashboard-card-soft p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                Clinics
+                {t("supervisor.calendar.clinics")}
               </p>
               <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {workspace?.clinics.length || 0}
@@ -159,7 +181,7 @@ export function SupervisorCalendarView({
             </div>
             <div className="denty-dashboard-card-soft p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                Reports pending
+                {t("supervisor.calendar.reports_pending")}
               </p>
               <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {workspace?.stats.pendingReports || 0}

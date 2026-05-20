@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { SemesterProgressionPreview } from "@/features/admin/types/admin";
 import type {
   PlanningWorkspaceData,
@@ -141,6 +142,7 @@ export function PlanningResourcesView({
   onDeleteSemester,
   onDeleteClinicCase,
 }: PlanningResourcesViewProps) {
+  const t = useTranslation();
   const [semesterSelections, setSemesterSelections] = useState<Record<string, string>>(
     {},
   );
@@ -169,14 +171,12 @@ export function PlanningResourcesView({
   return (
     <div className="grid gap-5 xl:grid-cols-[0.68fr_1.32fr]">
       <div className={panelClass}>
-        <p className="denty-kicker">Setup wall</p>
+        <p className="denty-kicker">{t("admin.plan.setup_wall")}</p>
         <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-          Clinics and shifts
+          {t("admin.plan.clinics_shifts")}
         </h2>
         <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
-          Open the form only when the hospital setup changes. The planning wall
-          will reuse these resources without asking the admin to rebuild them
-          repeatedly.
+          {t("admin.plan.setup_intro")}
         </p>
 
         <div className="mt-5 flex flex-wrap gap-3">
@@ -186,15 +186,17 @@ export function PlanningResourcesView({
             className={secondaryAction}
           >
             {showClinicForm && !editingClinicId
-              ? "Hide clinic form"
-              : "Create clinic"}
+              ? t("admin.plan.hide_clinic_form")
+              : t("admin.plan.create_clinic")}
           </button>
           <button
             type="button"
             onClick={onToggleShiftForm}
             className={secondaryAction}
           >
-            {showShiftForm && !editingShiftId ? "Hide shift form" : "Create shift"}
+            {showShiftForm && !editingShiftId
+              ? t("admin.plan.hide_shift_form")
+              : t("admin.plan.create_shift")}
           </button>
           <button
             type="button"
@@ -202,8 +204,8 @@ export function PlanningResourcesView({
             className={secondaryAction}
           >
             {showSemesterForm && !editingSemesterId
-              ? "Hide semester form"
-              : "Create semester"}
+              ? t("admin.plan.hide_semester_form")
+              : t("admin.plan.create_semester")}
           </button>
           <button
             type="button"
@@ -211,8 +213,8 @@ export function PlanningResourcesView({
             className={secondaryAction}
           >
             {showClinicCaseForm && !editingClinicCaseId
-              ? "Hide case form"
-              : "Create clinic case"}
+              ? t("admin.plan.hide_case_form")
+              : t("admin.plan.create_clinic_case")}
           </button>
         </div>
 
@@ -220,7 +222,9 @@ export function PlanningResourcesView({
           <div className="mt-5 space-y-3 rounded-[20px] border border-white/12 bg-white/34 p-4">
             <div className="flex items-center justify-between gap-3">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.62)]">
-                {editingClinicId ? "Edit clinic" : "New clinic"}
+                {editingClinicId
+                  ? t("admin.plan.edit_clinic")
+                  : t("admin.plan.new_clinic")}
               </p>
               {editingClinicId ? (
                 <button
@@ -228,7 +232,7 @@ export function PlanningResourcesView({
                   onClick={onResetClinicForm}
                   className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.56)]"
                 >
-                  Cancel
+                  {t("admin.common.cancel")}
                 </button>
               ) : null}
             </div>
@@ -237,7 +241,7 @@ export function PlanningResourcesView({
               value={clinicForm.name}
               onChange={(e) => onClinicFieldChange("name", e.target.value)}
               className="denty-field text-sm"
-              placeholder="Pedo clinic"
+              placeholder={t("admin.plan.clinic_name_placeholder")}
             />
             <textarea
               value={clinicForm.description}
@@ -245,14 +249,16 @@ export function PlanningResourcesView({
                 onClinicFieldChange("description", e.target.value)
               }
               className="denty-field min-h-[100px] text-sm"
-              placeholder="Optional clinic note"
+              placeholder={t("admin.plan.clinic_note_placeholder")}
             />
             <button
               type="button"
               onClick={onSaveClinic}
               className={primaryAction}
             >
-              {editingClinicId ? "Save clinic changes" : "Save clinic"}
+              {editingClinicId
+                ? t("admin.plan.save_clinic_changes")
+                : t("admin.plan.save_clinic")}
             </button>
           </div>
         ) : null}
@@ -261,7 +267,9 @@ export function PlanningResourcesView({
           <div className="mt-5 grid gap-3 rounded-[20px] border border-white/12 bg-white/34 p-4 md:grid-cols-2">
             <div className="flex items-center justify-between gap-3 md:col-span-2">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.62)]">
-                {editingShiftId ? "Edit shift" : "New shift"}
+                {editingShiftId
+                  ? t("admin.plan.edit_shift")
+                  : t("admin.plan.new_shift")}
               </p>
               {editingShiftId ? (
                 <button
@@ -269,7 +277,7 @@ export function PlanningResourcesView({
                   onClick={onResetShiftForm}
                   className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.56)]"
                 >
-                  Cancel
+                  {t("admin.common.cancel")}
                 </button>
               ) : null}
             </div>
@@ -278,7 +286,7 @@ export function PlanningResourcesView({
               value={shiftForm.name}
               onChange={(e) => onShiftFieldChange("name", e.target.value)}
               className="denty-field text-sm md:col-span-2"
-              placeholder="Shift A"
+              placeholder={t("admin.plan.shift_name_placeholder")}
             />
             <input
               type="time"
@@ -301,14 +309,16 @@ export function PlanningResourcesView({
                 onShiftFieldChange("appointmentCapacity", e.target.value)
               }
               className="denty-field text-sm md:col-span-2"
-              placeholder="Appointments per student"
+              placeholder={t("admin.plan.shift_capacity_placeholder")}
             />
             <button
               type="button"
               onClick={onSaveShift}
               className={`${primaryAction} md:col-span-2`}
             >
-              {editingShiftId ? "Save shift changes" : "Save shift"}
+              {editingShiftId
+                ? t("admin.plan.save_shift_changes")
+                : t("admin.plan.save_shift")}
             </button>
           </div>
         ) : null}
@@ -317,7 +327,9 @@ export function PlanningResourcesView({
           <div className="mt-5 grid gap-3 rounded-[20px] border border-white/12 bg-white/34 p-4 md:grid-cols-2">
             <div className="flex items-center justify-between gap-3 md:col-span-2">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.62)]">
-                {editingSemesterId ? "Edit semester" : "New semester"}
+                {editingSemesterId
+                  ? t("admin.plan.edit_semester")
+                  : t("admin.plan.new_semester")}
               </p>
               {editingSemesterId ? (
                 <button
@@ -325,7 +337,7 @@ export function PlanningResourcesView({
                   onClick={onResetSemesterForm}
                   className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.56)]"
                 >
-                  Cancel
+                  {t("admin.common.cancel")}
                 </button>
               ) : null}
             </div>
@@ -333,14 +345,14 @@ export function PlanningResourcesView({
               value={semesterForm.label}
               onChange={(e) => onSemesterFieldChange("label", e.target.value)}
               className="denty-field text-sm md:col-span-2"
-              placeholder="4th year / 1st semester"
+              placeholder={t("admin.plan.semester_label_placeholder")}
             />
             <input
               type="number"
               value={semesterForm.sortOrder}
               onChange={(e) => onSemesterFieldChange("sortOrder", e.target.value)}
               className="denty-field text-sm"
-              placeholder="Sort order"
+              placeholder={t("admin.plan.sort_order_placeholder")}
             />
             <input
               type="date"
@@ -353,7 +365,9 @@ export function PlanningResourcesView({
               onClick={onSaveSemester}
               className={`${primaryAction} md:col-span-2`}
             >
-              {editingSemesterId ? "Save semester changes" : "Save semester"}
+              {editingSemesterId
+                ? t("admin.plan.save_semester_changes")
+                : t("admin.plan.save_semester")}
             </button>
           </div>
         ) : null}
@@ -362,7 +376,9 @@ export function PlanningResourcesView({
           <div className="mt-5 grid gap-3 rounded-[20px] border border-white/12 bg-white/34 p-4 md:grid-cols-2">
             <div className="flex items-center justify-between gap-3 md:col-span-2">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.62)]">
-                {editingClinicCaseId ? "Edit clinic case" : "New clinic case"}
+                {editingClinicCaseId
+                  ? t("admin.plan.edit_clinic_case")
+                  : t("admin.plan.new_clinic_case")}
               </p>
               {editingClinicCaseId ? (
                 <button
@@ -370,7 +386,7 @@ export function PlanningResourcesView({
                   onClick={onResetClinicCaseForm}
                   className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.56)]"
                 >
-                  Cancel
+                  {t("admin.common.cancel")}
                 </button>
               ) : null}
             </div>
@@ -379,7 +395,7 @@ export function PlanningResourcesView({
               onChange={(e) => onClinicCaseFieldChange("semesterId", e.target.value)}
               className="denty-field cursor-pointer text-sm"
             >
-              <option value="">Choose semester</option>
+              <option value="">{t("admin.plan.choose_semester")}</option>
               {sortedSemesters.map((semester) => (
                 <option key={semester.id} value={semester.id}>
                   {semester.label}
@@ -391,7 +407,7 @@ export function PlanningResourcesView({
               onChange={(e) => onClinicCaseFieldChange("clinicId", e.target.value)}
               className="denty-field cursor-pointer text-sm"
             >
-              <option value="">Choose clinic</option>
+              <option value="">{t("admin.plan.choose_clinic")}</option>
               {sortedClinics.map((clinic) => (
                 <option key={clinic.id} value={clinic.id}>
                   {clinic.name}
@@ -402,7 +418,7 @@ export function PlanningResourcesView({
               value={clinicCaseForm.title}
               onChange={(e) => onClinicCaseFieldChange("title", e.target.value)}
               className="denty-field text-sm md:col-span-2"
-              placeholder="Case title"
+              placeholder={t("admin.plan.case_title_placeholder")}
             />
             <textarea
               value={clinicCaseForm.description}
@@ -410,7 +426,7 @@ export function PlanningResourcesView({
                 onClinicCaseFieldChange("description", e.target.value)
               }
               className="denty-field min-h-[100px] text-sm md:col-span-2"
-              placeholder="Optional notes for the case requirement"
+              placeholder={t("admin.plan.case_note_placeholder")}
             />
             <input
               type="number"
@@ -420,14 +436,16 @@ export function PlanningResourcesView({
                 onClinicCaseFieldChange("requiredCount", e.target.value)
               }
               className="denty-field text-sm md:col-span-2"
-              placeholder="Required count"
+              placeholder={t("admin.plan.required_count_placeholder")}
             />
             <button
               type="button"
               onClick={onSaveClinicCase}
               className={`${primaryAction} md:col-span-2`}
             >
-              {editingClinicCaseId ? "Save case changes" : "Save clinic case"}
+              {editingClinicCaseId
+                ? t("admin.plan.save_case_changes")
+                : t("admin.plan.save_clinic_case")}
             </button>
           </div>
         ) : null}
@@ -436,14 +454,13 @@ export function PlanningResourcesView({
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/58">
-                Progression desk
+                {t("admin.plan.progression_desk")}
               </p>
               <h3 className="mt-3 text-xl font-semibold text-white">
-                Semester progression
+                {t("admin.plan.semester_progression")}
               </h3>
               <p className="mt-3 text-sm leading-7 text-white/70">
-                Promote students whose semester window has ended, or reassign
-                individual students manually when results require an override.
+                {t("admin.plan.progression_intro")}
               </p>
             </div>
             <button
@@ -452,7 +469,9 @@ export function PlanningResourcesView({
               disabled={progressingSemesters}
               className={`${primaryAction} whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-60`}
             >
-              {progressingSemesters ? "Advancing..." : "Advance eligible students"}
+              {progressingSemesters
+                ? t("admin.plan.advancing")
+                : t("admin.plan.advance_eligible")}
             </button>
           </div>
 
@@ -471,12 +490,15 @@ export function PlanningResourcesView({
                       <p className="mt-1 text-sm text-white/64">
                         @{student.username}
                         {student.doctorIdNumber
-                          ? ` | Student ID ${student.doctorIdNumber}`
+                          ? t("admin.plan.student_id_inline", {
+                              value: student.doctorIdNumber,
+                            })
                           : ""}
                       </p>
                       <p className="mt-3 text-sm text-white/74">
                         {student.currentSemester.label} {"->"}{" "}
-                        {student.nextSemester?.label || "No next semester set"}
+                        {student.nextSemester?.label ||
+                          t("admin.plan.no_next_semester")}
                       </p>
                     </div>
 
@@ -491,7 +513,9 @@ export function PlanningResourcesView({
                         }
                         className="denty-field cursor-pointer bg-white/90 text-sm text-[var(--foreground)]"
                       >
-                        <option value="">Clear semester</option>
+                        <option value="">
+                          {t("admin.plan.clear_semester")}
+                        </option>
                         {semesterOptions.map((option) => (
                           <option key={option.id} value={option.id}>
                             {option.label}
@@ -510,8 +534,8 @@ export function PlanningResourcesView({
                         className={`${smallSecondary} whitespace-nowrap disabled:cursor-not-allowed disabled:opacity-60`}
                       >
                         {studentSemesterSubmittingId === student.id
-                          ? "Saving..."
-                          : "Save"}
+                          ? t("admin.common.saving")
+                          : t("admin.common.save")}
                       </button>
                     </div>
                   </div>
@@ -520,8 +544,7 @@ export function PlanningResourcesView({
             ) : (
               <div className="rounded-[22px] border border-dashed border-white/18 bg-white/6 p-4">
                 <p className="text-sm leading-7 text-white/72">
-                  No students are currently due for progression. Add semester
-                  end dates to let the system queue the next cohort automatically.
+                  {t("admin.plan.no_due_students")}
                 </p>
               </div>
             )}
@@ -533,8 +556,10 @@ export function PlanningResourcesView({
         <div className="grid gap-5 xl:grid-cols-2">
           <div>
             <div className="flex items-center justify-between gap-3">
-              <p className="denty-kicker">Clinics</p>
-              <span className="denty-pill">{sortedClinics.length} saved</span>
+              <p className="denty-kicker">{t("admin.plan.clinics")}</p>
+              <span className="denty-pill">
+                {t("admin.plan.saved_count", { count: sortedClinics.length })}
+              </span>
             </div>
 
             <div className="mt-4 space-y-3">
@@ -554,7 +579,9 @@ export function PlanningResourcesView({
                         </p>
                       ) : null}
                       <p className="mt-3 text-xs uppercase tracking-[0.16em] text-[rgba(10,22,40,0.52)]">
-                        {clinic.tasks.length} clinic tasks
+                        {t("admin.plan.clinic_tasks_count", {
+                          count: clinic.tasks.length,
+                        })}
                       </p>
                     </div>
                     <div className="flex flex-wrap justify-end gap-2">
@@ -563,14 +590,14 @@ export function PlanningResourcesView({
                         onClick={() => onEditClinic(clinic)}
                         className={smallSecondary}
                       >
-                        Edit
+                        {t("admin.common.edit")}
                       </button>
                       <button
                         type="button"
                         onClick={() => onDeleteClinic(clinic)}
                         className={smallDanger}
                       >
-                        Delete
+                        {t("admin.common.delete")}
                       </button>
                     </div>
                   </div>
@@ -581,8 +608,10 @@ export function PlanningResourcesView({
 
           <div>
             <div className="flex items-center justify-between gap-3">
-              <p className="denty-kicker">Shifts</p>
-              <span className="denty-pill">{sortedShifts.length} saved</span>
+              <p className="denty-kicker">{t("admin.plan.shifts")}</p>
+              <span className="denty-pill">
+                {t("admin.plan.saved_count", { count: sortedShifts.length })}
+              </span>
             </div>
 
             <div className="mt-4 space-y-3">
@@ -600,7 +629,9 @@ export function PlanningResourcesView({
                         {shift.startsAt} - {shift.endsAt}
                       </p>
                       <p className="mt-3 text-xs uppercase tracking-[0.16em] text-[rgba(10,22,40,0.52)]">
-                        {shift.appointmentCapacity} appointment slots
+                        {t("admin.plan.appointment_slots", {
+                          count: shift.appointmentCapacity,
+                        })}
                       </p>
                     </div>
                     <div className="flex flex-wrap justify-end gap-2">
@@ -609,14 +640,14 @@ export function PlanningResourcesView({
                         onClick={() => onEditShift(shift)}
                         className={smallSecondary}
                       >
-                        Edit
+                        {t("admin.common.edit")}
                       </button>
                       <button
                         type="button"
                         onClick={() => onDeleteShift(shift)}
                         className={smallDanger}
                       >
-                        Delete
+                        {t("admin.common.delete")}
                       </button>
                     </div>
                   </div>
@@ -627,8 +658,12 @@ export function PlanningResourcesView({
 
           <div>
             <div className="flex items-center justify-between gap-3">
-              <p className="denty-kicker">Semesters and case catalog</p>
-              <span className="denty-pill">{sortedSemesters.length} semesters</span>
+              <p className="denty-kicker">{t("admin.plan.semesters_catalog")}</p>
+              <span className="denty-pill">
+                {t("admin.plan.semesters_count", {
+                  count: sortedSemesters.length,
+                })}
+              </span>
             </div>
 
             <div className="mt-4 max-h-[50rem] space-y-4 overflow-y-auto pr-1">
@@ -643,10 +678,16 @@ export function PlanningResourcesView({
                         {semester.label}
                       </p>
                       <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                        Sort {semester.sortOrder}
+                        {t("admin.plan.sort_value", {
+                          value: semester.sortOrder,
+                        })}
                         {semester.endsOn
-                          ? ` | ends ${new Date(semester.endsOn).toLocaleDateString()}`
-                          : " | no end date yet"}
+                          ? t("admin.plan.ends_value", {
+                              date: new Date(
+                                semester.endsOn,
+                              ).toLocaleDateString(),
+                            })
+                          : t("admin.plan.no_end_date")}
                       </p>
                     </div>
                     <div className="flex flex-wrap justify-end gap-2">
@@ -655,14 +696,14 @@ export function PlanningResourcesView({
                         onClick={() => onEditSemester(semester)}
                         className={smallSecondary}
                       >
-                        Edit
+                        {t("admin.common.edit")}
                       </button>
                       <button
                         type="button"
                         onClick={() => onDeleteSemester(semester)}
                         className={smallDanger}
                       >
-                        Delete
+                        {t("admin.common.delete")}
                       </button>
                     </div>
                   </div>
@@ -670,7 +711,7 @@ export function PlanningResourcesView({
                   <div className="mt-4 space-y-2">
                     {semester.clinicCases.length === 0 ? (
                       <p className="text-sm text-[var(--muted-foreground)]">
-                        No clinic cases defined for this semester yet.
+                        {t("admin.plan.no_cases")}
                       </p>
                     ) : null}
                     {semester.clinicCases.map((clinicCase) => (
@@ -684,7 +725,10 @@ export function PlanningResourcesView({
                               {clinicCase.title}
                             </p>
                             <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-                              {clinicCase.clinic.name} | required {clinicCase.requiredCount}
+                              {t("admin.plan.case_required", {
+                                clinic: clinicCase.clinic.name,
+                                count: clinicCase.requiredCount,
+                              })}
                             </p>
                             {clinicCase.description ? (
                               <p className="mt-2 text-sm leading-6 text-[var(--muted-foreground)]">
@@ -698,14 +742,14 @@ export function PlanningResourcesView({
                               onClick={() => onEditClinicCase(clinicCase, semester)}
                               className={smallSecondary}
                             >
-                              Edit
+                              {t("admin.common.edit")}
                             </button>
                             <button
                               type="button"
                               onClick={() => onDeleteClinicCase(clinicCase)}
                               className={smallDanger}
                             >
-                              Delete
+                              {t("admin.common.delete")}
                             </button>
                           </div>
                         </div>

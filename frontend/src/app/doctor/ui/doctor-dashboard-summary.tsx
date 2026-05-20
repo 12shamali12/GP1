@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
+
 type DoctorDashboardSummaryProps = {
   userName: string;
   todayAppointments: number;
@@ -35,35 +37,37 @@ export function DoctorDashboardSummary({
   showLegacyOps,
   onToggleLegacy,
 }: DoctorDashboardSummaryProps) {
+  const t = useTranslation();
+
   return (
     <>
       <div className="grid gap-4 xl:grid-cols-[1.16fr_0.72fr_0.72fr_0.72fr]">
         <div className="denty-panel-strong p-5 md:p-6">
-          <p className="denty-kicker">Doctor workspace</p>
+          <p className="denty-kicker">{t("doctor.common.workspace")}</p>
           <h1 className="mt-3 text-2xl font-semibold text-[var(--foreground)] md:text-2xl">
-            Welcome back, {userName || "Doctor"}
+            {t("doctor.summary.welcome", {
+              name: userName || t("doctor.common.doctor"),
+            })}
           </h1>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)] md:text-base">
-            The page now starts from your actual clinical workflow first, then leaves the older
-            dense operations behind one optional toggle instead of pushing everything into the
-            opening view.
+            {t("doctor.summary.intro")}
           </p>
         </div>
 
         <SummaryMetric
-          label="Today"
+          label={t("doctor.summary.today")}
           value={todayAppointments}
-          note="Scheduled appointments"
+          note={t("doctor.summary.today_note")}
         />
         <SummaryMetric
-          label="Pending"
+          label={t("doctor.summary.pending")}
           value={pendingAppointments}
-          note="Requests waiting for action"
+          note={t("doctor.summary.pending_note")}
         />
         <SummaryMetric
-          label="Unread"
+          label={t("doctor.summary.unread")}
           value={unreadNotifications}
-          note="Notifications in your queue"
+          note={t("doctor.summary.unread_note")}
         />
       </div>
 
@@ -73,7 +77,9 @@ export function DoctorDashboardSummary({
           onClick={onToggleLegacy}
           className="inline-flex min-h-[3rem] items-center justify-center rounded-[18px] border border-white/16 bg-[rgba(255,255,255,0.42)] px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.68)] shadow-[0_18px_34px_rgba(7,18,34,0.08)] backdrop-blur-[16px] transition hover:-translate-y-[1px] hover:bg-[rgba(255,255,255,0.54)]"
         >
-          {showLegacyOps ? "Hide legacy operations" : "Open legacy operations"}
+          {showLegacyOps
+            ? t("doctor.summary.hide_legacy")
+            : t("doctor.summary.open_legacy")}
         </button>
       </div>
     </>

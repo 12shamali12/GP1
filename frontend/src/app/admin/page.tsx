@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AdminShell } from "@/features/admin/components/admin-shell";
+import { useTranslation } from "@/features/i18n/language-provider";
 import {
   getDoctorRequests,
   getSupervisorRequests,
@@ -29,6 +30,7 @@ type AdminLaneCard = {
 };
 
 export default function AdminPage() {
+  const t = useTranslation();
   const [supervisorRequests, setSupervisorRequests] = useState<SupervisorRequestItem[]>([]);
   const [doctorRequests, setDoctorRequests] = useState<DoctorRequestItem[]>([]);
   const [users, setUsers] = useState<ManagedUser[]>([]);
@@ -50,7 +52,7 @@ export default function AdminPage() {
       setDoctorRequests(nextDoctorRequests || []);
       setUsers(nextUsers || []);
     } catch (e: any) {
-      setError(e?.message || "Failed to load admin data.");
+      setError(e?.message || t("admin.queue.failed_load"));
     } finally {
       setLoading(false);
     }
@@ -72,45 +74,45 @@ export default function AdminPage() {
   const cards: AdminLaneCard[] = [
     {
       href: "/admin/supervisor-requests",
-      eyebrow: "Review",
-      title: "Supervisor requests",
-      description: "Approve or reject pending supervisor accounts in a dedicated review lane.",
-      metric: `${pendingSupervisor} pending`,
+      eyebrow: t("admin.common.review"),
+      title: t("admin.queue.card_supervisor_title"),
+      description: t("admin.queue.card_supervisor_desc"),
+      metric: t("admin.queue.metric_pending", { count: pendingSupervisor }),
     },
     {
       href: "/admin/doctor-requests",
-      eyebrow: "Review",
-      title: "Doctor requests",
-      description: "Handle doctor applications and keep status decisions in one clearer queue.",
-      metric: `${pendingDoctor} pending`,
+      eyebrow: t("admin.common.review"),
+      title: t("admin.queue.card_doctor_title"),
+      description: t("admin.queue.card_doctor_desc"),
+      metric: t("admin.queue.metric_pending", { count: pendingDoctor }),
     },
     {
       href: "/admin/groups",
-      eyebrow: "Studio",
-      title: "Semester groups",
-      description: "Create groups, manage student membership, and approve pairing requests from one focused studio.",
-      metric: "Manage groups",
+      eyebrow: t("admin.common.studio"),
+      title: t("admin.queue.card_groups_title"),
+      description: t("admin.queue.card_groups_desc"),
+      metric: t("admin.queue.metric_manage_groups"),
     },
     {
       href: "/admin/planning",
-      eyebrow: "Studio",
-      title: "Clinics and shifts",
-      description: "Build named two-week plans with one fixed shift, a clinic per working day, and separate group assignment lanes.",
-      metric: "Plan rotations",
+      eyebrow: t("admin.common.studio"),
+      title: t("admin.queue.card_planning_title"),
+      description: t("admin.queue.card_planning_desc"),
+      metric: t("admin.queue.metric_plan_rotations"),
     },
     {
       href: "/admin/users",
-      eyebrow: "Control",
-      title: "User management",
-      description: "Block, unblock, delete, and re-approve platform accounts from one control desk.",
-      metric: `${visibleUsers.length} accounts`,
+      eyebrow: t("admin.common.control"),
+      title: t("admin.queue.card_users_title"),
+      description: t("admin.queue.card_users_desc"),
+      metric: t("admin.queue.metric_accounts", { count: visibleUsers.length }),
     },
   ];
 
   return (
     <AdminShell
-      title="Admin Request Desk"
-      description="Handle pending approvals and account controls from one wider review workspace."
+      title={t("admin.queue.title")}
+      description={t("admin.queue.description")}
     >
       {error ? (
         <div className={`${panelClass} border-rose-200/60 bg-[linear-gradient(180deg,rgba(255,244,246,0.86),rgba(255,234,238,0.48))]`}>
@@ -122,54 +124,54 @@ export default function AdminPage() {
         <div className={panelClass}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="denty-kicker">Queue</p>
+              <p className="denty-kicker">{t("admin.queue.eyebrow")}</p>
               <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)] md:text-xl">
-                All pending requests
+                {t("admin.queue.all_pending")}
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)] md:text-base">
-                This queue combines pending supervisor and doctor approvals so the admin can see the whole review load at once.
+                {t("admin.queue.intro")}
               </p>
             </div>
 
             <div className="rounded-[24px] border border-white/12 bg-[rgba(9,20,38,0.68)] px-5 py-4 text-white shadow-[0_20px_46px_rgba(4,11,26,0.24)] backdrop-blur-[18px]">
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-white/62">
-                Total pending
+                {t("admin.queue.total_pending")}
               </p>
               <p className="mt-3 text-2xl font-semibold">{pendingTotal}</p>
             </div>
           </div>
 
           {loading ? (
-            <p className="mt-6 text-sm text-[var(--muted-foreground)]">Loading queue...</p>
+            <p className="mt-6 text-sm text-[var(--muted-foreground)]">{t("admin.queue.loading_queue")}</p>
           ) : (
             <div className="mt-6 grid gap-4 md:grid-cols-3">
               <div className={softCardClass}>
-                <p className="denty-kicker !tracking-[0.18em]">Supervisor queue</p>
+                <p className="denty-kicker !tracking-[0.18em]">{t("admin.queue.supervisor_queue")}</p>
                 <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {pendingSupervisor}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">
-                  Pending supervisor requests waiting for review.
+                  {t("admin.queue.supervisor_queue_note")}
                 </p>
               </div>
 
               <div className={softCardClass}>
-                <p className="denty-kicker !tracking-[0.18em]">Doctor queue</p>
+                <p className="denty-kicker !tracking-[0.18em]">{t("admin.queue.doctor_queue")}</p>
                 <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {pendingDoctor}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">
-                  Pending doctor requests waiting for approval or rejection.
+                  {t("admin.queue.doctor_queue_note")}
                 </p>
               </div>
 
               <div className={softCardClass}>
-                <p className="denty-kicker !tracking-[0.18em]">Blocked users</p>
+                <p className="denty-kicker !tracking-[0.18em]">{t("admin.queue.blocked_users")}</p>
                 <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {blockedUsers}
                 </p>
                 <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">
-                  Accounts currently blocked from using the platform.
+                  {t("admin.queue.blocked_users_note")}
                 </p>
               </div>
             </div>
@@ -177,38 +179,38 @@ export default function AdminPage() {
         </div>
 
         <div className={panelClass}>
-          <p className="denty-kicker">Accounts</p>
+          <p className="denty-kicker">{t("admin.queue.accounts_eyebrow")}</p>
           <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
-            Platform users
+            {t("admin.queue.platform_users")}
           </h2>
           <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
-            A quick scan of live account volume before you enter the detailed user control page.
+            {t("admin.queue.platform_users_note")}
           </p>
 
           {loading ? (
-            <p className="mt-6 text-sm text-[var(--muted-foreground)]">Loading users...</p>
+            <p className="mt-6 text-sm text-[var(--muted-foreground)]">{t("admin.queue.loading_users")}</p>
           ) : (
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <div className={softCardClass}>
-                <p className="denty-kicker !tracking-[0.18em]">Doctors</p>
+                <p className="denty-kicker !tracking-[0.18em]">{t("admin.queue.doctors")}</p>
                 <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {doctorCount}
                 </p>
               </div>
               <div className={softCardClass}>
-                <p className="denty-kicker !tracking-[0.18em]">Supervisors</p>
+                <p className="denty-kicker !tracking-[0.18em]">{t("admin.queue.supervisors")}</p>
                 <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {supervisorCount}
                 </p>
               </div>
               <div className={softCardClass}>
-                <p className="denty-kicker !tracking-[0.18em]">Patients</p>
+                <p className="denty-kicker !tracking-[0.18em]">{t("admin.queue.patients")}</p>
                 <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {patientCount}
                 </p>
               </div>
               <div className={softCardClass}>
-                <p className="denty-kicker !tracking-[0.18em]">All accounts</p>
+                <p className="denty-kicker !tracking-[0.18em]">{t("admin.queue.all_accounts")}</p>
                 <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                   {visibleUsers.length}
                 </p>
@@ -243,7 +245,7 @@ export default function AdminPage() {
 
             <p className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--color-navy)]">
               <span className="h-2.5 w-2.5 rounded-full bg-[var(--color-ice)]" />
-              Open review lane
+              {t("admin.queue.open_review_lane")}
             </p>
           </Link>
         ))}

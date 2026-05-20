@@ -1,11 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { ManagedUser } from "@/features/admin/types/admin";
 import type {
   GroupedUserRole,
   RoleFilter,
 } from "../hooks/use-admin-users-workspace";
+
+const roleLabelKey: Record<GroupedUserRole["role"], string> = {
+  SUPERVISOR: "admin.users.filter_supervisors",
+  DOCTOR: "admin.users.filter_doctors",
+  PATIENT: "admin.users.filter_patients",
+};
 
 type UsersRoleSectionsProps = {
   groupedUsers: GroupedUserRole[];
@@ -28,6 +35,7 @@ export function UsersRoleSections({
   onReapproveDoctor,
   hasActiveTimedFreeze,
 }: UsersRoleSectionsProps) {
+  const t = useTranslation();
   return (
     <div className="mt-6 space-y-4">
       {groupedUsers.map((group) => {
@@ -40,9 +48,11 @@ export function UsersRoleSections({
               className="flex w-full cursor-pointer items-center justify-between gap-4 rounded-[22px] border border-white/10 bg-white/28 px-4 py-4 text-left transition hover:bg-white/40"
             >
               <div>
-                <p className="denty-kicker !tracking-[0.18em]">{group.label}</p>
+                <p className="denty-kicker !tracking-[0.18em]">
+                  {t(roleLabelKey[group.role])}
+                </p>
                 <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
-                  {group.count} accounts
+                  {t("admin.common.accounts_count", { count: group.count })}
                 </p>
               </div>
               <span className="inline-flex min-h-[2.8rem] min-w-[2.8rem] items-center justify-center rounded-full border border-white/14 bg-white/38 text-xl font-semibold text-[var(--foreground)]">
@@ -54,7 +64,7 @@ export function UsersRoleSections({
               <div className="mt-4 space-y-4">
                 {group.count === 0 ? (
                   <p className="text-xs text-[var(--muted-foreground)]/80">
-                    No accounts.
+                    {t("admin.users.no_accounts")}
                   </p>
                 ) : null}
 
@@ -75,33 +85,71 @@ export function UsersRoleSections({
                           >
                             {user.name}
                           </Link>
-                          <p className="mt-2">Email: {user.email || "-"}</p>
-                          <p>Phone: {user.phone || "-"}</p>
+                          <p className="mt-2">
+                            {t("admin.users.email_field", {
+                              value: user.email || "-",
+                            })}
+                          </p>
+                          <p>
+                            {t("admin.users.phone_field", {
+                              value: user.phone || "-",
+                            })}
+                          </p>
                           {user.role === "DOCTOR" ? (
-                            <p>Doctor ID: {user.doctorIdNumber || "-"}</p>
+                            <p>
+                              {t("admin.users.doctor_id_field", {
+                                value: user.doctorIdNumber || "-",
+                              })}
+                            </p>
                           ) : null}
                           {user.role === "SUPERVISOR" ? (
-                            <p>Status: {user.supervisorStatus || "UNKNOWN"}</p>
+                            <p>
+                              {t("admin.users.status_field", {
+                                value:
+                                  user.supervisorStatus ||
+                                  t("admin.common.unknown"),
+                              })}
+                            </p>
                           ) : null}
                           {user.role === "DOCTOR" ? (
-                            <p>Status: {user.doctorStatus || "UNKNOWN"}</p>
+                            <p>
+                              {t("admin.users.status_field", {
+                                value:
+                                  user.doctorStatus ||
+                                  t("admin.common.unknown"),
+                              })}
+                            </p>
                           ) : null}
-                          <p>Blocked: {user.blocked ? "Yes" : "No"}</p>
+                          <p>
+                            {t("admin.users.blocked_field", {
+                              value: user.blocked
+                                ? t("admin.common.yes")
+                                : t("admin.common.no"),
+                            })}
+                          </p>
                           {hasActiveTimedFreeze(user) ? (
                             <p>
-                              Frozen until:{" "}
-                              {new Date(user.blockedUntil as string).toLocaleString()}
+                              {t("admin.users.frozen_field", {
+                                value: new Date(
+                                  user.blockedUntil as string,
+                                ).toLocaleString(),
+                              })}
                             </p>
                           ) : null}
                           {user.blockReason ? (
-                            <p>Freeze note: {user.blockReason}</p>
+                            <p>
+                              {t("admin.users.freeze_note_field", {
+                                value: user.blockReason,
+                              })}
+                            </p>
                           ) : null}
                           {user.role === "DOCTOR" ? (
                             <p>
-                              Group:{" "}
-                              {user.groupMembership?.group
-                                ? `${user.groupMembership.group.name} - ${user.groupMembership.group.semesterLabel}`
-                                : "Not assigned"}
+                              {t("admin.users.group_field", {
+                                value: user.groupMembership?.group
+                                  ? `${user.groupMembership.group.name} - ${user.groupMembership.group.semesterLabel}`
+                                  : t("admin.users.not_assigned"),
+                              })}
                             </p>
                           ) : null}
 
@@ -114,8 +162,8 @@ export function UsersRoleSections({
                                 className="cursor-pointer rounded-full border border-emerald-600/40 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
                               >
                                 {user.supervisorStatus === "REJECTED"
-                                  ? "Re-approve"
-                                  : "Approve now"}
+                                  ? t("admin.common.re_approve")
+                                  : t("admin.common.approve_now")}
                               </button>
                             ) : null}
 
@@ -127,8 +175,8 @@ export function UsersRoleSections({
                                 className="cursor-pointer rounded-full border border-emerald-600/40 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100"
                               >
                                 {user.doctorStatus === "REJECTED"
-                                  ? "Re-approve"
-                                  : "Approve now"}
+                                  ? t("admin.common.re_approve")
+                                  : t("admin.common.approve_now")}
                               </button>
                             ) : null}
 
@@ -136,14 +184,16 @@ export function UsersRoleSections({
                               onClick={() => onBlockUser(user.id, !user.blocked)}
                               className="cursor-pointer rounded-full border border-[rgba(183,136,66,0.34)] bg-[rgba(183,136,66,0.14)] px-4 py-2 text-sm font-semibold text-[#855f1d] hover:bg-[rgba(183,136,66,0.22)]"
                             >
-                              {user.blocked ? "Unblock" : "Block"}
+                              {user.blocked
+                                ? t("admin.common.unblock")
+                                : t("admin.common.block")}
                             </button>
 
                             <button
                               onClick={() => onOpenDeleteModal(user)}
                               className="cursor-pointer rounded-full border border-rose-600/30 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 hover:bg-rose-100"
                             >
-                              Delete
+                              {t("admin.common.delete")}
                             </button>
                           </div>
                         </div>

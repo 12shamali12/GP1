@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
+
 type DoctorApprovalsViewProps = {
   pendingAppointments: any[];
   loadingAction: boolean;
@@ -13,25 +15,31 @@ export function DoctorApprovalsView({
   onApprove,
   onReject,
 }: DoctorApprovalsViewProps) {
+  const t = useTranslation();
+
   return (
     <div className="denty-dashboard-card overflow-hidden p-5 md:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="denty-kicker">Approval desk</p>
+          <p className="denty-kicker">{t("doctor.approvals.eyebrow")}</p>
           <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Pending reservations
+            {t("doctor.approvals.title")}
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Review incoming requests without leaving the main doctor workspace.
+            {t("doctor.approvals.description")}
           </p>
         </div>
-        <span className="denty-pill">{pendingAppointments.length} pending</span>
+        <span className="denty-pill">
+          {t("doctor.approvals.pending_count", {
+            count: pendingAppointments.length,
+          })}
+        </span>
       </div>
 
       <div className="mt-6 grid gap-4 xl:grid-cols-2">
         {pendingAppointments.length === 0 ? (
           <div className="denty-dashboard-card-soft p-5 text-sm text-[var(--muted-foreground)] xl:col-span-2">
-            No pending approvals right now.
+            {t("doctor.approvals.empty")}
           </div>
         ) : null}
 
@@ -44,16 +52,16 @@ export function DoctorApprovalsView({
               <p className="text-lg font-semibold text-[var(--foreground)]">
                 {appointment.patient?.name ||
                   appointment.patientId?.slice(0, 6) ||
-                  "Unknown patient"}
+                  t("doctor.common.unknown_patient")}
               </p>
               <p className="text-sm text-[var(--muted-foreground)]">
                 {appointment.slot?.startTime
                   ? new Date(appointment.slot.startTime).toLocaleString()
-                  : "No time assigned"}
+                  : t("doctor.common.no_time")}
               </p>
               {appointment.note ? (
                 <p className="rounded-[18px] border border-[rgba(148,163,184,0.16)] bg-white/60 px-4 py-3 text-sm text-[var(--muted-foreground)]">
-                  Note: {appointment.note}
+                  {t("doctor.approvals.note", { value: appointment.note })}
                 </p>
               ) : null}
             </div>
@@ -64,20 +72,20 @@ export function DoctorApprovalsView({
                 className="denty-action denty-action-success disabled:opacity-60"
                 disabled={loadingAction}
               >
-                Approve
+                {t("doctor.common.approve")}
               </button>
               <button
                 onClick={() => {
                   const note =
                     typeof window !== "undefined"
-                      ? window.prompt("Add a rejection note (optional):") || ""
+                      ? window.prompt(t("doctor.approvals.reject_prompt")) || ""
                       : "";
                   onReject(appointment.id, note);
                 }}
                 className="denty-action denty-action-danger disabled:opacity-60"
                 disabled={loadingAction}
               >
-                Reject
+                {t("doctor.common.reject")}
               </button>
             </div>
           </div>

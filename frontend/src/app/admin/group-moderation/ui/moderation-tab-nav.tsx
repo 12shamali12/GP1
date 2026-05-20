@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type {
   ModerationCounts,
   ModerationTab,
@@ -19,15 +20,20 @@ export function ModerationTabNav({
   counts,
   onTabChange,
 }: ModerationTabNavProps) {
+  const t = useTranslation();
   const tabButtons: Array<{
     key: ModerationTab;
     label: string;
     count: number;
   }> = [
-    { key: "join", label: "Join requests", count: counts.join },
-    { key: "partner", label: "Partner requests", count: counts.partner },
-    { key: "students", label: "Student memberships", count: counts.students },
-    { key: "pairs", label: "Active pairs", count: counts.pairs },
+    { key: "join", label: t("admin.mod.tab_join"), count: counts.join },
+    { key: "partner", label: t("admin.mod.tab_partner"), count: counts.partner },
+    {
+      key: "students",
+      label: t("admin.mod.tab_students"),
+      count: counts.students,
+    },
+    { key: "pairs", label: t("admin.mod.tab_pairs"), count: counts.pairs },
   ];
 
   return (

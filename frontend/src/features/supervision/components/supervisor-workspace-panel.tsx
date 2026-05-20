@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { SupervisorWorkspaceData } from "../types";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 import { SupervisorWorkspaceHero } from "./supervisor-workspace/supervisor-workspace-hero";
 import { SupervisorWorkspaceLiveView } from "./supervisor-workspace/supervisor-workspace-live-view";
@@ -19,6 +20,7 @@ const tabClass =
   "rounded-full border border-white/12 bg-white/8 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/72 transition hover:border-white/20 hover:bg-white/14";
 
 export function SupervisorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange }: Props) {
+  const t = useTranslation();
   const [workspace, setWorkspace] = useState<SupervisorWorkspaceData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,8 +63,8 @@ export function SupervisorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange
     error,
     clearMessage: () => setMessage(null),
     clearError: () => setError(null),
-    messageTitle: "Supervisor workspace",
-    errorTitle: "Supervisor workspace",
+    messageTitle: t("supervisor.common.toast_workspace"),
+    errorTitle: t("supervisor.common.toast_workspace"),
   });
 
   const loadWorkspace = async () => {
@@ -74,11 +76,12 @@ export function SupervisorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange
         `${apiUrl}/supervisor/workspace?identifier=${encodeURIComponent(identifier)}`,
       );
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to load supervisor workspace.");
+      if (!res.ok)
+        throw new Error(data?.message || t("supervision.sup.error.load_workspace"));
       setWorkspace(data);
       onWorkspaceChange?.(data);
     } catch (e: any) {
-      setError(e?.message || "Failed to load supervisor workspace.");
+      setError(e?.message || t("supervision.sup.error.load_workspace"));
     } finally {
       setLoading(false);
     }
@@ -110,15 +113,15 @@ export function SupervisorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange
 
   const submitTask = async () => {
     if (!taskForm.title.trim() || !taskForm.description.trim()) {
-      setError("Task title and description are required.");
+      setError(t("supervision.sup.error.task_required"));
       return;
     }
     if (taskForm.targetType === "doctor" && !selectedStudent?.id) {
-      setError("Choose a student first.");
+      setError(t("supervision.sup.error.choose_student"));
       return;
     }
     if (taskForm.targetType === "group" && !taskForm.groupId) {
-      setError("Choose a group first.");
+      setError(t("supervision.sup.error.choose_group"));
       return;
     }
     setError(null);
@@ -137,22 +140,23 @@ export function SupervisorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to create task.");
-      setMessage("Task assigned.");
+      if (!res.ok)
+        throw new Error(data?.message || t("supervision.sup.error.create_task"));
+      setMessage(t("supervision.sup.msg.task_assigned"));
       setTaskForm({ title: "", description: "", dueAt: "", targetType: "doctor", groupId: "" });
       await loadWorkspace();
     } catch (e: any) {
-      setError(e?.message || "Failed to create task.");
+      setError(e?.message || t("supervision.sup.error.create_task"));
     }
   };
 
   const submitFreeze = async () => {
     if (!selectedStudent?.id) {
-      setError("Choose a student first.");
+      setError(t("supervision.sup.error.choose_student"));
       return;
     }
     if (!freezeUntil) {
-      setError("Choose a freeze end date.");
+      setError(t("supervision.sup.error.freeze_date"));
       return;
     }
     setError(null);
@@ -168,13 +172,14 @@ export function SupervisorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to freeze student.");
-      setMessage("Student account frozen.");
+      if (!res.ok)
+        throw new Error(data?.message || t("supervision.sup.error.freeze"));
+      setMessage(t("supervision.sup.msg.account_frozen"));
       setFreezeUntil("");
       setFreezeReason("");
       await loadWorkspace();
     } catch (e: any) {
-      setError(e?.message || "Failed to freeze student.");
+      setError(e?.message || t("supervision.sup.error.freeze"));
     }
   };
 
@@ -188,17 +193,18 @@ export function SupervisorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange
         body: JSON.stringify({ supervisorIdentifier: identifier }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to unfreeze student.");
-      setMessage("Student account unfrozen.");
+      if (!res.ok)
+        throw new Error(data?.message || t("supervision.sup.error.unfreeze"));
+      setMessage(t("supervision.sup.msg.account_unfrozen"));
       await loadWorkspace();
     } catch (e: any) {
-      setError(e?.message || "Failed to unfreeze student.");
+      setError(e?.message || t("supervision.sup.error.unfreeze"));
     }
   };
 
   const submitExam = async () => {
     if (!selectedStudent?.id || !examForm.clinicId || !examForm.scheduledAt || !examForm.title.trim()) {
-      setError("Student, clinic, title, and schedule are required.");
+      setError(t("supervision.sup.error.exam_required"));
       return;
     }
     setError(null);
@@ -218,19 +224,20 @@ export function SupervisorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to schedule exam.");
-      setMessage("Clinic exam scheduled.");
+      if (!res.ok)
+        throw new Error(data?.message || t("supervision.sup.error.schedule_exam"));
+      setMessage(t("supervision.sup.msg.exam_scheduled"));
       setExamForm({ clinicId: "", shiftId: "", scheduledAt: "", title: "", cases: "" });
       await loadWorkspace();
     } catch (e: any) {
-      setError(e?.message || "Failed to schedule exam.");
+      setError(e?.message || t("supervision.sup.error.schedule_exam"));
     }
   };
 
   const submitExamGrade = async (examId: string) => {
     const draft = examDrafts[examId];
     if (!draft?.mark) {
-      setError("Mark is required.");
+      setError(t("supervision.sup.error.mark_required"));
       return;
     }
     setError(null);
@@ -246,18 +253,19 @@ export function SupervisorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to grade exam.");
-      setMessage("Exam graded.");
+      if (!res.ok)
+        throw new Error(data?.message || t("supervision.sup.error.grade_exam"));
+      setMessage(t("supervision.sup.msg.exam_graded"));
       await loadWorkspace();
     } catch (e: any) {
-      setError(e?.message || "Failed to grade exam.");
+      setError(e?.message || t("supervision.sup.error.grade_exam"));
     }
   };
 
   const submitReview = async (reportId: string) => {
     const draft = reviewForms[reportId];
     if (!draft?.mark || !draft?.rating) {
-      setError("Mark and rating are required.");
+      setError(t("supervision.sup.error.mark_rating_required"));
       return;
     }
     setError(null);
@@ -275,17 +283,18 @@ export function SupervisorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to review report.");
+      if (!res.ok)
+        throw new Error(data?.message || t("supervision.sup.error.review_report"));
       setMessage(
         draft.outcome === "CASE_REJECTED"
-          ? "Case completion rejected."
+          ? t("supervision.sup.msg.case_rejected")
           : draft.outcome === "NEEDS_EDIT"
-            ? "Report sent back for edits."
-            : "Report reviewed.",
+            ? t("supervision.sup.msg.report_returned")
+            : t("supervision.sup.msg.report_reviewed"),
       );
       await loadWorkspace();
     } catch (e: any) {
-      setError(e?.message || "Failed to review report.");
+      setError(e?.message || t("supervision.sup.error.review_report"));
     }
   };
 
@@ -298,7 +307,11 @@ export function SupervisorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange
     <div className="space-y-5">
       <SupervisorWorkspaceHero view={view} workspace={workspace} tabClass={tabClass} onChange={setView} />
 
-      {loading ? <p className="text-sm text-[var(--muted-foreground)]">Loading workspace...</p> : null}
+      {loading ? (
+        <p className="text-sm text-[var(--muted-foreground)]">
+          {t("supervision.sup.loading_workspace")}
+        </p>
+      ) : null}
 
       {view === "live" ? (
         <SupervisorWorkspaceLiveView

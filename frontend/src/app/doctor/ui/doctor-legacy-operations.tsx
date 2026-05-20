@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
+
 type DoctorLegacyOperationsProps = {
   todayAppointments: any[];
   appointments: any[];
@@ -89,19 +91,25 @@ export function DoctorLegacyOperations({
   onToggleHour,
   onAddMultipleSlots,
 }: DoctorLegacyOperationsProps) {
+  const t = useTranslation();
+
   return (
     <div className="space-y-4">
       <div className="grid gap-4 xl:grid-cols-[1.45fr_0.95fr]">
         <div className="denty-dashboard-card p-5">
           <div className="mb-4 flex items-center justify-between gap-4">
             <div>
-              <p className="denty-kicker">Today&apos;s schedule</p>
+              <p className="denty-kicker">{t("doctor.legacy.today_schedule")}</p>
               <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
-                Appointments
+                {t("doctor.legacy.appointments")}
               </h3>
             </div>
 
-            <span className="denty-pill">{todayAppointments.length} planned</span>
+            <span className="denty-pill">
+              {t("doctor.legacy.planned_count", {
+                count: todayAppointments.length,
+              })}
+            </span>
           </div>
 
           <div className="space-y-3">
@@ -112,7 +120,12 @@ export function DoctorLegacyOperations({
               >
                 <div>
                   <p className="font-semibold text-[var(--foreground)]">
-                    Patient: {appointment.patient?.name || appointment.patientId?.slice(0, 6) || "Unknown"}
+                    {t("doctor.legacy.patient_label", {
+                      value:
+                        appointment.patient?.name ||
+                        appointment.patientId?.slice(0, 6) ||
+                        t("patient.common.unknown"),
+                    })}
                   </p>
 
                   <p className="mt-1 text-sm text-[var(--muted-foreground)]">
@@ -142,7 +155,7 @@ export function DoctorLegacyOperations({
                         className="denty-action denty-action-success disabled:opacity-60"
                         disabled={loadingAction}
                       >
-                        Approve
+                        {t("doctor.common.approve")}
                       </button>
 
                       <button
@@ -150,7 +163,7 @@ export function DoctorLegacyOperations({
                         className="denty-action denty-action-danger disabled:opacity-60"
                         disabled={loadingAction}
                       >
-                        Reject
+                        {t("doctor.common.reject")}
                       </button>
                     </>
                   ) : null}
@@ -161,7 +174,7 @@ export function DoctorLegacyOperations({
                       className="denty-action denty-action-danger disabled:opacity-60"
                       disabled={loadingAction}
                     >
-                      Cancel
+                      {t("doctor.common.cancel")}
                     </button>
                   ) : null}
                 </div>
@@ -171,10 +184,12 @@ export function DoctorLegacyOperations({
         </div>
 
         <div className="denty-dashboard-card-soft p-5">
-          <p className="denty-kicker">Notifications</p>
+          <p className="denty-kicker">{t("doctor.legacy.notifications")}</p>
 
           <div className="mt-3 flex items-center justify-between gap-3">
-            <p className="text-sm text-[var(--muted-foreground)]">{unreadNotifications} unread</p>
+            <p className="text-sm text-[var(--muted-foreground)]">
+              {t("doctor.notif.unread_count", { count: unreadNotifications })}
+            </p>
 
             {notifications.length > 0 ? (
               <div className="flex items-center gap-3">
@@ -183,7 +198,7 @@ export function DoctorLegacyOperations({
                   onClick={onMarkAllNotificationsRead}
                   className="denty-link-button"
                 >
-                  Mark all read
+                  {t("doctor.common.mark_all_read")}
                 </button>
 
                 <button
@@ -191,7 +206,7 @@ export function DoctorLegacyOperations({
                   onClick={onDeleteAllNotifications}
                   className="text-[11px] font-semibold text-[#b91c1c] underline underline-offset-[0.22rem]"
                 >
-                  Remove all
+                  {t("doctor.common.remove_all")}
                 </button>
               </div>
             ) : null}
@@ -236,9 +251,9 @@ export function DoctorLegacyOperations({
                       <button
                         onClick={() => notification.id && onDeleteNotification(notification.id)}
                         className="denty-action denty-action-danger px-3 py-1.5 text-[11px]"
-                        aria-label="Delete notification"
+                        aria-label={t("doctor.common.delete")}
                       >
-                        Delete
+                        {t("doctor.common.delete")}
                       </button>
                     ) : null}
                   </div>
@@ -247,7 +262,9 @@ export function DoctorLegacyOperations({
             })}
 
             {notifications.length === 0 ? (
-              <p className="text-sm text-[var(--muted-foreground)]">No notifications yet.</p>
+              <p className="text-sm text-[var(--muted-foreground)]">
+                {t("doctor.common.no_notifications")}
+              </p>
             ) : null}
           </div>
         </div>
@@ -257,15 +274,21 @@ export function DoctorLegacyOperations({
         <div className="denty-dashboard-card p-5">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
-              <p className="denty-kicker">Slot planner</p>
-              <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">My slots</h3>
+              <p className="denty-kicker">{t("doctor.legacy.slot_planner")}</p>
+              <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
+                {t("doctor.legacy.my_slots")}
+              </h3>
             </div>
-            <span className="denty-pill">{groupedSlots.length} days</span>
+            <span className="denty-pill">
+              {t("doctor.legacy.days_count", { count: groupedSlots.length })}
+            </span>
           </div>
 
           <div className="mt-2 max-h-96 space-y-2 overflow-y-auto pr-1">
             {groupedSlots.length === 0 ? (
-              <p className="text-sm text-[var(--muted-foreground)]">No slots yet.</p>
+              <p className="text-sm text-[var(--muted-foreground)]">
+                {t("doctor.legacy.no_slots")}
+              </p>
             ) : null}
 
             {groupedSlots.map((group) => (
@@ -285,7 +308,7 @@ export function DoctorLegacyOperations({
                     className="denty-action denty-action-danger disabled:opacity-60"
                     disabled={loadingAction}
                   >
-                    Delete day
+                    {t("doctor.legacy.delete_day")}
                   </button>
                 </div>
 
@@ -319,18 +342,28 @@ export function DoctorLegacyOperations({
                           </p>
 
                           <p className="text-xs text-[var(--muted-foreground)]">
-                            Status: {slot.status} <span className="text-base align-middle">{slot.status === "BOOKED" ? "?" : "?"}</span>
+                            {t("doctor.legacy.status_label", {
+                              value: slot.status,
+                            })}{" "}
+                            <span className="text-base align-middle">{slot.status === "BOOKED" ? "?" : "?"}</span>
                           </p>
 
                           {slot.purpose ? (
                             <p className="text-xs text-[var(--muted-foreground)]">
-                              Cases: {slot.purpose}
+                              {t("doctor.legacy.cases_label", {
+                                value: slot.purpose,
+                              })}
                             </p>
                           ) : null}
 
                           {slot.status === "BOOKED" ? (
                             <p className="text-xs text-[var(--muted-foreground)]">
-                              With: {appointment?.patient?.name || "Patient"} • {appointment?.patient?.phone || "N/A"}
+                              {t("doctor.legacy.with_label", {
+                                name:
+                                  appointment?.patient?.name ||
+                                  t("doctor.common.patient"),
+                                phone: appointment?.patient?.phone || "N/A",
+                              })}
                             </p>
                           ) : null}
                         </div>
@@ -342,7 +375,7 @@ export function DoctorLegacyOperations({
                               className="denty-action denty-action-primary disabled:opacity-60"
                               disabled={loadingAction}
                             >
-                              Fill report
+                              {t("doctor.legacy.fill_report")}
                             </button>
 
                             <button
@@ -350,7 +383,7 @@ export function DoctorLegacyOperations({
                               className="denty-action denty-action-danger disabled:opacity-60"
                               disabled={loadingAction}
                             >
-                              Haven&apos;t showed
+                              {t("doctor.legacy.no_show")}
                             </button>
                           </div>
                         ) : (
@@ -359,7 +392,7 @@ export function DoctorLegacyOperations({
                             className="denty-action denty-action-danger disabled:opacity-60"
                             disabled={loadingAction}
                           >
-                            Remove
+                            {t("doctor.common.remove")}
                           </button>
                         )}
                       </div>
@@ -373,37 +406,52 @@ export function DoctorLegacyOperations({
 
         <div className="denty-dashboard-card-soft p-5">
           <p className="denty-kicker">
-            Performance ({getWeekRange().start.toLocaleDateString()} - {getWeekRange().end.toLocaleDateString()})
+            {t("doctor.legacy.performance", {
+              start: getWeekRange().start.toLocaleDateString(),
+              end: getWeekRange().end.toLocaleDateString(),
+            })}
           </p>
 
           <div className="mt-4 grid grid-cols-2 gap-3 text-[var(--foreground)]">
             <div className="denty-stat-card p-4">
-              <p className="text-xs text-[var(--muted-foreground)]">Done this week</p>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                {t("doctor.legacy.done_week")}
+              </p>
               <p className="mt-2 text-2xl font-semibold">{weeklyPerformance.done}</p>
             </div>
 
             <div className="denty-stat-card p-4">
-              <p className="text-xs text-[var(--muted-foreground)]">Rejected reservations</p>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                {t("doctor.legacy.rejected_reservations")}
+              </p>
               <p className="mt-2 text-2xl font-semibold">{weeklyPerformance.rejected}</p>
             </div>
 
             <div className="denty-stat-card p-4">
-              <p className="text-xs text-[var(--muted-foreground)]">Cancelled by you</p>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                {t("doctor.legacy.cancelled_by_you")}
+              </p>
               <p className="mt-2 text-2xl font-semibold">{weeklyPerformance.cancelledByDoctor}</p>
             </div>
 
             <div className="denty-stat-card p-4">
-              <p className="text-xs text-[var(--muted-foreground)]">Cancelled by patients</p>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                {t("doctor.legacy.cancelled_by_patients")}
+              </p>
               <p className="mt-2 text-2xl font-semibold">{weeklyPerformance.cancelledByPatient}</p>
             </div>
 
             <div className="denty-stat-card p-4">
-              <p className="text-xs text-[var(--muted-foreground)]">No-shows</p>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                {t("doctor.legacy.no_shows")}
+              </p>
               <p className="mt-2 text-2xl font-semibold">{weeklyPerformance.noShow}</p>
             </div>
 
             <div className="denty-stat-card p-4">
-              <p className="text-xs text-[var(--muted-foreground)]">Rating</p>
+              <p className="text-xs text-[var(--muted-foreground)]">
+                {t("doctor.legacy.rating")}
+              </p>
               <p className="mt-2 text-2xl font-semibold">-</p>
             </div>
           </div>
@@ -414,18 +462,20 @@ export function DoctorLegacyOperations({
         <div className="denty-dashboard-card space-y-4 p-5">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="denty-kicker">Planning surface</p>
+              <p className="denty-kicker">{t("doctor.legacy.planning_surface")}</p>
               <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
-                Availability planner
+                {t("doctor.legacy.availability_planner")}
               </h3>
             </div>
-            <span className="denty-pill">Live scheduling</span>
+            <span className="denty-pill">
+              {t("doctor.legacy.live_scheduling")}
+            </span>
           </div>
 
           <div className="grid items-start gap-2 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                Month
+                {t("doctor.legacy.month")}
               </label>
 
               <select
@@ -445,7 +495,7 @@ export function DoctorLegacyOperations({
 
             <div className="space-y-2">
               <label className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                Year
+                {t("doctor.legacy.year")}
               </label>
 
               <select
@@ -463,7 +513,7 @@ export function DoctorLegacyOperations({
 
             <div className="space-y-2 lg:col-span-2">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                Select cases
+                {t("doctor.legacy.select_cases")}
               </p>
 
               <div className="relative">
@@ -473,7 +523,9 @@ export function DoctorLegacyOperations({
                   className="denty-field flex items-center justify-between text-left text-sm"
                 >
                   <span>
-                    {selectedPurposes.length ? selectedPurposes.join(", ") : "Select cases"}
+                    {selectedPurposes.length
+                      ? selectedPurposes.join(", ")
+                      : t("doctor.legacy.select_cases")}
                   </span>
 
                   <span className="text-xs text-[var(--muted-foreground)]">
@@ -483,7 +535,15 @@ export function DoctorLegacyOperations({
 
                 {casesOpen ? (
                   <div className="denty-dashboard-card absolute z-20 mt-2 max-h-48 w-full overflow-auto p-2 shadow-lg">
-                    {["General", "Check-up", "Cleaning", "Pain/Urgent", "Whitening"].map((purpose) => {
+                    {(
+                      [
+                        ["General", "doctor.legacy.case.general"],
+                        ["Check-up", "doctor.legacy.case.checkup"],
+                        ["Cleaning", "doctor.legacy.case.cleaning"],
+                        ["Pain/Urgent", "doctor.legacy.case.pain"],
+                        ["Whitening", "doctor.legacy.case.whitening"],
+                      ] as const
+                    ).map(([purpose, labelKey]) => {
                       const active = selectedPurposes.includes(purpose);
 
                       return (
@@ -493,7 +553,7 @@ export function DoctorLegacyOperations({
                           onClick={() => onTogglePurpose(purpose)}
                           className="flex w-full items-center justify-between rounded-[14px] px-3 py-2 text-sm text-[var(--foreground)] hover:bg-[rgba(230,244,246,0.78)]"
                         >
-                          <span>{purpose}</span>
+                          <span>{t(labelKey)}</span>
                           <span className="ml-3 text-base">{active ? "" : ""}</span>
                         </button>
                       );
@@ -506,7 +566,7 @@ export function DoctorLegacyOperations({
 
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-              Pick a day
+              {t("doctor.legacy.pick_day")}
             </p>
 
             <div className="grid grid-cols-7 gap-2 rounded-[22px] border border-[rgba(148,163,184,0.14)] bg-[rgba(244,245,247,0.88)] p-3">
@@ -554,7 +614,9 @@ export function DoctorLegacyOperations({
             <div className="space-y-3">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                  Slots for {selectedDay.toDateString()}
+                  {t("doctor.legacy.slots_for", {
+                    date: selectedDay.toDateString(),
+                  })}
                 </p>
 
                 <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
@@ -587,13 +649,15 @@ export function DoctorLegacyOperations({
                 disabled={loadingAction}
                 className="denty-button-primary w-full px-4 py-3 text-sm font-semibold disabled:opacity-60"
               >
-                {loadingAction ? "Adding..." : "Add selected slots"}
+                {loadingAction
+                  ? t("doctor.legacy.adding")
+                  : t("doctor.legacy.add_slots")}
               </button>
 
               {slotsForSelectedDay.length > 0 ? (
                 <div className="space-y-1">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Existing slots for this day
+                    {t("doctor.legacy.existing_slots")}
                   </p>
 
                   {slotsForSelectedDay.map((slot) => (
@@ -610,17 +674,24 @@ export function DoctorLegacyOperations({
                         </p>
 
                         <p className="text-xs text-[var(--muted-foreground)]">
-                          Status: {slot.status} <span className="text-base align-middle">{slot.status === "BOOKED" ? "?" : "?"}</span>
+                          {t("doctor.legacy.status_label", {
+                            value: slot.status,
+                          })}{" "}
+                          <span className="text-base align-middle">{slot.status === "BOOKED" ? "?" : "?"}</span>
                         </p>
 
                         {slot.purpose ? (
                           <p className="text-xs text-[var(--muted-foreground)]">
-                            Cases: {slot.purpose}
+                            {t("doctor.legacy.cases_label", {
+                              value: slot.purpose,
+                            })}
                           </p>
                         ) : null}
                       </div>
 
-                      <span className="denty-status-chip">1 hr</span>
+                      <span className="denty-status-chip">
+                        {t("doctor.legacy.one_hour")}
+                      </span>
                     </div>
                   ))}
                 </div>

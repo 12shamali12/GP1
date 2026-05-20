@@ -1,11 +1,13 @@
 "use client";
 
 import { AdminShell } from "@/features/admin/components/admin-shell";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { useAdminDoctorRequestsWorkspace } from "./hooks/use-admin-doctor-requests-workspace";
 import { DoctorAccountsLane } from "./ui/doctor-accounts-lane";
 import { DoctorRequestLane } from "./ui/doctor-request-lane";
 
 export default function AdminDoctorRequestsPage() {
+  const t = useTranslation();
   const {
     error,
     loading,
@@ -24,8 +26,8 @@ export default function AdminDoctorRequestsPage() {
 
   return (
     <AdminShell
-      title="Doctor Requests"
-      description="Doctor approvals and doctor account controls now have their own review lounge instead of living inside the supervisor dashboard."
+      title={t("admin.doc_req.title")}
+      description={t("admin.doc_req.description")}
     >
       <div className="grid gap-5 xl:grid-cols-2">
         <DoctorRequestLane

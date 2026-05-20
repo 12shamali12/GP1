@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
+
 type PatientNotificationsViewProps = {
   notifications: any[];
   unreadNotifications: number;
@@ -21,35 +23,38 @@ export function PatientNotificationsView({
   onDeleteNotification,
   onGoToCareDesk,
 }: PatientNotificationsViewProps) {
+  const t = useTranslation();
+
   return (
     <div className="denty-dashboard-card overflow-hidden p-5 md:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="denty-kicker">Alerts</p>
+          <p className="denty-kicker">{t("patient.notif.eyebrow")}</p>
           <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Patient notifications
+            {t("patient.notif.title")}
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Review reservation updates, doctor responses, and booking changes from one visible
-            feed.
+            {t("patient.notif.description")}
           </p>
         </div>
-        <span className="denty-pill">{unreadNotifications} unread</span>
+        <span className="denty-pill">
+          {t("patient.notif.unread_count", { count: unreadNotifications })}
+        </span>
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={onMarkAllRead} className="denty-action denty-action-primary">
-          Mark all read
+          {t("patient.notif.mark_all_read")}
         </button>
         <button type="button" onClick={onDeleteAll} className="denty-action denty-action-danger">
-          Remove all
+          {t("patient.notif.remove_all")}
         </button>
       </div>
 
       <div className="mt-6 space-y-3">
         {notifications.length === 0 ? (
           <div className="denty-dashboard-card-soft p-5 text-sm text-[var(--muted-foreground)]">
-            No notifications yet.
+            {t("patient.common.no_notifications")}
           </div>
         ) : null}
 
@@ -92,16 +97,16 @@ export function PatientNotificationsView({
                   <button
                     onClick={() => notification.id && onDeleteNotification(notification.id)}
                     className="denty-action denty-action-danger px-3 py-1.5 text-[11px]"
-                    aria-label="Delete notification"
+                    aria-label={t("doctor.common.delete")}
                   >
-                    Delete
+                    {t("doctor.common.delete")}
                   </button>
                 </div>
               </div>
 
               {isActionable ? (
                 <button onClick={onGoToCareDesk} className="denty-link-button self-start">
-                  Go to care desk
+                  {t("patient.notif.go_to_care_desk")}
                 </button>
               ) : null}
             </div>

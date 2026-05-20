@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { ManagedUser } from "@/features/admin/types/admin";
 import type { AdminGroupItem } from "@/features/supervision/types";
 import { GroupCountCard } from "./group-count-card";
@@ -39,6 +40,7 @@ export function GroupDetailModal({
   onSaveGroupChanges,
   onAddDoctorToGroup,
 }: GroupDetailModalProps) {
+  const t = useTranslation();
   if (!selectedGroup) return null;
 
   return (
@@ -47,7 +49,7 @@ export function GroupDetailModal({
         <div className="denty-panel-strong max-h-full w-full overflow-y-auto rounded-[34px] p-6 md:p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="denty-kicker">Group detail</p>
+              <p className="denty-kicker">{t("admin.groups.detail_eyebrow")}</p>
               <h2 className="mt-3 text-3xl font-semibold text-[var(--foreground)]">
                 {selectedGroup.name}
               </h2>
@@ -59,7 +61,7 @@ export function GroupDetailModal({
               onClick={onClose}
               className="denty-button-secondary px-4 py-3 text-sm font-semibold"
             >
-              Close
+              {t("admin.common.close")}
             </button>
           </div>
 
@@ -67,9 +69,9 @@ export function GroupDetailModal({
             <div className="denty-dashboard-card p-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="denty-kicker">Group settings</p>
+                  <p className="denty-kicker">{t("admin.groups.group_settings")}</p>
                   <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
-                    Edit details
+                    {t("admin.groups.edit_details")}
                   </h3>
                 </div>
                 <button
@@ -79,7 +81,7 @@ export function GroupDetailModal({
                   }
                   className="rounded-full border border-rose-300/40 bg-rose-50/90 px-4 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-rose-700"
                 >
-                  Delete group
+                  {t("admin.groups.delete_button")}
                 </button>
               </div>
               <div className="mt-4 grid gap-3">
@@ -89,7 +91,7 @@ export function GroupDetailModal({
                     onGroupEditorChange("name", e.target.value)
                   }
                   className="denty-field text-sm"
-                  placeholder="Group name"
+                  placeholder={t("admin.groups.field_name")}
                 />
                 <input
                   value={groupEditor.semesterLabel}
@@ -97,7 +99,7 @@ export function GroupDetailModal({
                     onGroupEditorChange("semesterLabel", e.target.value)
                   }
                   className="denty-field text-sm"
-                  placeholder="Semester label"
+                  placeholder={t("admin.groups.field_semester")}
                 />
                 <textarea
                   value={groupEditor.description}
@@ -105,7 +107,7 @@ export function GroupDetailModal({
                     onGroupEditorChange("description", e.target.value)
                   }
                   className="denty-field min-h-[110px] text-sm"
-                  placeholder="Description"
+                  placeholder={t("admin.groups.field_description")}
                 />
                 <label className="flex items-center gap-3 rounded-[18px] border border-white/12 bg-white/34 px-4 py-3 text-sm text-[var(--foreground)]">
                   <input
@@ -115,14 +117,14 @@ export function GroupDetailModal({
                       onGroupEditorChange("active", e.target.checked)
                     }
                   />
-                  Group active
+                  {t("admin.groups.group_active")}
                 </label>
                 <button
                   type="button"
                   onClick={onSaveGroupChanges}
                   className="denty-button-primary px-4 py-3 text-sm font-semibold"
                 >
-                  Save group changes
+                  {t("admin.groups.save_changes")}
                 </button>
               </div>
             </div>
@@ -130,15 +132,17 @@ export function GroupDetailModal({
             <div className="denty-dashboard-card p-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="denty-kicker">Assigned plans</p>
+                  <p className="denty-kicker">{t("admin.groups.assigned_plans")}</p>
                   <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
-                    Planning for this group
+                    {t("admin.groups.planning_for_group")}
                   </h3>
                 </div>
                 <span className="denty-pill">
-                  {(selectedGroup.currentPlan ? 1 : 0) +
-                    (selectedGroup.nextPlans?.length || 0)}{" "}
-                  plans
+                  {t("admin.groups.plans_count", {
+                    count:
+                      (selectedGroup.currentPlan ? 1 : 0) +
+                      (selectedGroup.nextPlans?.length || 0),
+                  })}
                 </span>
               </div>
               <div className="mt-4">
@@ -153,38 +157,36 @@ export function GroupDetailModal({
           <div className="mt-6 denty-panel-strong p-5 md:p-6">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="denty-kicker">Moderation desk</p>
+                <p className="denty-kicker">{t("admin.groups.mod_desk_eyebrow")}</p>
                 <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
-                  Group review lives in its own page
+                  {t("admin.groups.mod_desk_heading")}
                 </h3>
                 <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Join requests, partner approvals, student removals, and
-                  unpairing now stay inside the dedicated moderation workspace
-                  instead of this detail panel.
+                  {t("admin.groups.mod_desk_intro")}
                 </p>
               </div>
               <Link
                 href="/admin/group-moderation"
                 className="denty-button-secondary px-4 py-3 text-sm font-semibold"
               >
-                Open moderation desk
+                {t("admin.groups.open_mod_desk")}
               </Link>
             </div>
             <div className="mt-5 grid gap-3 md:grid-cols-3">
               <GroupCountCard
-                label="Join queue"
+                label={t("admin.groups.join_queue")}
                 value={selectedGroup.joinRequests.length}
-                note="Pending membership approvals."
+                note={t("admin.groups.join_queue_note")}
               />
               <GroupCountCard
-                label="Partner queue"
+                label={t("admin.groups.partner_queue")}
                 value={selectedGroup.partnerRequests?.length || 0}
-                note="Pending pair confirmations."
+                note={t("admin.groups.partner_queue_note")}
               />
               <GroupCountCard
-                label="Active pairs"
+                label={t("admin.groups.active_pairs")}
                 value={selectedGroup.partnerPairs?.length || 0}
-                note="Confirmed pairings in this group."
+                note={t("admin.groups.active_pairs_note")}
               />
             </div>
           </div>
@@ -194,10 +196,12 @@ export function GroupDetailModal({
               <div className="denty-dashboard-card p-5">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xl font-semibold text-[var(--foreground)]">
-                    Students
+                    {t("admin.groups.students")}
                   </p>
                   <span className="denty-pill">
-                    {selectedGroup.members.length} assigned
+                    {t("admin.groups.assigned_count", {
+                      count: selectedGroup.members.length,
+                    })}
                   </span>
                 </div>
                 <div className="mt-4 flex gap-2">
@@ -208,7 +212,7 @@ export function GroupDetailModal({
                     }
                     className="denty-field text-sm"
                   >
-                    <option value="">Select student</option>
+                    <option value="">{t("admin.groups.select_student")}</option>
                     {doctors.map((doctor) => (
                       <option key={doctor.id} value={doctor.id}>
                         {doctor.name}
@@ -222,7 +226,7 @@ export function GroupDetailModal({
                     onClick={() => onAddDoctorToGroup(selectedGroup.id)}
                     className="denty-button-secondary px-4 py-3 text-sm font-semibold"
                   >
-                    Add
+                    {t("admin.groups.add")}
                   </button>
                 </div>
                 <div className="mt-4 space-y-3">
@@ -252,7 +256,9 @@ export function GroupDetailModal({
                                 : ""}
                             </p>
                           </div>
-                          <span className="denty-pill">Assigned</span>
+                          <span className="denty-pill">
+                            {t("admin.groups.assigned")}
+                          </span>
                         </div>
                       </div>
                     ))}
@@ -261,7 +267,7 @@ export function GroupDetailModal({
 
               <div className="denty-dashboard-card p-5">
                 <p className="text-xl font-semibold text-[var(--foreground)]">
-                  Active partner pairs
+                  {t("admin.groups.active_partner_pairs")}
                 </p>
                 <div className="mt-4 space-y-3">
                   {[...(selectedGroup.partnerPairs || [])]
@@ -295,13 +301,15 @@ export function GroupDetailModal({
                               @{pair.doctorOne.username} - @{pair.doctorTwo.username}
                             </p>
                           </div>
-                          <span className="denty-pill">Confirmed</span>
+                          <span className="denty-pill">
+                            {t("admin.groups.confirmed")}
+                          </span>
                         </div>
                       </div>
                     ))}
                   {!selectedGroup.partnerPairs?.length ? (
                     <p className="text-sm text-[var(--muted-foreground)]">
-                      No active pairs yet.
+                      {t("admin.groups.no_active_pairs")}
                     </p>
                   ) : null}
                 </div>
@@ -313,43 +321,48 @@ export function GroupDetailModal({
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xl font-semibold text-[var(--foreground)]">
-                      Group snapshot
+                      {t("admin.groups.snapshot")}
                     </p>
                     <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                      One quick read of membership, planning, and activity before
-                      you leave the group panel.
+                      {t("admin.groups.snapshot_note")}
                     </p>
                   </div>
                   <span className="denty-pill">
-                    {selectedGroup.members.length} students
+                    {t("admin.groups.students_count", {
+                      count: selectedGroup.members.length,
+                    })}
                   </span>
                 </div>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <GroupCountCard
-                    label="Pairs"
+                    label={t("admin.groups.count_pairs")}
                     value={selectedGroup.partnerPairs?.length || 0}
-                    note="Active partner pairs confirmed for this group."
+                    note={t("admin.groups.count_pairs_note")}
                   />
                   <GroupCountCard
-                    label="Plans"
+                    label={t("admin.groups.count_plans")}
                     value={
                       (selectedGroup.currentPlan ? 1 : 0) +
                       (selectedGroup.nextPlans?.length || 0)
                     }
-                    note="One current plan plus any queued next windows."
+                    note={t("admin.groups.count_plans_note")}
                   />
                   <GroupCountCard
-                    label="Current plan"
-                    value={selectedGroup.currentPlan ? "Live" : "None"}
+                    label={t("admin.groups.count_current_plan")}
+                    value={
+                      selectedGroup.currentPlan
+                        ? t("admin.groups.current_live")
+                        : t("admin.groups.current_none")
+                    }
                     note={
                       selectedGroup.currentPlan?.plan.label ||
-                      "No active plan window right now."
+                      t("admin.groups.no_active_window")
                     }
                   />
                   <GroupCountCard
-                    label="Next queued"
+                    label={t("admin.groups.count_next_queued")}
                     value={selectedGroup.nextPlans?.length || 0}
-                    note="Plans queued after the current group window."
+                    note={t("admin.groups.next_queued_note")}
                   />
                 </div>
               </div>
@@ -357,17 +370,19 @@ export function GroupDetailModal({
               <div className="denty-dashboard-card p-5">
                 <div className="flex items-center justify-between gap-3">
                   <p className="text-xl font-semibold text-[var(--foreground)]">
-                    Recent group feed
+                    {t("admin.groups.recent_feed")}
                   </p>
                   <span className="denty-pill">
-                    {selectedGroup.posts.length} posts
+                    {t("admin.groups.posts_count", {
+                      count: selectedGroup.posts.length,
+                    })}
                   </span>
                 </div>
                 <div className="mt-4 space-y-3">
                   {selectedGroup.posts.map((post) => (
                     <div key={post.id} className="denty-dashboard-card-soft p-4">
                       <p className="text-base font-semibold text-[var(--foreground)]">
-                        {post.title || "Shared update"}
+                        {post.title || t("admin.groups.shared_update")}
                       </p>
                       <p className="mt-2 text-sm leading-7 text-[var(--muted-foreground)]">
                         {post.body}
@@ -385,7 +400,7 @@ export function GroupDetailModal({
                   ))}
                   {!selectedGroup.posts.length ? (
                     <p className="text-sm text-[var(--muted-foreground)]">
-                      No posts yet.
+                      {t("admin.groups.no_posts")}
                     </p>
                   ) : null}
                 </div>

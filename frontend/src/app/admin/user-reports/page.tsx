@@ -9,6 +9,7 @@ import {
 } from "@/features/admin/services/admin-api";
 import type { UserProfileReportItem } from "@/features/admin/types/admin";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 const panelClass =
   "overflow-hidden rounded-[24px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.16)] backdrop-blur-[24px] md:p-5";
@@ -16,6 +17,7 @@ const panelClass =
 type ReportFilter = "pending" | "resolved" | "all";
 
 export default function AdminUserReportsPage() {
+  const t = useTranslation();
   const [items, setItems] = useState<UserProfileReportItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [savingId, setSavingId] = useState<string | null>(null);
@@ -29,8 +31,8 @@ export default function AdminUserReportsPage() {
     error,
     clearMessage: () => setMessage(null),
     clearError: () => setError(null),
-    messageTitle: "User reports",
-    errorTitle: "User reports",
+    messageTitle: t("admin.reports.toast_title"),
+    errorTitle: t("admin.reports.toast_title"),
   });
 
   const loadReports = async () => {
@@ -40,7 +42,7 @@ export default function AdminUserReportsPage() {
       const data = await getUserProfileReports();
       setItems(Array.isArray(data) ? data : []);
     } catch (e: any) {
-      setError(e?.message || "Failed to load user reports.");
+      setError(e?.message || t("admin.reports.failed_load"));
     } finally {
       setLoading(false);
     }
@@ -87,10 +89,10 @@ export default function AdminUserReportsPage() {
     setError(null);
     try {
       const data = await decideUserProfileReport(reportId, status);
-      setMessage(data?.message || "Report decision saved.");
+      setMessage(data?.message || t("admin.reports.decision_saved"));
       await loadReports();
     } catch (e: any) {
-      setError(e?.message || "Failed to save report decision.");
+      setError(e?.message || t("admin.reports.failed_decision"));
     } finally {
       setSavingId(null);
     }
@@ -98,24 +100,23 @@ export default function AdminUserReportsPage() {
 
   return (
     <AdminShell
-      title="User Reports"
-      description="Moderate profile abuse reports from doctors, supervisors, and patients without losing the context of who reported whom and why."
+      title={t("admin.reports.title")}
+      description={t("admin.reports.description")}
     >
       <div className="grid gap-5 xl:grid-cols-[0.76fr_1.24fr]">
         <div className={panelClass}>
-          <p className="denty-kicker">Safety desk</p>
+          <p className="denty-kicker">{t("admin.reports.safety_desk")}</p>
           <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
-            Moderation queue
+            {t("admin.reports.moderation_queue")}
           </h2>
           <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
-            Reports are created from public profiles. Pending items should be
-            dismissed when harmless, or marked as action taken once staff responds.
+            {t("admin.reports.queue_intro")}
           </p>
 
           <div className="mt-5 grid gap-3 md:grid-cols-3">
             <div className="rounded-[24px] border border-white/10 bg-white/30 px-4 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                Pending
+                {t("admin.reports.pending")}
               </p>
               <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                 {pendingCount}
@@ -123,7 +124,7 @@ export default function AdminUserReportsPage() {
             </div>
             <div className="rounded-[24px] border border-white/10 bg-white/30 px-4 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                Reviewed
+                {t("admin.reports.reviewed")}
               </p>
               <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                 {items.filter((item) => item.status !== "PENDING").length}
@@ -131,7 +132,7 @@ export default function AdminUserReportsPage() {
             </div>
             <div className="rounded-[24px] border border-white/10 bg-white/30 px-4 py-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                Total
+                {t("admin.reports.total")}
               </p>
               <p className="mt-2 text-xl font-semibold text-[var(--foreground)]">
                 {items.length}
@@ -144,13 +145,13 @@ export default function AdminUserReportsPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="denty-field text-sm"
-              placeholder="Search reports by reporter, user, or reason"
+              placeholder={t("admin.reports.search_placeholder")}
             />
             <div className="flex flex-wrap gap-3">
               {[
-                { key: "pending", label: "Pending" },
-                { key: "resolved", label: "Resolved" },
-                { key: "all", label: "All" },
+                { key: "pending", label: t("admin.reports.filter_pending") },
+                { key: "resolved", label: t("admin.reports.filter_resolved") },
+                { key: "all", label: t("admin.reports.filter_all") },
               ].map((option) => {
                 const active = filter === option.key;
                 return (
@@ -175,18 +176,20 @@ export default function AdminUserReportsPage() {
         <div className={panelClass}>
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="denty-kicker">Reported users</p>
+              <p className="denty-kicker">{t("admin.reports.reported_users")}</p>
               <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
-                Review lane
+                {t("admin.reports.review_lane")}
               </h2>
             </div>
-            <span className="denty-pill">{filteredItems.length} reports</span>
+            <span className="denty-pill">
+              {t("admin.reports.reports_count", { count: filteredItems.length })}
+            </span>
           </div>
 
           <div className="mt-5 max-h-[56rem] space-y-3 overflow-y-auto pr-1">
             {loading ? (
               <p className="text-sm text-[var(--muted-foreground)]">
-                Loading reports...
+                {t("admin.reports.loading")}
               </p>
             ) : null}
 
@@ -217,7 +220,7 @@ export default function AdminUserReportsPage() {
                         disabled={savingId === item.id}
                         className="inline-flex min-h-[2.7rem] items-center justify-center rounded-[16px] border border-white/12 bg-white/42 px-4 py-2 text-sm font-semibold text-[var(--foreground)] transition hover:bg-white/56 disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        Dismiss
+                        {t("admin.reports.dismiss")}
                       </button>
                       <button
                         type="button"
@@ -225,7 +228,7 @@ export default function AdminUserReportsPage() {
                         disabled={savingId === item.id}
                         className="inline-flex min-h-[2.7rem] items-center justify-center rounded-[16px] border border-rose-300/34 bg-[rgba(190,24,93,0.16)] px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-[rgba(190,24,93,0.22)] disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        Take action
+                        {t("admin.reports.take_action")}
                       </button>
                     </div>
                   ) : null}
@@ -234,7 +237,7 @@ export default function AdminUserReportsPage() {
                 <div className="mt-4 grid gap-3 md:grid-cols-2">
                   <div className="rounded-[20px] border border-white/10 bg-white/30 px-4 py-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                      Reporter
+                      {t("admin.reports.reporter")}
                     </p>
                     <Link
                       href={`/profiles/${item.reporter.id}`}
@@ -248,7 +251,7 @@ export default function AdminUserReportsPage() {
                   </div>
                   <div className="rounded-[20px] border border-white/10 bg-white/30 px-4 py-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                      Reported user
+                      {t("admin.reports.reported_user")}
                     </p>
                     <Link
                       href={`/profiles/${item.reportedUser.id}`}
@@ -265,7 +268,7 @@ export default function AdminUserReportsPage() {
                 {item.note ? (
                   <div className="mt-4 rounded-[20px] border border-white/10 bg-white/24 px-4 py-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.48)]">
-                      Reporter note
+                      {t("admin.reports.reporter_note")}
                     </p>
                     <p className="mt-3 text-sm leading-7 text-[var(--foreground)]">
                       {item.note}
@@ -276,7 +279,7 @@ export default function AdminUserReportsPage() {
                 {item.resolutionNote ? (
                   <div className="mt-4 rounded-[20px] border border-emerald-300/24 bg-emerald-50/56 px-4 py-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700/80">
-                      Resolution note
+                      {t("admin.reports.resolution_note")}
                     </p>
                     <p className="mt-3 text-sm leading-7 text-emerald-900/90">
                       {item.resolutionNote}
@@ -289,7 +292,7 @@ export default function AdminUserReportsPage() {
             {!loading && filteredItems.length === 0 ? (
               <div className="rounded-[24px] border border-dashed border-white/16 bg-white/18 p-5">
                 <p className="text-sm text-[var(--muted-foreground)]">
-                  No reports match the current filter.
+                  {t("admin.reports.empty")}
                 </p>
               </div>
             ) : null}

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { AlphabetSection } from "@/features/admin/utils/collection";
 import type { SupervisorRequestItem } from "@/features/admin/types/admin";
 
@@ -23,25 +24,29 @@ export function SupervisorRequestLane({
   onRequestQueryChange,
   onDecide,
 }: SupervisorRequestLaneProps) {
-  const requestCountLabel = filteredCount === 1 ? "request" : "requests";
+  const t = useTranslation();
+  const requestCountLabel =
+    filteredCount === 1
+      ? t("admin.sup_req.requests_one")
+      : t("admin.sup_req.requests_other");
 
   return (
     <div className="denty-panel-strong flex min-h-[45rem] max-h-[45rem] flex-col overflow-hidden p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="denty-kicker">Review studio</p>
+          <p className="denty-kicker">{t("admin.common.review_studio")}</p>
           <h2 className="text-xl font-semibold text-[var(--foreground)]">
-            Pending supervisor requests
+            {t("admin.sup_req.pending_title")}
           </h2>
           {error ? <p className="mt-2 text-sm text-rose-700">{error}</p> : null}
           {loading ? (
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              Loading...
+              {t("admin.common.loading")}
             </p>
           ) : null}
         </div>
         <div className="rounded-full border border-white/12 bg-white/30 px-4 py-2 text-sm font-semibold text-[var(--foreground)]">
-          {filteredCount} open
+          {t("admin.common.open_count", { count: filteredCount })}
         </div>
       </div>
 
@@ -51,7 +56,7 @@ export function SupervisorRequestLane({
             type="text"
             value={requestQuery}
             onChange={(e) => onRequestQueryChange(e.target.value)}
-            placeholder="Search pending requests"
+            placeholder={t("admin.sup_req.search_placeholder")}
             className="denty-field text-sm"
           />
           <div className="rounded-full border border-white/14 bg-[rgba(9,20,38,0.08)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.6)]">
@@ -70,7 +75,7 @@ export function SupervisorRequestLane({
                     {section.letter}
                   </p>
                   <span className="rounded-full border border-white/12 bg-white/24 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.56)]">
-                    {section.items.length} open
+                    {t("admin.common.open_count", { count: section.items.length })}
                   </span>
                 </div>
                 <div className="mt-3 space-y-3">
@@ -91,20 +96,31 @@ export function SupervisorRequestLane({
                             @{request.applicant.username}
                           </p>
                           <p className="mt-3 text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.48)]">
-                            Submitted{" "}
-                            {new Date(request.createdAt).toLocaleDateString(undefined, {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
+                            {t("admin.common.submitted_on", {
+                              date: new Date(
+                                request.createdAt,
+                              ).toLocaleDateString(undefined, {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric",
+                              }),
                             })}
                           </p>
                         </div>
 
                         <div className="space-y-2 text-sm text-[var(--muted-foreground)]">
-                          <p>Email: {request.applicant.email || "-"}</p>
-                          <p>Phone: {request.applicant.phone || "-"}</p>
+                          <p>
+                            {t("admin.common.email_label", {
+                              value: request.applicant.email || "-",
+                            })}
+                          </p>
+                          <p>
+                            {t("admin.common.phone_label", {
+                              value: request.applicant.phone || "-",
+                            })}
+                          </p>
                           <p className="rounded-[18px] border border-white/10 bg-white/24 px-4 py-3 text-xs leading-6 text-[rgba(10,22,40,0.72)]">
-                            {request.note || "No review note was attached to this request."}
+                            {request.note || t("admin.common.no_review_note")}
                           </p>
                         </div>
 
@@ -113,13 +129,13 @@ export function SupervisorRequestLane({
                             onClick={() => onDecide(request.id, true)}
                             className="cursor-pointer rounded-full border border-emerald-600/40 bg-emerald-50 px-4 py-2.5 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
                           >
-                            Approve
+                            {t("admin.common.approve")}
                           </button>
                           <button
                             onClick={() => onDecide(request.id, false)}
                             className="cursor-pointer rounded-full border border-rose-600/30 bg-rose-50 px-4 py-2.5 text-xs font-semibold text-rose-700 hover:bg-rose-100"
                           >
-                            Reject
+                            {t("admin.common.reject")}
                           </button>
                         </div>
                       </div>
@@ -131,9 +147,9 @@ export function SupervisorRequestLane({
           </div>
         ) : !loading ? (
           <div className="denty-placeholder p-5">
-            <p className="denty-kicker">Quiet desk</p>
+            <p className="denty-kicker">{t("admin.common.quiet_desk")}</p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              No pending supervisor requests.
+              {t("admin.sup_req.none_pending")}
             </p>
           </div>
         ) : null}

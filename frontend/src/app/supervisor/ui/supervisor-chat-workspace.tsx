@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { ConversationItem, MessageItem } from "@/features/chat/types/chat";
 
 type SupervisorChatWorkspaceProps = {
@@ -38,19 +39,21 @@ export function SupervisorChatWorkspace({
   onAttachImage,
   onSend,
 }: SupervisorChatWorkspaceProps) {
+  const t = useTranslation();
   const isRoom = selectedConversation?.kind === "ROOM";
   const selectedTitle = isRoom
-    ? selectedConversation?.title || "Shared room"
+    ? selectedConversation?.title || t("supervisor.chat.shared_room")
     : selectedConversation?.otherUser?.name ||
       selectedConversation?.otherUser?.username ||
-      "Unknown";
+      t("supervisor.chat.unknown");
   const selectedMeta = isRoom
     ? selectedConversation?.description ||
       (selectedConversation?.group
         ? `${selectedConversation.group.name} | ${
-            selectedConversation.group.semesterLabel || "Group"
+            selectedConversation.group.semesterLabel ||
+            t("supervisor.chat.group_fallback")
           }`
-        : "Shared room")
+        : t("supervisor.chat.shared_room"))
     : selectedConversation?.otherUser?.phone ||
       selectedConversation?.otherUser?.email ||
       selectedConversation?.otherUser?.username ||
@@ -59,12 +62,14 @@ export function SupervisorChatWorkspace({
   return (
     <div className="grid gap-5 xl:grid-cols-[360px_minmax(0,1fr)]">
       <div className="denty-dashboard-card overflow-hidden p-5">
-        <p className="denty-kicker">Communication</p>
-        <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">Chats and rooms</h2>
+        <p className="denty-kicker">{t("supervisor.chat.eyebrow")}</p>
+        <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
+          {t("supervisor.chat.title")}
+        </h2>
         <input
           value={chatSearch}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Search by name, phone, username, or student ID"
+          placeholder={t("supervisor.chat.search")}
           className="denty-field mt-5 text-sm"
         />
 
@@ -72,7 +77,7 @@ export function SupervisorChatWorkspace({
           {chatResults.length > 0 ? (
             <div className="denty-dashboard-card-soft space-y-2 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                Search results
+                {t("supervisor.chat.search_results")}
               </p>
               {chatResults.map((result) => (
                 <button
@@ -104,18 +109,21 @@ export function SupervisorChatWorkspace({
             const other = conversation.otherUser;
             const title =
               conversation.kind === "ROOM"
-                ? conversation.title || "Shared room"
-                : other?.name || other?.username || "Unknown";
+                ? conversation.title || t("supervisor.chat.shared_room")
+                : other?.name || other?.username || t("supervisor.chat.unknown");
             const meta =
               conversation.kind === "ROOM"
                 ? conversation.description ||
                   (conversation.group
                     ? `${conversation.group.name} | ${
-                        conversation.group.semesterLabel || "Group"
+                        conversation.group.semesterLabel ||
+                        t("supervisor.chat.group_fallback")
                       }`
-                    : "Shared room")
+                    : t("supervisor.chat.shared_room"))
                 : conversation.lastMessage?.text ||
-                  (conversation.lastMessage?.imageUrl ? "[Image]" : "Start chatting");
+                  (conversation.lastMessage?.imageUrl
+                    ? t("supervisor.chat.image")
+                    : t("supervisor.chat.start_chatting"));
 
             return (
               <button
@@ -142,7 +150,7 @@ export function SupervisorChatWorkspace({
                     <p className="font-semibold text-[var(--foreground)]">{title}</p>
                     {conversation.kind === "ROOM" ? (
                       <span className="rounded-full border border-white/12 bg-white/22 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[rgba(10,22,40,0.56)]">
-                        Room
+                        {t("supervisor.common.room")}
                       </span>
                     ) : null}
                   </div>
@@ -161,7 +169,9 @@ export function SupervisorChatWorkspace({
           })}
 
           {conversations.length === 0 && chatResults.length === 0 ? (
-            <p className="text-sm text-[var(--muted-foreground)]">No chats or rooms yet.</p>
+            <p className="text-sm text-[var(--muted-foreground)]">
+              {t("supervisor.chat.empty")}
+            </p>
           ) : null}
         </div>
       </div>
@@ -243,10 +253,10 @@ export function SupervisorChatWorkspace({
                   href={`/profiles/${selectedConversation.otherUser.id}`}
                   className="denty-pill hover:bg-white/36"
                 >
-                  Profile
+                  {t("supervisor.common.profile")}
                 </Link>
               ) : (
-                <span className="denty-pill">Room</span>
+                <span className="denty-pill">{t("supervisor.common.room")}</span>
               )}
             </div>
 
@@ -289,18 +299,24 @@ export function SupervisorChatWorkspace({
                 })}
 
                 {chatMessages.length === 0 ? (
-                  <p className="text-sm text-[var(--muted-foreground)]">No messages yet.</p>
+                  <p className="text-sm text-[var(--muted-foreground)]">
+                    {t("supervisor.chat.no_messages")}
+                  </p>
                 ) : null}
               </div>
 
               <div className="mt-4 flex items-center gap-3">
                 <button onClick={onAttachImage} className="denty-action denty-action-secondary px-4 py-3">
-                  Attach
+                  {t("supervisor.common.attach")}
                 </button>
                 <input
                   value={chatText}
                   onChange={(event) => onChatTextChange(event.target.value)}
-                  placeholder={isRoom ? "Write to the room" : "Type a message"}
+                  placeholder={
+                    isRoom
+                      ? t("supervisor.chat.write_room")
+                      : t("supervisor.chat.type_message")
+                  }
                   className="denty-field flex-1 text-sm"
                 />
                 <button
@@ -308,16 +324,18 @@ export function SupervisorChatWorkspace({
                   disabled={chatLoading}
                   className="denty-button-primary px-5 py-3 text-sm disabled:opacity-60"
                 >
-                  Send
+                  {t("supervisor.common.send")}
                 </button>
               </div>
             </div>
           </>
         ) : (
           <div className="flex h-[40rem] flex-col items-center justify-center text-center text-[var(--muted-foreground)]">
-            <p className="text-xl font-semibold text-[var(--foreground)]">Select a conversation</p>
+            <p className="text-xl font-semibold text-[var(--foreground)]">
+              {t("supervisor.chat.select_title")}
+            </p>
             <p className="mt-3 max-w-xl text-sm leading-7">
-              Open one of your direct chats or supervision rooms to continue the discussion.
+              {t("supervisor.chat.select_body")}
             </p>
           </div>
         )}

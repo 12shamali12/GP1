@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
+
 type GroupDeleteDialogProps = {
   deleteDialog: { id: string; label: string } | null;
   deleteSubmitting: boolean;
@@ -13,6 +15,7 @@ export function GroupDeleteDialog({
   onClose,
   onConfirm,
 }: GroupDeleteDialogProps) {
+  const t = useTranslation();
   if (!deleteDialog) return null;
 
   return (
@@ -20,16 +23,16 @@ export function GroupDeleteDialog({
       <div className="w-full max-w-lg overflow-hidden rounded-[24px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.84),rgba(225,234,241,0.42))] p-6 shadow-[0_34px_90px_rgba(4,11,26,0.28)] backdrop-blur-[28px] md:p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="denty-kicker">Delete group</p>
+            <p className="denty-kicker">{t("admin.groups.delete_eyebrow")}</p>
             <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-              Confirm permanent deletion
+              {t("admin.common.confirm_deletion")}
             </h2>
             <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
-              This will permanently remove{" "}
+              {t("admin.groups.delete_intro_prefix")}
               <span className="font-semibold text-[var(--foreground)]">
                 {deleteDialog.label}
               </span>
-              . Published plan assignments must be cleared first.
+              {t("admin.groups.delete_intro_suffix")}
             </p>
           </div>
           <button
@@ -46,7 +49,7 @@ export function GroupDeleteDialog({
             onClick={onClose}
             className="denty-button-secondary px-4 py-3 text-sm font-semibold"
           >
-            Cancel
+            {t("admin.common.cancel")}
           </button>
           <button
             type="button"
@@ -54,7 +57,9 @@ export function GroupDeleteDialog({
             onClick={onConfirm}
             className="rounded-full border border-rose-300/40 bg-rose-50/90 px-4 py-3 text-sm font-semibold text-rose-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {deleteSubmitting ? "Deleting..." : "Delete group"}
+            {deleteSubmitting
+              ? t("admin.common.deleting")
+              : t("admin.groups.delete_button")}
           </button>
         </div>
       </div>

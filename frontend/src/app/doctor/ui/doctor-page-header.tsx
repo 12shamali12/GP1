@@ -1,6 +1,7 @@
 "use client";
 
 import { BrandMark } from "@/features/ui/components/brand-mark";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 export type DoctorSurface =
   | "overview"
@@ -20,77 +21,121 @@ export type DoctorSurfaceMeta = {
   badges: string[];
 };
 
-export const doctorSurfaceMeta: Record<DoctorSurface, DoctorSurfaceMeta> = {
+/**
+ * Translation-key descriptors for each doctor surface. The visible strings are
+ * resolved through `useTranslation()` inside the component, so this stays a
+ * pure key map and never holds raw English.
+ */
+type DoctorSurfaceMetaKeys = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  badges: string[];
+};
+
+export const doctorSurfaceMeta: Record<DoctorSurface, DoctorSurfaceMetaKeys> = {
   overview: {
-    eyebrow: "Student workspace",
-    title: "Doctor clinical desk",
-    description:
-      "Your academic clinic workspace, planning surface, approvals, and reporting tools in one wider desk.",
-    badges: ["Clinical desk", "Planning", "Review actions"],
+    eyebrow: "doctor.surface.overview.eyebrow",
+    title: "doctor.surface.overview.title",
+    description: "doctor.surface.overview.description",
+    badges: [
+      "doctor.surface.overview.badge1",
+      "doctor.surface.overview.badge2",
+      "doctor.surface.overview.badge3",
+    ],
   },
   profile: {
-    eyebrow: "Profile",
-    title: "Doctor identity and account",
-    description:
-      "Keep your personal details, profile image, and password settings inside the same doctor suite.",
-    badges: ["Identity", "Account", "Profile"],
+    eyebrow: "doctor.surface.profile.eyebrow",
+    title: "doctor.surface.profile.title",
+    description: "doctor.surface.profile.description",
+    badges: [
+      "doctor.surface.profile.badge1",
+      "doctor.surface.profile.badge2",
+      "doctor.surface.profile.badge3",
+    ],
   },
   notifications: {
-    eyebrow: "Alerts",
-    title: "Doctor notifications center",
-    description:
-      "Read request updates, scheduling alerts, and workflow messages without leaving the page.",
-    badges: ["Alerts", "Unread tracking", "Actionable"],
+    eyebrow: "doctor.surface.notifications.eyebrow",
+    title: "doctor.surface.notifications.title",
+    description: "doctor.surface.notifications.description",
+    badges: [
+      "doctor.surface.notifications.badge1",
+      "doctor.surface.notifications.badge2",
+      "doctor.surface.notifications.badge3",
+    ],
   },
   approvals: {
-    eyebrow: "Review",
-    title: "Reservation approval desk",
-    description:
-      "Handle pending appointment decisions from a full-width workspace instead of a popup drawer.",
-    badges: ["Pending requests", "Approve", "Reject"],
+    eyebrow: "doctor.surface.approvals.eyebrow",
+    title: "doctor.surface.approvals.title",
+    description: "doctor.surface.approvals.description",
+    badges: [
+      "doctor.surface.approvals.badge1",
+      "doctor.surface.approvals.badge2",
+      "doctor.surface.approvals.badge3",
+    ],
   },
   report: {
-    eyebrow: "Reports",
-    title: "Case report studio",
-    description:
-      "Review booked appointments, mark no-shows, and complete reports in a stable inline workspace.",
-    badges: ["Booked cases", "No-show", "Submission"],
+    eyebrow: "doctor.surface.report.eyebrow",
+    title: "doctor.surface.report.title",
+    description: "doctor.surface.report.description",
+    badges: [
+      "doctor.surface.report.badge1",
+      "doctor.surface.report.badge2",
+      "doctor.surface.report.badge3",
+    ],
   },
   chat: {
-    eyebrow: "Communication",
-    title: "Chat and room workspace",
-    description:
-      "Search, open, and continue direct conversations and shared rooms from one always-visible communication desk.",
-    badges: ["Direct chat", "Rooms", "Attachments"],
+    eyebrow: "doctor.surface.chat.eyebrow",
+    title: "doctor.surface.chat.title",
+    description: "doctor.surface.chat.description",
+    badges: [
+      "doctor.surface.chat.badge1",
+      "doctor.surface.chat.badge2",
+      "doctor.surface.chat.badge3",
+    ],
   },
   leaderboard: {
-    eyebrow: "Standings",
-    title: "Academic leaderboard",
-    description:
-      "See where you rank across the whole program, then switch into your semester cohort to compare against current peers.",
-    badges: ["Cohort ranking", "Overall ranking", "Your standing"],
+    eyebrow: "doctor.surface.leaderboard.eyebrow",
+    title: "doctor.surface.leaderboard.title",
+    description: "doctor.surface.leaderboard.description",
+    badges: [
+      "doctor.surface.leaderboard.badge1",
+      "doctor.surface.leaderboard.badge2",
+      "doctor.surface.leaderboard.badge3",
+    ],
   },
   game: {
-    eyebrow: "Practice",
-    title: "Toothy knowledge quiz",
-    description:
-      "Sharpen your clinical knowledge with a ten-question quiz across anatomy, caries, periodontics, endodontics, and oral surgery. Every attempt feeds your leaderboard standing.",
-    badges: ["Anatomy", "Caries", "Perio", "Endo", "Surgery"],
+    eyebrow: "doctor.surface.game.eyebrow",
+    title: "doctor.surface.game.title",
+    description: "doctor.surface.game.description",
+    badges: [
+      "doctor.surface.game.badge1",
+      "doctor.surface.game.badge2",
+      "doctor.surface.game.badge3",
+      "doctor.surface.game.badge4",
+      "doctor.surface.game.badge5",
+    ],
   },
   settings: {
-    eyebrow: "Preferences",
-    title: "Doctor settings",
-    description:
-      "Theme, language, notifications, and account controls grouped into one calm preferences surface.",
-    badges: ["Appearance", "Language", "Notifications", "Account"],
+    eyebrow: "doctor.surface.settings.eyebrow",
+    title: "doctor.surface.settings.title",
+    description: "doctor.surface.settings.description",
+    badges: [
+      "doctor.surface.settings.badge1",
+      "doctor.surface.settings.badge2",
+      "doctor.surface.settings.badge3",
+      "doctor.surface.settings.badge4",
+    ],
   },
 };
 
 type DoctorPageHeaderProps = {
-  meta: DoctorSurfaceMeta;
+  meta: DoctorSurfaceMetaKeys;
 };
 
 export function DoctorPageHeader({ meta }: DoctorPageHeaderProps) {
+  const t = useTranslation();
+
   return (
     <div className="overflow-hidden rounded-[24px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.78),rgba(222,233,241,0.34))] px-5 py-5 shadow-[0_28px_72px_rgba(7,18,34,0.16)] backdrop-blur-[24px] md:px-7 md:py-6">
       <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
@@ -98,17 +143,17 @@ export function DoctorPageHeader({ meta }: DoctorPageHeaderProps) {
           <div className="flex items-center gap-3">
             <BrandMark className="h-14 w-14 frozen-float" />
             <span className="rounded-full border border-white/20 bg-white/26 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[rgba(10,22,40,0.64)]">
-              Doctor workspace
+              {t("doctor.header.badge")}
             </span>
           </div>
 
           <div>
-            <p className="denty-kicker">{meta.eyebrow}</p>
+            <p className="denty-kicker">{t(meta.eyebrow)}</p>
             <h1 className="mt-3 max-w-4xl text-3xl font-semibold text-[var(--foreground)] md:text-3xl">
-              {meta.title}
+              {t(meta.title)}
             </h1>
             <p className="mt-3 max-w-4xl text-sm leading-7 text-[var(--muted-foreground)] md:text-base">
-              {meta.description}
+              {t(meta.description)}
             </p>
           </div>
         </div>
@@ -119,7 +164,7 @@ export function DoctorPageHeader({ meta }: DoctorPageHeaderProps) {
               key={badge}
               className="rounded-full border border-white/20 bg-white/26 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[rgba(10,22,40,0.62)]"
             >
-              {badge}
+              {t(badge)}
             </span>
           ))}
         </div>

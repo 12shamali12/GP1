@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { NotificationItem } from "@/features/notifications/types/notification";
 
 type NotificationsStreamProps = {
@@ -13,17 +14,20 @@ export function NotificationsStream({
   filteredItems,
   onUpdateItem,
 }: NotificationsStreamProps) {
+  const t = useTranslation();
   return (
     <div className="denty-panel-strong max-h-[50rem] overflow-hidden p-6">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-xl font-semibold text-[var(--foreground)]">
-          Inbox stream
+          {t("admin.notif.stream")}
         </h2>
-        <span className="denty-pill">{filteredItems.length} shown</span>
+        <span className="denty-pill">
+          {t("admin.notif.shown_count", { count: filteredItems.length })}
+        </span>
       </div>
       {loading ? (
         <p className="mt-5 text-sm text-[var(--muted-foreground)]">
-          Loading notifications...
+          {t("admin.notif.loading")}
         </p>
       ) : null}
 
@@ -46,7 +50,11 @@ export function NotificationsStream({
                   {item.body}
                 </p>
               </div>
-              <span className="denty-pill">{item.read ? "Read" : "Unread"}</span>
+              <span className="denty-pill">
+                {item.read
+                  ? t("admin.notif.read")
+                  : t("admin.notif.unread")}
+              </span>
             </div>
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
               <p className="text-xs uppercase tracking-[0.14em] text-[rgba(10,22,40,0.48)]">
@@ -58,14 +66,16 @@ export function NotificationsStream({
                   onClick={() => onUpdateItem(item.id, "read", !item.read)}
                   className="denty-button-secondary px-4 py-2 text-xs font-semibold"
                 >
-                  {item.read ? "Mark unread" : "Mark read"}
+                  {item.read
+                    ? t("admin.notif.mark_unread")
+                    : t("admin.notif.mark_read")}
                 </button>
                 <button
                   type="button"
                   onClick={() => onUpdateItem(item.id, "delete")}
                   className="cursor-pointer rounded-full border border-rose-300/40 bg-rose-50/90 px-4 py-2 text-xs font-semibold text-rose-700"
                 >
-                  Delete
+                  {t("admin.common.delete")}
                 </button>
               </div>
             </div>
@@ -74,9 +84,9 @@ export function NotificationsStream({
 
         {!loading && filteredItems.length === 0 ? (
           <div className="denty-placeholder p-5">
-            <p className="denty-kicker">Inbox</p>
+            <p className="denty-kicker">{t("admin.notif.inbox")}</p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              No notifications in this view.
+              {t("admin.notif.empty")}
             </p>
           </div>
         ) : null}

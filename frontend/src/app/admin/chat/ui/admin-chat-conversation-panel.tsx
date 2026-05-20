@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "@/features/i18n/language-provider";
 import type {
   ConversationItem,
   MessageItem,
@@ -31,14 +32,15 @@ export function AdminChatConversationPanel({
   onImageFileChange,
   onSendMessage,
 }: AdminChatConversationPanelProps) {
+  const t = useTranslation();
   if (!selectedConversation) {
     return (
       <div className="denty-panel-strong flex min-h-[48rem] max-h-[48rem] overflow-hidden p-6">
         <div className="denty-placeholder flex h-full w-full items-center justify-center p-5">
           <div>
-            <p className="denty-kicker">Chat</p>
+            <p className="denty-kicker">{t("nav.chat")}</p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              Select a conversation or search for a user to start chatting.
+              {t("admin.chat.empty_select")}
             </p>
           </div>
         </div>
@@ -48,17 +50,18 @@ export function AdminChatConversationPanel({
 
   const isRoom = selectedConversation.kind === "ROOM";
   const title = isRoom
-    ? selectedConversation.title || "Shared room"
+    ? selectedConversation.title || t("admin.chat.shared_room")
     : selectedConversation.otherUser?.name ||
       selectedConversation.otherUser?.username ||
-      "Conversation";
+      t("admin.chat.conversation");
   const subtitle = isRoom
     ? selectedConversation.description ||
       (selectedConversation.group
         ? `${selectedConversation.group.name} | ${
-            selectedConversation.group.semesterLabel || "Group"
+            selectedConversation.group.semesterLabel ||
+            t("admin.chat.group_fallback")
           }`
-        : "Shared room")
+        : t("admin.chat.shared_room"))
     : selectedConversation.otherUser?.phone ||
       selectedConversation.otherUser?.email ||
       selectedConversation.otherUser?.username ||
@@ -126,10 +129,12 @@ export function AdminChatConversationPanel({
             href={`/profiles/${selectedConversation.otherUser.id}`}
             className="denty-pill hover:bg-white/36"
           >
-            Profile
+            {t("admin.chat.profile")}
           </Link>
         ) : (
-          <span className="denty-pill">{isRoom ? "Room" : "Direct"}</span>
+          <span className="denty-pill">
+            {isRoom ? t("admin.chat.room") : t("admin.chat.direct")}
+          </span>
         )}
       </div>
 
@@ -174,7 +179,7 @@ export function AdminChatConversationPanel({
                     rel="noreferrer"
                     className="mt-2 inline-flex rounded-[16px] border border-white/14 bg-white/10 px-3 py-2 text-xs font-semibold"
                   >
-                    Open image
+                    {t("admin.chat.open_image")}
                   </a>
                 ) : null}
                 <p
@@ -191,9 +196,9 @@ export function AdminChatConversationPanel({
 
         {messages.length === 0 ? (
           <div className="denty-placeholder p-5">
-            <p className="denty-kicker">Conversation</p>
+            <p className="denty-kicker">{t("admin.chat.conversation")}</p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              No messages yet. Start the conversation.
+              {t("admin.chat.no_messages")}
             </p>
           </div>
         ) : null}
@@ -204,7 +209,11 @@ export function AdminChatConversationPanel({
           value={messageText}
           onChange={(e) => onMessageTextChange(e.target.value)}
           className="denty-field min-h-[110px] text-sm"
-          placeholder={isRoom ? "Write to the room" : "Write a message"}
+          placeholder={
+            isRoom
+              ? t("admin.chat.write_room")
+              : t("admin.chat.write_message")
+          }
         />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/12 bg-white/26 px-4 py-3 text-sm font-semibold text-[var(--foreground)]">
@@ -214,7 +223,7 @@ export function AdminChatConversationPanel({
               className="hidden"
               onChange={(e) => onImageFileChange(e.target.files?.[0] || null)}
             />
-            {imageFile ? imageFile.name : "Attach image"}
+            {imageFile ? imageFile.name : t("admin.chat.attach_image")}
           </label>
           <button
             type="button"
@@ -222,7 +231,9 @@ export function AdminChatConversationPanel({
             onClick={onSendMessage}
             className="denty-button-primary px-5 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {sending ? "Sending..." : "Send message"}
+            {sending
+              ? t("admin.chat.sending")
+              : t("admin.chat.send_message")}
           </button>
         </div>
       </div>

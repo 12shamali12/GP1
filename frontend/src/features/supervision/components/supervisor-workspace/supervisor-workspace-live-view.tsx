@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { SupervisorWorkspaceData } from "../../types";
 import type { SearchDoctorItem } from "./supervisor-workspace-types";
 
@@ -35,15 +36,24 @@ export function SupervisorWorkspaceLiveView({
   submitFreeze,
   unfreezeDoctor,
 }: Props) {
+  const t = useTranslation();
   return (
     <div className="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
       <div className="denty-panel-strong p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="denty-kicker">Clinic duties</p>
-            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Who is in your clinic today</h2>
+            <p className="denty-kicker">
+              {t("supervision.sup.live.duties_eyebrow")}
+            </p>
+            <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              {t("supervision.sup.live.duties_title")}
+            </h2>
           </div>
-          <span className="denty-pill">{workspace?.clinicOverview.length || 0} duties</span>
+          <span className="denty-pill">
+            {t("supervision.sup.live.duties_count", {
+              count: workspace?.clinicOverview.length || 0,
+            })}
+          </span>
         </div>
         <div className="mt-5 space-y-4">
           {workspace?.clinicOverview.map((duty) => (
@@ -64,10 +74,19 @@ export function SupervisorWorkspaceLiveView({
                       <div>
                         <p className="text-lg font-semibold text-[var(--foreground)]">{assignment.group.name}</p>
                         <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                          {assignment.group.members.length} students - {assignment.group.partnerPairs.length} pairs
+                          {t("supervision.sup.live.group_summary", {
+                            students: assignment.group.members.length,
+                            pairs: assignment.group.partnerPairs.length,
+                          })}
                         </p>
                       </div>
-                      <span className="denty-pill">{assignment.slots.filter((slot) => slot.appointment).length} booked</span>
+                      <span className="denty-pill">
+                        {t("supervision.sup.live.booked", {
+                          count: assignment.slots.filter(
+                            (slot) => slot.appointment,
+                          ).length,
+                        })}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -76,8 +95,12 @@ export function SupervisorWorkspaceLiveView({
           ))}
           {workspace && workspace.clinicOverview.length === 0 ? (
             <div className="denty-placeholder p-5">
-              <p className="denty-kicker">Clinic duties</p>
-              <p className="mt-2 text-sm text-[var(--muted-foreground)]">No clinic duties are assigned yet.</p>
+              <p className="denty-kicker">
+                {t("supervision.sup.live.duties_eyebrow")}
+              </p>
+              <p className="mt-2 text-sm text-[var(--muted-foreground)]">
+                {t("supervision.sup.live.no_duties")}
+              </p>
             </div>
           ) : null}
         </div>
@@ -85,14 +108,18 @@ export function SupervisorWorkspaceLiveView({
 
       <div className="space-y-5">
         <div className="denty-panel-strong p-6">
-          <p className="denty-kicker">Student finder</p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Search by name or student ID</h2>
+          <p className="denty-kicker">
+            {t("supervision.sup.live.finder_eyebrow")}
+          </p>
+          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+            {t("supervision.sup.live.finder_title")}
+          </h2>
           <div className="mt-5 space-y-3">
             <input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="denty-field text-sm"
-              placeholder="Search doctors by student ID, name, or username"
+              placeholder={t("supervision.sup.live.finder_placeholder")}
             />
             <div className="space-y-2">
               {searchResults.map((doctor) => (
@@ -117,12 +144,16 @@ export function SupervisorWorkspaceLiveView({
         </div>
 
         <div className="denty-panel-strong p-6">
-          <p className="denty-kicker">Selected student</p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">{selectedStudent?.name || "Choose a student"}</h2>
+          <p className="denty-kicker">
+            {t("supervision.sup.live.selected_eyebrow")}
+          </p>
+          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+            {selectedStudent?.name || t("supervision.sup.live.choose_student")}
+          </h2>
           <p className="mt-3 text-sm text-[var(--muted-foreground)]">
             {selectedStudent
               ? `${selectedStudent.doctorIdNumber || selectedStudent.username}${selectedStudent.groupMembership?.group ? ` - ${selectedStudent.groupMembership.group.name}` : ""}`
-              : "Search a student first, then freeze, unfreeze, schedule exams, or assign an individual task."}
+              : t("supervision.sup.live.choose_student_hint")}
           </p>
           {selectedStudent ? (
             <div className="mt-5 space-y-3">
@@ -130,20 +161,22 @@ export function SupervisorWorkspaceLiveView({
                 href={`/profiles/${selectedStudent.id}`}
                 className="inline-flex rounded-full border border-white/12 bg-white/30 px-4 py-2 text-sm font-semibold text-[var(--foreground)] hover:bg-white/42"
               >
-                Open profile
+                {t("supervision.sup.live.open_profile")}
               </Link>
               <div className="grid gap-3 md:grid-cols-2">
                 <input type="datetime-local" value={freezeUntil} onChange={(e) => setFreezeUntil(e.target.value)} className="denty-field text-sm" />
-                <input value={freezeReason} onChange={(e) => setFreezeReason(e.target.value)} className="denty-field text-sm" placeholder="Freeze reason" />
+                <input value={freezeReason} onChange={(e) => setFreezeReason(e.target.value)} className="denty-field text-sm" placeholder={t("supervision.sup.live.freeze_reason")} />
               </div>
               <div className="flex flex-wrap gap-2">
-                <button onClick={submitFreeze} className="denty-button-secondary px-4 py-3 text-sm font-semibold">Freeze account</button>
+                <button onClick={submitFreeze} className="denty-button-secondary px-4 py-3 text-sm font-semibold">
+                  {t("supervision.sup.live.freeze_account")}
+                </button>
                 {selectedStudentFreeze ? (
                   <button
                     onClick={() => unfreezeDoctor(selectedStudent.id)}
                     className="rounded-full border border-emerald-600/28 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700"
                   >
-                    Unfreeze account
+                    {t("supervision.sup.live.unfreeze_account")}
                   </button>
                 ) : null}
               </div>

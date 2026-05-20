@@ -1,6 +1,7 @@
 "use client";
 
 import type { PublicProfileResponse } from "@/features/profiles/types/profile";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 type PatientUser = {
   name?: string;
@@ -86,6 +87,7 @@ export function PatientProfilePanel({
   onBack,
   onSave,
 }: PatientProfilePanelProps) {
+  const t = useTranslation();
   const careHistory = publicProfile?.history.patientAppointments || [];
   const doctorFeedback = publicProfile?.comments.staff || [];
   const cancelledCount = history.filter(
@@ -117,7 +119,7 @@ export function PatientProfilePanel({
               type="button"
               onClick={onAvatarPick}
               className="group relative flex h-28 w-28 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-[22px] border border-white/20 bg-[linear-gradient(180deg,rgba(8,18,34,0.78),rgba(11,24,42,0.58))] text-3xl font-bold text-white shadow-[0_18px_34px_rgba(4,11,26,0.22)] transition hover:scale-[1.02] hover:border-white/28"
-              title="Click to add or update photo"
+              title={t("patient.profile.photo_title")}
             >
               {avatarData || user.avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -130,30 +132,29 @@ export function PatientProfilePanel({
                 <span>{(user.name || "P").charAt(0).toUpperCase()}</span>
               )}
               <span className="absolute inset-x-3 bottom-3 rounded-full border border-white/12 bg-black/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/82 backdrop-blur group-hover:bg-black/40">
-                Update photo
+                {t("patient.profile.update_photo")}
               </span>
             </button>
 
             <div className="min-w-0 space-y-3">
               <span className="inline-flex rounded-full border border-white/16 bg-white/18 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[rgba(10,22,40,0.62)]">
-                Patient profile
+                {t("patient.profile.tag")}
               </span>
               <div>
                 <div className="flex flex-wrap items-center gap-3">
                   <h1 className="text-3xl font-semibold text-[var(--foreground)] md:text-3xl">
-                    {editName || user.name || "Patient"}
+                    {editName || user.name || t("patient.common.patient")}
                   </h1>
                   <button
                     type="button"
                     onClick={onNameEditOpen}
                     className="denty-action denty-action-secondary px-4 py-2 text-xs"
                   >
-                    Edit name
+                    {t("patient.profile.edit_name")}
                   </button>
                 </div>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)] md:text-base">
-                  Keep your contact details ready, review your visit history, and
-                  keep a clean record of doctor notes and completed appointments.
+                  {t("patient.profile.intro")}
                 </p>
               </div>
             </div>
@@ -163,7 +164,7 @@ export function PatientProfilePanel({
             onClick={onBack}
             className="denty-button-secondary shrink-0 px-5 py-3 text-sm font-semibold"
           >
-            Back
+            {t("patient.common.back")}
           </button>
         </div>
       </div>
@@ -172,14 +173,14 @@ export function PatientProfilePanel({
         <div className="space-y-5">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="denty-dashboard-card-soft p-5">
-              <p className="denty-kicker">Role</p>
+              <p className="denty-kicker">{t("patient.profile.role")}</p>
               <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                 {(user.role || "PATIENT").toString().toUpperCase()}
               </p>
             </div>
 
             <div className="denty-dashboard-card-soft p-5">
-              <p className="denty-kicker">Appointments</p>
+              <p className="denty-kicker">{t("patient.profile.appointments")}</p>
               <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                 {history.length}
               </p>
@@ -189,10 +190,9 @@ export function PatientProfilePanel({
           <div className="denty-dashboard-card-soft space-y-4 p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="denty-kicker">Bio</p>
+                <p className="denty-kicker">{t("patient.profile.bio")}</p>
                 <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                  Add a short patient note or personal introduction if you want staff
-                  to recognize you quickly.
+                  {t("patient.profile.bio_hint")}
                 </p>
               </div>
               <button
@@ -200,7 +200,9 @@ export function PatientProfilePanel({
                 onClick={onBioEditableToggle}
                 className="denty-action denty-action-secondary px-4 py-2 text-xs"
               >
-                {bioEditable ? "Done" : "Edit"}
+                {bioEditable
+                  ? t("patient.profile.done")
+                  : t("patient.profile.edit")}
               </button>
             </div>
 
@@ -209,13 +211,13 @@ export function PatientProfilePanel({
                 value={editBio}
                 onChange={(event) => onBioChange(event.target.value)}
                 className="denty-field min-h-[110px] text-base"
-                placeholder="Add any short personal note you want on your profile."
+                placeholder={t("patient.profile.bio_placeholder")}
               />
             ) : (
               <div className="rounded-[22px] border border-white/12 bg-white/52 px-4 py-4 text-sm leading-7 text-[var(--foreground)] shadow-[0_16px_28px_rgba(7,18,34,0.08)]">
                 {editBio?.trim()
                   ? editBio
-                  : "No profile note has been added yet."}
+                  : t("patient.profile.bio_empty")}
               </div>
             )}
           </div>
@@ -223,9 +225,9 @@ export function PatientProfilePanel({
           <div className="denty-dashboard-card-soft space-y-4 p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="denty-kicker">Email</p>
+                <p className="denty-kicker">{t("patient.profile.email")}</p>
                 <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                  Primary contact for updates and booking confirmations.
+                  {t("patient.profile.email_hint")}
                 </p>
               </div>
               <button
@@ -233,7 +235,9 @@ export function PatientProfilePanel({
                 onClick={onEmailEditableToggle}
                 className="denty-action denty-action-secondary px-4 py-2 text-xs"
               >
-                {emailEditable ? "Done" : "Edit"}
+                {emailEditable
+                  ? t("patient.profile.done")
+                  : t("patient.profile.edit")}
               </button>
             </div>
             {emailEditable ? (
@@ -241,11 +245,11 @@ export function PatientProfilePanel({
                 value={editEmail}
                 onChange={(event) => onEmailChange(event.target.value)}
                 className="denty-field text-base"
-                placeholder="Add an email"
+                placeholder={t("patient.profile.email_placeholder")}
               />
             ) : (
               <div className="rounded-[22px] border border-white/12 bg-white/52 px-4 py-4 text-lg font-semibold text-[var(--foreground)] shadow-[0_16px_28px_rgba(7,18,34,0.08)]">
-                {editEmail || user.email || "No email set"}
+                {editEmail || user.email || t("patient.profile.no_email")}
               </div>
             )}
           </div>
@@ -253,9 +257,9 @@ export function PatientProfilePanel({
           <div className="denty-dashboard-card-soft space-y-4 p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="denty-kicker">Phone</p>
+                <p className="denty-kicker">{t("patient.profile.phone")}</p>
                 <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                  Used for direct communication during reservation confirmation.
+                  {t("patient.profile.phone_hint")}
                 </p>
               </div>
               <button
@@ -263,7 +267,9 @@ export function PatientProfilePanel({
                 onClick={onPhoneEditableToggle}
                 className="denty-action denty-action-secondary px-4 py-2 text-xs"
               >
-                {phoneEditable ? "Done" : "Edit"}
+                {phoneEditable
+                  ? t("patient.profile.done")
+                  : t("patient.profile.edit")}
               </button>
             </div>
             {phoneEditable ? (
@@ -282,9 +288,9 @@ export function PatientProfilePanel({
           <div className="denty-dashboard-card-soft space-y-4 p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="denty-kicker">Security</p>
+                <p className="denty-kicker">{t("patient.profile.security")}</p>
                 <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                  Change your password from the same profile workspace.
+                  {t("patient.profile.security_hint")}
                 </p>
               </div>
               <button
@@ -292,7 +298,9 @@ export function PatientProfilePanel({
                 onClick={onPasswordEditableToggle}
                 className="denty-action denty-action-secondary px-4 py-2 text-xs"
               >
-                {pwdEditable ? "Done" : "Edit"}
+                {pwdEditable
+                  ? t("patient.profile.done")
+                  : t("patient.profile.edit")}
               </button>
             </div>
 
@@ -303,7 +311,7 @@ export function PatientProfilePanel({
                     type={showOldPwd ? "text" : "password"}
                     value={oldPassword}
                     onChange={(event) => onOldPasswordChange(event.target.value)}
-                    placeholder="Current password"
+                    placeholder={t("patient.profile.current_password")}
                     className="denty-field pr-20 text-base"
                   />
                   <button
@@ -311,7 +319,9 @@ export function PatientProfilePanel({
                     onClick={onShowOldPasswordToggle}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]"
                   >
-                    {showOldPwd ? "Hide" : "Show"}
+                    {showOldPwd
+                      ? t("patient.profile.hide")
+                      : t("patient.profile.show")}
                   </button>
                 </div>
                 <div className="relative">
@@ -319,7 +329,7 @@ export function PatientProfilePanel({
                     type={showNewPwd ? "text" : "password"}
                     value={newPassword}
                     onChange={(event) => onNewPasswordChange(event.target.value)}
-                    placeholder="New password"
+                    placeholder={t("patient.profile.new_password")}
                     className="denty-field pr-20 text-base"
                   />
                   <button
@@ -327,20 +337,22 @@ export function PatientProfilePanel({
                     onClick={onShowNewPasswordToggle}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]"
                   >
-                    {showNewPwd ? "Hide" : "Show"}
+                    {showNewPwd
+                      ? t("patient.profile.hide")
+                      : t("patient.profile.show")}
                   </button>
                 </div>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(event) => onConfirmPasswordChange(event.target.value)}
-                  placeholder="Rewrite new password"
+                  placeholder={t("patient.profile.rewrite_password")}
                   className="denty-field text-base"
                 />
               </div>
             ) : (
               <div className="rounded-[22px] border border-dashed border-[rgba(148,163,184,0.2)] bg-white/36 px-4 py-5 text-sm leading-7 text-[var(--muted-foreground)]">
-                Password fields stay hidden until you choose to edit them.
+                {t("patient.profile.password_hidden")}
               </div>
             )}
           </div>
@@ -349,25 +361,33 @@ export function PatientProfilePanel({
         <div className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="denty-stat-card p-5">
-              <p className="denty-kicker !tracking-[0.18em]">Completed</p>
+              <p className="denty-kicker !tracking-[0.18em]">
+                {t("patient.profile.completed")}
+              </p>
               <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {attendedCount}
               </p>
             </div>
             <div className="denty-stat-card p-5">
-              <p className="denty-kicker !tracking-[0.18em]">Cancelled</p>
+              <p className="denty-kicker !tracking-[0.18em]">
+                {t("patient.profile.cancelled")}
+              </p>
               <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {cancelledCount}
               </p>
             </div>
             <div className="denty-stat-card p-5">
-              <p className="denty-kicker !tracking-[0.18em]">No-show</p>
+              <p className="denty-kicker !tracking-[0.18em]">
+                {t("patient.profile.no_show")}
+              </p>
               <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {noShowCount}
               </p>
             </div>
             <div className="denty-stat-card p-5">
-              <p className="denty-kicker !tracking-[0.18em]">Doctor avg</p>
+              <p className="denty-kicker !tracking-[0.18em]">
+                {t("patient.profile.doctor_avg")}
+              </p>
               <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {publicProfile?.stats.doctorRatings?.toFixed(1) || "-"}
               </p>
@@ -376,8 +396,12 @@ export function PatientProfilePanel({
 
           <div className="denty-dashboard-card-soft space-y-4 p-5">
             <div className="flex items-center justify-between gap-3">
-              <p className="denty-kicker">Doctor notes</p>
-              <span className="denty-pill">{doctorFeedback.length} notes</span>
+              <p className="denty-kicker">{t("patient.profile.doctor_notes")}</p>
+              <span className="denty-pill">
+                {t("patient.profile.notes_count", {
+                  count: doctorFeedback.length,
+                })}
+              </span>
             </div>
             <div className="space-y-3">
               {doctorFeedback.slice(0, 6).map((comment) => (
@@ -390,7 +414,9 @@ export function PatientProfilePanel({
                       {comment.rater.name}
                     </p>
                     <span className="rounded-full border border-amber-300/34 bg-amber-50/70 px-3 py-1 text-xs font-semibold text-amber-700">
-                      {comment.stars.toFixed(1)} stars
+                      {t("patient.profile.stars", {
+                        value: comment.stars.toFixed(1),
+                      })}
                     </span>
                   </div>
                   <p className="mt-3 text-sm leading-7 text-[var(--foreground)]">
@@ -401,14 +427,16 @@ export function PatientProfilePanel({
 
               {!publicProfileLoading && doctorFeedback.length === 0 ? (
                 <p className="text-sm text-[var(--muted-foreground)]">
-                  No doctor comments yet.
+                  {t("patient.profile.no_doctor_comments")}
                 </p>
               ) : null}
             </div>
           </div>
 
           <div className="denty-dashboard-card-soft space-y-4 p-5">
-            <p className="denty-kicker">Appointment history</p>
+            <p className="denty-kicker">
+              {t("patient.profile.appointment_history")}
+            </p>
             <div className="space-y-3">
               {careHistory.slice(0, 8).map((entry) => (
                 <div
@@ -416,17 +444,20 @@ export function PatientProfilePanel({
                   className="rounded-[20px] border border-white/10 bg-white/34 px-4 py-4"
                 >
                   <p className="font-semibold text-[var(--foreground)]">
-                    {entry.clinicCase?.title || "Appointment"}
+                    {entry.clinicCase?.title ||
+                      t("patient.profile.appointment_fallback")}
                   </p>
                   <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                    {entry.clinicCase?.clinic?.name || "Clinic"} | {entry.status}
+                    {entry.clinicCase?.clinic?.name ||
+                      t("patient.common.clinic")}{" "}
+                    | {entry.status}
                   </p>
                 </div>
               ))}
 
               {!publicProfileLoading && careHistory.length === 0 ? (
                 <p className="text-sm text-[var(--muted-foreground)]">
-                  No appointment history yet.
+                  {t("patient.profile.no_history")}
                 </p>
               ) : null}
             </div>
@@ -440,7 +471,7 @@ export function PatientProfilePanel({
             onClick={onSave}
             className="denty-button-primary px-6 py-3 text-sm font-semibold"
           >
-            Save changes
+            {t("patient.profile.save_changes")}
           </button>
         </div>
       ) : null}

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { ConversationItem, MessageItem } from "@/features/chat/types/chat";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 type PatientChatWorkspaceProps = {
   apiUrl: string;
@@ -38,19 +39,21 @@ export function PatientChatWorkspace({
   onAttachImage,
   onSend,
 }: PatientChatWorkspaceProps) {
+  const t = useTranslation();
   const isRoom = selectedConversation?.kind === "ROOM";
   const selectedTitle = isRoom
-    ? selectedConversation?.title || "Shared room"
+    ? selectedConversation?.title || t("patient.chat.shared_room")
     : selectedConversation?.otherUser?.name ||
       selectedConversation?.otherUser?.username ||
-      "Unknown";
+      t("patient.common.unknown");
   const selectedMeta = isRoom
     ? selectedConversation?.description ||
       (selectedConversation?.group
         ? `${selectedConversation.group.name} | ${
-            selectedConversation.group.semesterLabel || "Group"
+            selectedConversation.group.semesterLabel ||
+            t("admin.chat.group_fallback")
           }`
-        : "Shared room")
+        : t("patient.chat.shared_room"))
     : selectedConversation?.otherUser?.phone ||
       selectedConversation?.otherUser?.email ||
       selectedConversation?.otherUser?.username ||
@@ -59,14 +62,14 @@ export function PatientChatWorkspace({
   return (
     <div className="grid gap-5 xl:grid-cols-[360px_minmax(0,1fr)]">
       <div className="denty-dashboard-card overflow-hidden p-5">
-        <p className="denty-kicker">Communication</p>
+        <p className="denty-kicker">{t("patient.chat.eyebrow")}</p>
         <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
-          Chats and rooms
+          {t("patient.chat.title")}
         </h2>
         <input
           value={chatSearch}
           onChange={(event) => onSearchChange(event.target.value)}
-          placeholder="Search doctors, supervisors, or staff"
+          placeholder={t("patient.chat.search")}
           className="denty-field mt-5 text-sm"
         />
 
@@ -74,7 +77,7 @@ export function PatientChatWorkspace({
           {chatResults.length > 0 ? (
             <div className="denty-dashboard-card-soft space-y-2 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted-foreground)]">
-                Search results
+                {t("patient.chat.search_results")}
               </p>
               {chatResults.map((result) => (
                 <button
@@ -106,18 +109,21 @@ export function PatientChatWorkspace({
             const other = conversation.otherUser;
             const title =
               conversation.kind === "ROOM"
-                ? conversation.title || "Shared room"
-                : other?.name || other?.username || "Unknown";
+                ? conversation.title || t("patient.chat.shared_room")
+                : other?.name || other?.username || t("patient.common.unknown");
             const meta =
               conversation.kind === "ROOM"
                 ? conversation.description ||
                   (conversation.group
                     ? `${conversation.group.name} | ${
-                        conversation.group.semesterLabel || "Group"
+                        conversation.group.semesterLabel ||
+                        t("admin.chat.group_fallback")
                       }`
-                    : "Shared room")
+                    : t("patient.chat.shared_room"))
                 : conversation.lastMessage?.text ||
-                  (conversation.lastMessage?.imageUrl ? "[Image]" : "Start chatting");
+                  (conversation.lastMessage?.imageUrl
+                    ? t("patient.chat.image")
+                    : t("patient.chat.start_chatting"));
 
             return (
               <button
@@ -144,7 +150,7 @@ export function PatientChatWorkspace({
                     <p className="font-semibold text-[var(--foreground)]">{title}</p>
                     {conversation.kind === "ROOM" ? (
                       <span className="rounded-full border border-white/12 bg-white/22 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[rgba(10,22,40,0.56)]">
-                        Room
+                        {t("patient.common.room")}
                       </span>
                     ) : null}
                   </div>
@@ -163,7 +169,9 @@ export function PatientChatWorkspace({
           })}
 
           {conversations.length === 0 && chatResults.length === 0 ? (
-            <p className="text-sm text-[var(--muted-foreground)]">No chats or rooms yet.</p>
+            <p className="text-sm text-[var(--muted-foreground)]">
+              {t("patient.chat.empty")}
+            </p>
           ) : null}
         </div>
       </div>
@@ -245,10 +253,10 @@ export function PatientChatWorkspace({
                   href={`/profiles/${selectedConversation.otherUser.id}`}
                   className="denty-pill hover:bg-white/36"
                 >
-                  Profile
+                  {t("patient.common.profile")}
                 </Link>
               ) : (
-                <span className="denty-pill">Room</span>
+                <span className="denty-pill">{t("patient.common.room")}</span>
               )}
             </div>
 
@@ -293,18 +301,24 @@ export function PatientChatWorkspace({
                 })}
 
                 {chatMessages.length === 0 ? (
-                  <p className="text-sm text-[var(--muted-foreground)]">No messages yet.</p>
+                  <p className="text-sm text-[var(--muted-foreground)]">
+                    {t("patient.chat.no_messages")}
+                  </p>
                 ) : null}
               </div>
 
               <div className="mt-4 flex items-center gap-3">
                 <button onClick={onAttachImage} className="denty-action denty-action-secondary px-4 py-3">
-                  Attach
+                  {t("patient.common.attach")}
                 </button>
                 <input
                   value={chatText}
                   onChange={(event) => onChatTextChange(event.target.value)}
-                  placeholder={isRoom ? "Write to the room" : "Type a message"}
+                  placeholder={
+                    isRoom
+                      ? t("patient.chat.write_room")
+                      : t("patient.chat.type_message")
+                  }
                   className="denty-field flex-1 text-sm"
                 />
                 <button
@@ -312,16 +326,18 @@ export function PatientChatWorkspace({
                   disabled={chatLoading}
                   className="denty-button-primary px-5 py-3 text-sm disabled:opacity-60"
                 >
-                  Send
+                  {t("patient.common.send")}
                 </button>
               </div>
             </div>
           </>
         ) : (
           <div className="flex h-[40rem] flex-col items-center justify-center text-center text-[var(--muted-foreground)]">
-            <p className="text-xl font-semibold text-[var(--foreground)]">Select a conversation</p>
+            <p className="text-xl font-semibold text-[var(--foreground)]">
+              {t("patient.chat.select_title")}
+            </p>
             <p className="mt-3 max-w-xl text-sm leading-7">
-              Open one of your allowed direct chats or shared rooms to continue the discussion.
+              {t("patient.chat.select_body")}
             </p>
           </div>
         )}

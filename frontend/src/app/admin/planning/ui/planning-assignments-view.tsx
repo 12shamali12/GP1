@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { AdminGroupItem, PlanningWorkspaceData } from "@/features/supervision/types";
 
 type PlanningPlan = PlanningWorkspaceData["plans"][number];
@@ -34,6 +35,7 @@ export function PlanningAssignmentsView({
   onAssignmentFieldChange,
   onSubmitAssignment,
 }: PlanningAssignmentsViewProps) {
+  const t = useTranslation();
   const scheduledGroups = sortedGroups.filter(
     (group) => group.currentPlan || (group.nextPlans?.length || 0) > 0
   );
@@ -41,14 +43,12 @@ export function PlanningAssignmentsView({
   return (
     <div className="grid gap-5 xl:grid-cols-[0.64fr_1.36fr]">
       <div className={panelClass}>
-        <p className="denty-kicker">Assignment desk</p>
+        <p className="denty-kicker">{t("admin.plan.assignment_desk")}</p>
         <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-          Queue one plan for one group
+          {t("admin.plan.queue_one_plan")}
         </h2>
         <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
-          A group can keep its current plan and queue the next one after it.
-          Conflict checks still prevent two groups from occupying the same clinic
-          during the same shift and day.
+          {t("admin.plan.assignment_intro")}
         </p>
 
         <div className="mt-6 space-y-3">
@@ -80,7 +80,7 @@ export function PlanningAssignmentsView({
             value={assignmentForm.notes}
             onChange={(e) => onAssignmentFieldChange("notes", e.target.value)}
             className="denty-field min-h-[120px] text-sm"
-            placeholder="Optional note for the assignment"
+            placeholder={t("admin.plan.assignment_note_placeholder")}
           />
         </div>
 
@@ -92,25 +92,28 @@ export function PlanningAssignmentsView({
                   {selectedAssignmentPlan.label}
                 </p>
                 <p className="mt-2 text-sm text-white/70">
-                  {
-                    selectedAssignmentPlan.days.filter((day) => !day.isVacation)
-                      .length
-                  }{" "}
-                  clinic days and{" "}
-                  {
-                    selectedAssignmentPlan.days.filter((day) => day.isVacation)
-                      .length
-                  }{" "}
-                  free days.
+                  {t("admin.plan.clinic_days_count", {
+                    count: selectedAssignmentPlan.days.filter(
+                      (day) => !day.isVacation,
+                    ).length,
+                  })}
+                  {" - "}
+                  {t("admin.plan.free_days_count", {
+                    count: selectedAssignmentPlan.days.filter(
+                      (day) => day.isVacation,
+                    ).length,
+                  })}
                 </p>
               </div>
               <span className="rounded-full border border-white/10 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/76">
-                Ready to queue
+                {t("admin.plan.ready_to_queue")}
               </span>
             </div>
             <p className="mt-3 text-xs uppercase tracking-[0.14em] text-white/54">
-              Queue window: {formatDateLabel(selectedAssignmentPlan.startsOn)} -{" "}
-              {formatDateLabel(selectedAssignmentPlan.endsOn)}
+              {t("admin.plan.queue_window", {
+                start: formatDateLabel(selectedAssignmentPlan.startsOn),
+                end: formatDateLabel(selectedAssignmentPlan.endsOn),
+              })}
             </p>
           </div>
         ) : null}
@@ -121,7 +124,7 @@ export function PlanningAssignmentsView({
             onClick={onSubmitAssignment}
             className={primaryAction}
           >
-            Assign plan to group
+            {t("admin.plan.assign_to_group")}
           </button>
         </div>
       </div>
@@ -129,13 +132,15 @@ export function PlanningAssignmentsView({
       <div className={panelClass}>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="denty-kicker">Planning wall</p>
+            <p className="denty-kicker">{t("admin.plan.planning_wall")}</p>
             <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-              Current and next plans
+              {t("admin.plan.current_next_plans")}
             </h2>
           </div>
           <span className="rounded-full border border-white/14 bg-[rgba(255,255,255,0.28)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.58)]">
-            {scheduledGroups.length} scheduled groups
+            {t("admin.plan.scheduled_groups_count", {
+              count: scheduledGroups.length,
+            })}
           </span>
         </div>
         <div className="mt-5 space-y-4">
@@ -155,7 +160,9 @@ export function PlanningAssignmentsView({
                 </div>
                 <div className="grid gap-3 md:grid-cols-2">
                   <div className="rounded-[22px] border border-[rgba(7,111,133,0.14)] bg-[rgba(7,111,133,0.08)] px-4 py-3">
-                    <p className="denty-kicker !tracking-[0.16em]">Current</p>
+                    <p className="denty-kicker !tracking-[0.16em]">
+                      {t("admin.plan.current_label")}
+                    </p>
                     {group.currentPlan ? (
                       <>
                         <p className="mt-2 text-base font-semibold text-[var(--foreground)]">
@@ -167,19 +174,23 @@ export function PlanningAssignmentsView({
                       </>
                     ) : (
                       <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                        No active plan right now.
+                        {t("admin.plan.no_active_plan_now")}
                       </p>
                     )}
                   </div>
                   <div className="rounded-[22px] border border-white/10 bg-white/24 px-4 py-3">
-                    <p className="denty-kicker !tracking-[0.16em]">Next queued</p>
+                    <p className="denty-kicker !tracking-[0.16em]">
+                      {t("admin.plan.next_queued_label")}
+                    </p>
                     <p className="mt-2 text-base font-semibold text-[var(--foreground)]">
-                      {group.nextPlans?.length || 0} upcoming
+                      {t("admin.plan.upcoming_count", {
+                        count: group.nextPlans?.length || 0,
+                      })}
                     </p>
                     <p className="mt-1 text-sm text-[var(--muted-foreground)]">
                       {(group.nextPlans || [])[0]
                         ? `${formatDateLabel(group.nextPlans![0].plan.startsOn)} - ${formatDateLabel(group.nextPlans![0].plan.endsOn)}`
-                        : "No future plan queued yet."}
+                        : t("admin.plan.no_future_plan")}
                     </p>
                   </div>
                 </div>
@@ -209,13 +220,15 @@ export function PlanningAssignmentsView({
                 ))}
                 {group.nextPlans && group.nextPlans.length > 3 ? (
                   <p className="text-xs uppercase tracking-[0.14em] text-[rgba(10,22,40,0.48)]">
-                    +{group.nextPlans.length - 3} more queued plans
+                    {t("admin.plan.more_queued", {
+                      count: group.nextPlans.length - 3,
+                    })}
                   </p>
                 ) : null}
                 {!group.nextPlans?.length ? (
                   <div className="rounded-[20px] border border-dashed border-white/14 bg-white/16 px-4 py-3">
                     <p className="text-sm text-[var(--muted-foreground)]">
-                      No queued plans after the current window.
+                      {t("admin.plan.no_queued_after")}
                     </p>
                   </div>
                 ) : null}
@@ -225,9 +238,9 @@ export function PlanningAssignmentsView({
 
           {!scheduledGroups.length ? (
             <div className="denty-placeholder p-5">
-              <p className="denty-kicker">Planning board</p>
+              <p className="denty-kicker">{t("admin.plan.planning_board")}</p>
               <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                No active or upcoming group plans yet.
+                {t("admin.plan.no_group_plans")}
               </p>
             </div>
           ) : null}

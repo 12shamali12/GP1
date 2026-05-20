@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { NotificationsFilter } from "../hooks/use-admin-notifications-workspace";
 
 type NotificationsFilterPanelProps = {
@@ -19,17 +20,17 @@ export function NotificationsFilterPanel({
   onMarkAllRead,
   onRemoveAll,
 }: NotificationsFilterPanelProps) {
+  const t = useTranslation();
   return (
     <div className="denty-panel-strong p-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
         <div>
-          <p className="denty-kicker">Inbox</p>
+          <p className="denty-kicker">{t("admin.notif.inbox")}</p>
           <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Review incoming admin updates
+            {t("admin.notif.review_heading")}
           </h2>
           <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
-            Join requests, partner approvals, and account-review events stay
-            visible here.
+            {t("admin.notif.review_intro")}
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
@@ -42,7 +43,7 @@ export function NotificationsFilterPanel({
                 : "border-white/12 bg-white/26 text-[var(--foreground)]"
             }`}
           >
-            All
+            {t("admin.notif.filter_all")}
             <span className="rounded-full bg-white/14 px-2 py-1 text-xs">
               {itemsCount}
             </span>
@@ -56,7 +57,7 @@ export function NotificationsFilterPanel({
                 : "border-white/12 bg-white/26 text-[var(--foreground)]"
             }`}
           >
-            Unread
+            {t("admin.notif.filter_unread")}
             <span className="rounded-full bg-white/14 px-2 py-1 text-xs">
               {unreadCount}
             </span>
@@ -70,14 +71,14 @@ export function NotificationsFilterPanel({
           onClick={onMarkAllRead}
           className="denty-button-secondary px-4 py-3 text-sm font-semibold"
         >
-          Mark all read
+          {t("admin.notif.mark_all_read")}
         </button>
         <button
           type="button"
           onClick={onRemoveAll}
           className="cursor-pointer rounded-full border border-rose-300/40 bg-rose-50/90 px-4 py-3 text-sm font-semibold text-rose-700"
         >
-          Remove all
+          {t("admin.notif.remove_all")}
         </button>
       </div>
     </div>

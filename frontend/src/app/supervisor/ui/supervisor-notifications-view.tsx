@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
+
 type SupervisorNotificationsViewProps = {
   notifications: any[];
   unreadNotifications: number;
@@ -21,34 +23,37 @@ export function SupervisorNotificationsView({
   onDeleteNotification,
   onGoToWorkspace,
 }: SupervisorNotificationsViewProps) {
+  const t = useTranslation();
   return (
     <div className="denty-dashboard-card overflow-hidden p-5 md:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="denty-kicker">Alerts</p>
+          <p className="denty-kicker">{t("supervisor.notif.eyebrow")}</p>
           <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-            Supervisor notifications
+            {t("supervisor.notif.title")}
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            Track review prompts, clinic updates, and student activity from one readable feed.
+            {t("supervisor.notif.description")}
           </p>
         </div>
-        <span className="denty-pill">{unreadNotifications} unread</span>
+        <span className="denty-pill">
+          {t("supervisor.notif.unread_count", { count: unreadNotifications })}
+        </span>
       </div>
 
       <div className="mt-6 flex flex-wrap gap-3">
         <button type="button" onClick={onMarkAllRead} className="denty-action denty-action-primary">
-          Mark all read
+          {t("supervisor.notif.mark_all_read")}
         </button>
         <button type="button" onClick={onDeleteAll} className="denty-action denty-action-danger">
-          Remove all
+          {t("supervisor.notif.remove_all")}
         </button>
       </div>
 
       <div className="mt-6 space-y-3">
         {notifications.length === 0 ? (
           <div className="denty-dashboard-card-soft p-5 text-sm text-[var(--muted-foreground)]">
-            No notifications yet.
+            {t("supervisor.notif.empty")}
           </div>
         ) : null}
 
@@ -91,16 +96,16 @@ export function SupervisorNotificationsView({
                   <button
                     onClick={() => notification.id && onDeleteNotification(notification.id)}
                     className="denty-action denty-action-danger px-3 py-1.5 text-[11px]"
-                    aria-label="Delete notification"
+                    aria-label={t("supervisor.notif.delete_aria")}
                   >
-                    Delete
+                    {t("supervisor.common.delete")}
                   </button>
                 </div>
               </div>
 
               {isActionable ? (
                 <button onClick={onGoToWorkspace} className="denty-link-button self-start">
-                  Go to workspace
+                  {t("supervisor.notif.go_to_workspace")}
                 </button>
               ) : null}
             </div>

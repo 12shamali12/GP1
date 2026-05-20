@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
+
 type PatientGlobalWorkspaceProps = {
   userName: string;
   globalMessages: { sender: string; text: string; createdAt: Date }[];
@@ -15,24 +17,30 @@ export function PatientGlobalWorkspace({
   onGlobalTextChange,
   onSend,
 }: PatientGlobalWorkspaceProps) {
+  const t = useTranslation();
+
   return (
     <div className="denty-dashboard-card overflow-hidden p-5 md:p-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="denty-kicker">Shared space</p>
-          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Global chat</h2>
+          <p className="denty-kicker">{t("patient.global.eyebrow")}</p>
+          <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+            {t("patient.global.title")}
+          </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-            One public thread for broader updates, reminders, and community conversation.
+            {t("patient.global.description")}
           </p>
         </div>
-        <span className="denty-pill">{userName || "Patient"}</span>
+        <span className="denty-pill">
+          {userName || t("patient.common.patient")}
+        </span>
       </div>
 
       <div className="mt-6 space-y-3">
         <div className="denty-dashboard-card-soft max-h-[28rem] space-y-3 overflow-y-auto p-5">
           {globalMessages.length === 0 ? (
             <p className="text-sm text-[var(--muted-foreground)]">
-              Start the conversation with everyone.
+              {t("patient.global.empty")}
             </p>
           ) : null}
           {globalMessages.map((message, index) => (
@@ -41,7 +49,7 @@ export function PatientGlobalWorkspace({
               className="denty-list-row px-4 py-3"
             >
               <div className="flex items-center gap-3 text-sm font-semibold text-[var(--foreground)]">
-                <span>{message.sender || "User"}</span>
+                <span>{message.sender || t("patient.global.user_fallback")}</span>
                 <span className="text-xs font-normal text-[var(--muted-foreground)]">
                   {message.createdAt.toLocaleString()}
                 </span>
@@ -55,11 +63,11 @@ export function PatientGlobalWorkspace({
           <input
             value={globalText}
             onChange={(event) => onGlobalTextChange(event.target.value)}
-            placeholder="Message everyone..."
+            placeholder={t("patient.global.placeholder")}
             className="denty-field flex-1 text-sm"
           />
           <button onClick={onSend} className="denty-button-primary px-5 py-3 text-sm">
-            Send
+            {t("patient.common.send")}
           </button>
         </div>
       </div>

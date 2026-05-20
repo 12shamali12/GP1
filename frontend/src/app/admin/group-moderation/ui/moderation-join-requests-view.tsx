@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { AlphabetSection } from "@/features/admin/utils/collection";
 import type { ModeratedJoinRequest } from "../hooks/use-admin-group-moderation-workspace";
 
@@ -14,18 +15,21 @@ export function ModerationJoinRequestsView({
   total,
   onDecide,
 }: ModerationJoinRequestsViewProps) {
+  const t = useTranslation();
   return (
     <div className="denty-panel-strong max-h-[48rem] overflow-hidden p-6">
       <div className="flex items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-[var(--foreground)]">
-            Join requests
+            {t("admin.mod.join_title")}
           </h2>
           <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-            Student requests waiting for admin approval.
+            {t("admin.mod.join_subtitle")}
           </p>
         </div>
-        <span className="denty-pill">{total} pending</span>
+        <span className="denty-pill">
+          {t("admin.mod.pending_count", { count: total })}
+        </span>
       </div>
 
       <div className="mt-5 max-h-[38rem] overflow-y-auto pr-2">
@@ -55,10 +59,12 @@ export function ModerationJoinRequestsView({
                       </p>
                       <p className="mt-2 text-sm text-[var(--muted-foreground)]">
                         {request.applicant.doctorIdNumber
-                          ? `Student ID: ${request.applicant.doctorIdNumber}`
+                          ? t("admin.mod.student_id", {
+                              value: request.applicant.doctorIdNumber,
+                            })
                           : request.applicant.email ||
                             request.applicant.phone ||
-                            "No contact"}
+                            t("admin.mod.no_contact")}
                       </p>
                       {request.note ? (
                         <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">
@@ -71,14 +77,14 @@ export function ModerationJoinRequestsView({
                           onClick={() => onDecide(request.id, true)}
                           className="rounded-full border border-emerald-600/32 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700"
                         >
-                          Approve
+                          {t("admin.common.approve")}
                         </button>
                         <button
                           type="button"
                           onClick={() => onDecide(request.id, false)}
                           className="rounded-full border border-rose-600/24 bg-rose-50 px-4 py-2 text-xs font-semibold text-rose-700"
                         >
-                          Reject
+                          {t("admin.common.reject")}
                         </button>
                       </div>
                     </div>
@@ -89,9 +95,9 @@ export function ModerationJoinRequestsView({
           </div>
         ) : (
           <div className="denty-placeholder p-5">
-            <p className="denty-kicker">Join queue</p>
+            <p className="denty-kicker">{t("admin.mod.join_queue")}</p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              No join requests match the current filter.
+              {t("admin.mod.join_empty")}
             </p>
           </div>
         )}

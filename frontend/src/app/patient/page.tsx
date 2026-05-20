@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { usePublicProfile } from "@/features/profiles/hooks/use-public-profile";
 import { SettingsPanel } from "@/features/settings/components/settings-panel";
 import { SmileStreakSurface } from "@/features/smile-streak/components/smile-streak-surface";
@@ -42,6 +43,7 @@ type PatientSurface =
 
 export default function PatientPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+  const t = useTranslation();
   const [activeSurface, setActiveSurface] = useState<PatientSurface>("overview");
   const [user, setUser] = useState<PatientUser>({});
   const [bookingForm, setBookingForm] = useState({
@@ -185,8 +187,8 @@ export default function PatientPage() {
     error,
     clearMessage: () => setMessage(null),
     clearError: () => setError(null),
-    messageTitle: "Patient workspace",
-    errorTitle: "Patient workspace",
+    messageTitle: t("patient.common.toast_workspace"),
+    errorTitle: t("patient.common.toast_workspace"),
   });
 
   const {
@@ -330,50 +332,71 @@ export default function PatientPage() {
     { eyebrow: string; title: string; description: string; badges: string[] }
   > = {
     overview: {
-      eyebrow: "Care desk",
-      title: "Reservations and booking flow",
-      description:
-        "Track upcoming visits, filter available slots, and reserve appointments from one calmer patient workspace.",
+      eyebrow: t("patient.surface.overview.eyebrow"),
+      title: t("patient.surface.overview.title"),
+      description: t("patient.surface.overview.description"),
       badges: [
-        `${uniqueUpcoming.length} upcoming`,
-        `${availableSlots.length} slots`,
-        `${selectedType} focus`,
+        t("patient.surface.overview.badge_upcoming", {
+          count: uniqueUpcoming.length,
+        }),
+        t("patient.surface.overview.badge_slots", {
+          count: availableSlots.length,
+        }),
+        t("patient.surface.overview.badge_focus", { value: selectedType }),
       ],
     },
     profile: {
-      eyebrow: "Identity",
-      title: "Patient profile",
-      description:
-        "Manage your patient identity, contact details, password, and profile photo without leaving the main page.",
-      badges: ["Account", "Contact", "Security"],
+      eyebrow: t("patient.surface.profile.eyebrow"),
+      title: t("patient.surface.profile.title"),
+      description: t("patient.surface.profile.description"),
+      badges: [
+        t("patient.surface.profile.badge1"),
+        t("patient.surface.profile.badge2"),
+        t("patient.surface.profile.badge3"),
+      ],
     },
     notifications: {
-      eyebrow: "Alerts",
-      title: "Patient notifications",
-      description:
-        "Read booking updates, reservation changes, and approval signals from one visible patient inbox.",
-      badges: [`${unreadPatientNotifications} unread`, "Inbox", "Updates"],
+      eyebrow: t("patient.surface.notifications.eyebrow"),
+      title: t("patient.surface.notifications.title"),
+      description: t("patient.surface.notifications.description"),
+      badges: [
+        t("patient.surface.notifications.badge_unread", {
+          count: unreadPatientNotifications,
+        }),
+        t("patient.surface.notifications.badge_inbox"),
+        t("patient.surface.notifications.badge_updates"),
+      ],
     },
     chat: {
-      eyebrow: "Communication",
-      title: "Chats and rooms",
-      description:
-        "Contact doctors, supervisors, and shared rooms from the main patient workspace instead of opening side drawers.",
-      badges: ["Direct chat", "Rooms", "Attachments"],
+      eyebrow: t("patient.surface.chat.eyebrow"),
+      title: t("patient.surface.chat.title"),
+      description: t("patient.surface.chat.description"),
+      badges: [
+        t("patient.surface.chat.badge1"),
+        t("patient.surface.chat.badge2"),
+        t("patient.surface.chat.badge3"),
+      ],
     },
     game: {
-      eyebrow: "Daily smile check-in",
-      title: "Healthy Smile Streak",
-      description:
-        "Three quick mouth-care rituals in 30 seconds. Build a streak, unlock badges, and keep your smile on track.",
-      badges: ["Brushing", "Habits", "Badges"],
+      eyebrow: t("patient.surface.game.eyebrow"),
+      title: t("patient.surface.game.title"),
+      description: t("patient.surface.game.description"),
+      badges: [
+        t("patient.surface.game.badge1"),
+        t("patient.surface.game.badge2"),
+        t("patient.surface.game.badge3"),
+      ],
     },
     settings: {
-      eyebrow: "Preferences",
-      title: "Patient settings",
-      description:
-        "Theme, language, notifications, and account controls grouped into one calm preferences surface.",
-      badges: ["Appearance", "Language", "Notifications", "Account"],
+      eyebrow: t("patient.surface.settings.eyebrow"),
+      title: t("patient.surface.settings.title"),
+      description: t("patient.surface.settings.description"),
+      badges: [
+        t("patient.surface.settings.badge1"),
+        t("patient.surface.settings.badge2"),
+        t("patient.surface.settings.badge3"),
+        t("patient.surface.settings.badge4"),
+      ],
     },
   };
 
@@ -397,13 +420,13 @@ export default function PatientPage() {
 
         <div className="denty-shell denty-dashboard-layout relative mx-0 max-w-none space-y-4 lg:space-y-0">
           <RoleShellLayout
-            topbarEyebrow="Patient"
+            topbarEyebrow={t("patient.common.patient")}
             notificationCount={unreadPatientNotifications}
             onNotificationsClick={() => setActiveSurface("notifications")}
             onProfileClick={() => setActiveSurface("profile")}
             sideRail={
               <PatientSideRail
-                userName={user.name || "Patient"}
+                userName={user.name || t("patient.common.patient")}
                 activeView={activeSurface}
                 unreadNotifications={unreadPatientNotifications}
                 chatUnreadCount={chatUnreadCount}
@@ -424,7 +447,7 @@ export default function PatientPage() {
                   <div className="flex items-center gap-3">
                     <BrandMark className="h-14 w-14 frozen-float" />
                     <span className="rounded-full border border-white/20 bg-white/26 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[rgba(10,22,40,0.64)]">
-                      Patient workspace
+                      {t("patient.common.workspace")}
                     </span>
                   </div>
 

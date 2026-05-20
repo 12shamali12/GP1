@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { ManagedUser } from "@/features/admin/types/admin";
 import type { PlanningWorkspaceData } from "@/features/supervision/types";
 
@@ -37,6 +38,7 @@ export function PlanningSupervisorsView({
   onSaveClinicSupervisor,
   onRemoveClinicSupervisor,
 }: PlanningSupervisorsViewProps) {
+  const t = useTranslation();
   const coveredClinics = sortedClinics.filter(
     (clinic) => clinic.supervisorLinks.length > 0
   );
@@ -44,14 +46,12 @@ export function PlanningSupervisorsView({
   return (
     <div className="grid gap-5 xl:grid-cols-[0.64fr_1.36fr]">
       <div className={panelClass}>
-        <p className="denty-kicker">Coverage desk</p>
+        <p className="denty-kicker">{t("admin.plan.coverage_desk")}</p>
         <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-          Link supervisors to clinics
+          {t("admin.plan.link_supervisors")}
         </h2>
         <p className="mt-3 text-sm leading-7 text-[var(--muted-foreground)]">
-          Supervisors belong to clinics generally, not to one specific plan day.
-          A clinic can host multiple supervisors, and one supervisor can cover
-          multiple clinics.
+          {t("admin.plan.coverage_intro")}
         </p>
 
         <div className="mt-6 space-y-3">
@@ -89,7 +89,7 @@ export function PlanningSupervisorsView({
               onClinicSupervisorFieldChange("notes", e.target.value)
             }
             className="denty-field min-h-[110px] text-sm"
-            placeholder="Optional clinic note for this supervisor"
+            placeholder={t("admin.plan.supervisor_note_placeholder")}
           />
         </div>
 
@@ -101,14 +101,17 @@ export function PlanningSupervisorsView({
                   {selectedClinicSupervisorTarget.name}
                 </p>
                 <p className="mt-2 text-sm text-white/70">
-                  {selectedClinicSupervisorTarget.supervisorLinks.length} linked supervisors
+                  {t("admin.plan.linked_supervisors_count", {
+                    count:
+                      selectedClinicSupervisorTarget.supervisorLinks.length,
+                  })}
                   {selectedClinicSupervisorTarget.description
                     ? ` | ${selectedClinicSupervisorTarget.description}`
                     : ""}
                 </p>
               </div>
               <span className="rounded-full border border-white/12 bg-white/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/76">
-                Coverage live
+                {t("admin.plan.coverage_live")}
               </span>
             </div>
           </div>
@@ -120,7 +123,7 @@ export function PlanningSupervisorsView({
             onClick={onSaveClinicSupervisor}
             className={primaryAction}
           >
-            Save clinic supervisor
+            {t("admin.plan.save_clinic_supervisor")}
           </button>
         </div>
       </div>
@@ -128,13 +131,15 @@ export function PlanningSupervisorsView({
       <div className={panelClass}>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="denty-kicker">Coverage wall</p>
+            <p className="denty-kicker">{t("admin.plan.coverage_wall")}</p>
             <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-              Supervisor by clinic
+              {t("admin.plan.supervisor_by_clinic")}
             </h2>
           </div>
           <span className="rounded-full border border-white/14 bg-[rgba(255,255,255,0.28)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(10,22,40,0.58)]">
-            {coveredClinics.length} clinics covered
+            {t("admin.plan.clinics_covered_count", {
+              count: coveredClinics.length,
+            })}
           </span>
         </div>
 
@@ -156,12 +161,16 @@ export function PlanningSupervisorsView({
                   ) : null}
                 </div>
                 <div className="rounded-[22px] border border-white/10 bg-white/24 px-4 py-3">
-                  <p className="denty-kicker !tracking-[0.16em]">Coverage</p>
+                  <p className="denty-kicker !tracking-[0.16em]">
+                    {t("admin.plan.coverage")}
+                  </p>
                   <p className="mt-2 text-base font-semibold text-[var(--foreground)]">
-                    {clinic.supervisorLinks.length} supervisors linked
+                    {t("admin.plan.supervisors_linked_count", {
+                      count: clinic.supervisorLinks.length,
+                    })}
                   </p>
                   <p className="mt-1 text-sm text-[var(--muted-foreground)]">
-                    Supervisors can cover multiple clinics at the same time.
+                    {t("admin.plan.cover_multiple")}
                   </p>
                 </div>
               </div>
@@ -188,7 +197,7 @@ export function PlanningSupervisorsView({
                         }
                         className={smallDanger}
                       >
-                        Remove
+                        {t("admin.common.remove")}
                       </button>
                     </div>
                     {link.notes ? (
@@ -204,9 +213,9 @@ export function PlanningSupervisorsView({
 
           {!coveredClinics.length ? (
             <div className="denty-placeholder p-5">
-              <p className="denty-kicker">Clinic coverage</p>
+              <p className="denty-kicker">{t("admin.plan.clinic_coverage")}</p>
               <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                No supervisors have been linked to clinics yet.
+                {t("admin.plan.no_clinic_supervisors")}
               </p>
             </div>
           ) : null}

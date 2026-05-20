@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { PublicProfileResponse } from "@/features/profiles/types/profile";
 
 type SupervisorUser = {
@@ -79,6 +80,7 @@ export function SupervisorProfilePanel({
   onShowNewPasswordToggle,
   onSave,
 }: SupervisorProfilePanelProps) {
+  const t = useTranslation();
   const profile = publicProfile?.profile;
   const stats = publicProfile?.stats;
   const recentReviews = publicProfile?.history.recentReviews || [];
@@ -92,43 +94,44 @@ export function SupervisorProfilePanel({
               type="button"
               onClick={onAvatarPick}
               className="group relative flex h-28 w-28 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-[22px] border border-white/20 bg-[linear-gradient(180deg,rgba(8,18,34,0.78),rgba(11,24,42,0.58))] text-3xl font-bold text-white shadow-[0_18px_34px_rgba(4,11,26,0.22)] transition hover:scale-[1.02] hover:border-white/28"
-              title="Click to add or update photo"
+              title={t("supervisor.profile.photo_title")}
             >
               {avatarData || user.avatar ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={avatarData || user.avatar || ""}
-                  alt="Supervisor avatar"
+                  alt={t("supervisor.profile.avatar_alt")}
                   className="h-full w-full object-cover"
                 />
               ) : (
                 <span>{(user.name || "S").charAt(0).toUpperCase()}</span>
               )}
               <span className="absolute inset-x-3 bottom-3 rounded-full border border-white/12 bg-black/30 px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/82 backdrop-blur group-hover:bg-black/40">
-                Update photo
+                {t("supervisor.profile.update_photo")}
               </span>
             </button>
 
             <div className="min-w-0 space-y-3">
               <span className="inline-flex rounded-full border border-white/16 bg-white/18 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[rgba(10,22,40,0.62)]">
-                Supervisor profile
+                {t("supervisor.profile.tag")}
               </span>
               <div>
                 <div className="flex flex-wrap items-center gap-3">
                   <h1 className="text-3xl font-semibold text-[var(--foreground)] md:text-3xl">
-                    {editName || user.name || "Supervisor"}
+                    {editName || user.name || t("supervisor.common.supervisor")}
                   </h1>
                   <button
                     type="button"
                     onClick={onNameEditableToggle}
                     className="denty-action denty-action-secondary px-4 py-2 text-xs"
                   >
-                    {nameEditable ? "Done" : "Edit name"}
+                    {nameEditable
+                      ? t("supervisor.profile.done")
+                      : t("supervisor.profile.edit_name")}
                   </button>
                 </div>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)] md:text-base">
-                  Present a professional supervision profile with clinics, review
-                  activity, and a cleaner identity for students and staff.
+                  {t("supervisor.profile.intro")}
                 </p>
               </div>
             </div>
@@ -138,7 +141,7 @@ export function SupervisorProfilePanel({
             onClick={onBack}
             className="denty-button-secondary shrink-0 px-5 py-3 text-sm font-semibold"
           >
-            Back
+            {t("supervisor.common.back")}
           </button>
         </div>
       </div>
@@ -147,13 +150,15 @@ export function SupervisorProfilePanel({
         <div className="space-y-5">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="denty-dashboard-card-soft p-5">
-              <p className="denty-kicker">Role</p>
+              <p className="denty-kicker">{t("supervisor.profile.role")}</p>
               <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                 {(user.role || "SUPERVISOR").toString().toUpperCase()}
               </p>
             </div>
             <div className="denty-dashboard-card-soft p-5">
-              <p className="denty-kicker">Reviewed reports</p>
+              <p className="denty-kicker">
+                {t("supervisor.profile.reviewed_reports")}
+              </p>
               <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                 {stats?.reviewedReports || 0}
               </p>
@@ -163,9 +168,11 @@ export function SupervisorProfilePanel({
           <div className="denty-dashboard-card-soft space-y-4 p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="denty-kicker">Display name</p>
+                <p className="denty-kicker">
+                  {t("supervisor.profile.display_name")}
+                </p>
                 <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                  Update how your profile appears to students and staff.
+                  {t("supervisor.profile.display_name_hint")}
                 </p>
               </div>
               <button
@@ -173,7 +180,9 @@ export function SupervisorProfilePanel({
                 onClick={onNameEditableToggle}
                 className="denty-action denty-action-secondary px-4 py-2 text-xs"
               >
-                {nameEditable ? "Done" : "Edit"}
+                {nameEditable
+                  ? t("supervisor.profile.done")
+                  : t("supervisor.profile.edit")}
               </button>
             </div>
             <input
@@ -187,9 +196,9 @@ export function SupervisorProfilePanel({
           <div className="denty-dashboard-card-soft space-y-4 p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="denty-kicker">Bio</p>
+                <p className="denty-kicker">{t("supervisor.profile.bio")}</p>
                 <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                  Introduce your teaching focus and clinical interests.
+                  {t("supervisor.profile.bio_hint")}
                 </p>
               </div>
               <button
@@ -197,7 +206,9 @@ export function SupervisorProfilePanel({
                 onClick={onBioEditableToggle}
                 className="denty-action denty-action-secondary px-4 py-2 text-xs"
               >
-                {bioEditable ? "Done" : "Edit"}
+                {bioEditable
+                  ? t("supervisor.profile.done")
+                  : t("supervisor.profile.edit")}
               </button>
             </div>
             {bioEditable ? (
@@ -205,13 +216,13 @@ export function SupervisorProfilePanel({
                 value={editBio}
                 onChange={(e) => onEditBioChange(e.target.value)}
                 className="denty-field min-h-[130px] text-base"
-                placeholder="Describe your supervision style, clinics, or teaching focus."
+                placeholder={t("supervisor.profile.bio_placeholder")}
               />
             ) : (
               <div className="rounded-[22px] border border-white/12 bg-white/52 px-4 py-4 text-sm leading-7 text-[var(--foreground)] shadow-[0_16px_28px_rgba(7,18,34,0.08)]">
                 {editBio?.trim()
                   ? editBio
-                  : "No supervisor description has been added yet."}
+                  : t("supervisor.profile.bio_empty")}
               </div>
             )}
           </div>
@@ -219,7 +230,7 @@ export function SupervisorProfilePanel({
           <div className="grid gap-5 md:grid-cols-2">
             <div className="denty-dashboard-card-soft space-y-4 p-5">
               <div className="flex items-center justify-between gap-3">
-                <p className="denty-kicker">Email</p>
+                <p className="denty-kicker">{t("supervisor.profile.email")}</p>
               </div>
               <div className="rounded-[22px] border border-white/12 bg-white/52 px-4 py-4 text-lg font-semibold text-[var(--foreground)] shadow-[0_16px_28px_rgba(7,18,34,0.08)]">
                 {user.email || "supervisor@example.com"}
@@ -229,14 +240,16 @@ export function SupervisorProfilePanel({
             <div className="denty-dashboard-card-soft space-y-4 p-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="denty-kicker">Phone</p>
+                  <p className="denty-kicker">{t("supervisor.profile.phone")}</p>
                 </div>
                 <button
                   type="button"
                   onClick={onPhoneEditableToggle}
                   className="denty-action denty-action-secondary px-4 py-2 text-xs"
                 >
-                  {phoneEditable ? "Done" : "Edit"}
+                  {phoneEditable
+                    ? t("supervisor.profile.done")
+                    : t("supervisor.profile.edit")}
                 </button>
               </div>
               <input
@@ -251,9 +264,9 @@ export function SupervisorProfilePanel({
           <div className="denty-dashboard-card-soft space-y-4 p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="denty-kicker">Security</p>
+                <p className="denty-kicker">{t("supervisor.profile.security")}</p>
                 <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                  Update your password from the same page.
+                  {t("supervisor.profile.security_hint")}
                 </p>
               </div>
               <button
@@ -261,7 +274,9 @@ export function SupervisorProfilePanel({
                 onClick={onPasswordEditableToggle}
                 className="denty-action denty-action-secondary px-4 py-2 text-xs"
               >
-                {pwdEditable ? "Done" : "Edit"}
+                {pwdEditable
+                  ? t("supervisor.profile.done")
+                  : t("supervisor.profile.edit")}
               </button>
             </div>
             {pwdEditable ? (
@@ -271,7 +286,7 @@ export function SupervisorProfilePanel({
                     type={showOldPwd ? "text" : "password"}
                     value={oldPassword}
                     onChange={(e) => onOldPasswordChange(e.target.value)}
-                    placeholder="Current password"
+                    placeholder={t("supervisor.profile.current_password")}
                     className="denty-field pr-20 text-base"
                   />
                   <button
@@ -279,7 +294,9 @@ export function SupervisorProfilePanel({
                     onClick={onShowOldPasswordToggle}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]"
                   >
-                    {showOldPwd ? "Hide" : "Show"}
+                    {showOldPwd
+                      ? t("supervisor.profile.hide")
+                      : t("supervisor.profile.show")}
                   </button>
                 </div>
                 <div className="relative">
@@ -287,7 +304,7 @@ export function SupervisorProfilePanel({
                     type={showNewPwd ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => onNewPasswordChange(e.target.value)}
-                    placeholder="New password"
+                    placeholder={t("supervisor.profile.new_password")}
                     className="denty-field pr-20 text-base"
                   />
                   <button
@@ -295,20 +312,22 @@ export function SupervisorProfilePanel({
                     onClick={onShowNewPasswordToggle}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]"
                   >
-                    {showNewPwd ? "Hide" : "Show"}
+                    {showNewPwd
+                      ? t("supervisor.profile.hide")
+                      : t("supervisor.profile.show")}
                   </button>
                 </div>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => onConfirmPasswordChange(e.target.value)}
-                  placeholder="Rewrite new password"
+                  placeholder={t("supervisor.profile.rewrite_password")}
                   className="denty-field text-base"
                 />
               </div>
             ) : (
               <div className="rounded-[22px] border border-dashed border-[rgba(148,163,184,0.2)] bg-white/36 px-4 py-5 text-sm leading-7 text-[var(--muted-foreground)]">
-                Password fields stay hidden until you choose to edit them.
+                {t("supervisor.profile.password_hidden")}
               </div>
             )}
           </div>
@@ -317,13 +336,17 @@ export function SupervisorProfilePanel({
         <div className="space-y-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="denty-stat-card p-5">
-              <p className="denty-kicker !tracking-[0.18em]">Clinics</p>
+              <p className="denty-kicker !tracking-[0.18em]">
+                {t("supervisor.profile.clinics")}
+              </p>
               <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {profile?.clinicsWorked?.length || 0}
               </p>
             </div>
             <div className="denty-stat-card p-5">
-              <p className="denty-kicker !tracking-[0.18em]">Reviews</p>
+              <p className="denty-kicker !tracking-[0.18em]">
+                {t("supervisor.profile.reviews")}
+              </p>
               <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
                 {stats?.reviewedReports || 0}
               </p>
@@ -332,9 +355,13 @@ export function SupervisorProfilePanel({
 
           <div className="denty-dashboard-card-soft p-5">
             <div className="flex items-center justify-between gap-3">
-              <p className="denty-kicker">Working clinics</p>
+              <p className="denty-kicker">
+                {t("supervisor.profile.working_clinics")}
+              </p>
               <span className="denty-pill">
-                {profile?.clinicsWorked?.length || 0} active
+                {t("supervisor.profile.clinics_active", {
+                  count: profile?.clinicsWorked?.length || 0,
+                })}
               </span>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -346,7 +373,7 @@ export function SupervisorProfilePanel({
                 ))
               ) : (
                 <p className="text-sm text-[var(--muted-foreground)]">
-                  No clinic links yet.
+                  {t("supervisor.profile.no_clinics")}
                 </p>
               )}
             </div>
@@ -354,8 +381,14 @@ export function SupervisorProfilePanel({
 
           <div className="denty-dashboard-card-soft p-5">
             <div className="flex items-center justify-between gap-3">
-              <p className="denty-kicker">Recent review activity</p>
-              <span className="denty-pill">{recentReviews.length} reports</span>
+              <p className="denty-kicker">
+                {t("supervisor.profile.recent_review_activity")}
+              </p>
+              <span className="denty-pill">
+                {t("supervisor.profile.reports_count", {
+                  count: recentReviews.length,
+                })}
+              </span>
             </div>
             <div className="mt-4 space-y-3">
               {recentReviews.slice(0, 8).map((entry) => (
@@ -364,18 +397,23 @@ export function SupervisorProfilePanel({
                   className="rounded-[20px] border border-white/10 bg-white/34 px-4 py-4"
                 >
                   <p className="font-semibold text-[var(--foreground)]">
-                    {entry.doctor?.name || "Doctor"} |{" "}
-                    {entry.clinicCase?.title || entry.title || "Reviewed case"}
+                    {entry.doctor?.name || t("supervisor.profile.doctor_fallback")}{" "}
+                    |{" "}
+                    {entry.clinicCase?.title ||
+                      entry.title ||
+                      t("supervisor.profile.reviewed_case_fallback")}
                   </p>
                   <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                    {entry.clinicCase?.clinic?.name || "Clinic"} | {entry.status}
+                    {entry.clinicCase?.clinic?.name ||
+                      t("supervisor.profile.clinic_fallback")}{" "}
+                    | {entry.status}
                   </p>
                 </div>
               ))}
 
               {!publicProfileLoading && recentReviews.length === 0 ? (
                 <p className="text-sm text-[var(--muted-foreground)]">
-                  No review history yet.
+                  {t("supervisor.profile.no_review_history")}
                 </p>
               ) : null}
             </div>
@@ -389,7 +427,7 @@ export function SupervisorProfilePanel({
             onClick={onSave}
             className="denty-button-primary px-6 py-3 text-sm font-semibold"
           >
-            Save changes
+            {t("supervisor.profile.save_changes")}
           </button>
         </div>
       ) : null}

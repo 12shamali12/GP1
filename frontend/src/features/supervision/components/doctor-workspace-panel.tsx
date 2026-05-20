@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { DoctorWorkspaceData } from "../types";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 import { DoctorWorkspaceCommunityView } from "./doctor-workspace/doctor-workspace-community-view";
 import { DoctorWorkspaceDeskView } from "./doctor-workspace/doctor-workspace-desk-view";
@@ -27,6 +28,7 @@ const tabInactiveClass =
   "border-white/12 bg-[rgba(255,255,255,0.34)] text-[rgba(10,22,40,0.76)] hover:border-white/18 hover:bg-[rgba(255,255,255,0.5)]";
 
 export function DoctorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange }: Props) {
+  const t = useTranslation();
   const [workspace, setWorkspace] = useState<DoctorWorkspaceData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,8 +44,8 @@ export function DoctorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange }: 
     error,
     clearMessage: () => setMessage(null),
     clearError: () => setError(null),
-    messageTitle: "Student workspace",
-    errorTitle: "Student workspace",
+    messageTitle: t("supervision.doctor.toast_workspace"),
+    errorTitle: t("supervision.doctor.toast_workspace"),
   });
 
   const loadWorkspace = async () => {
@@ -55,11 +57,12 @@ export function DoctorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange }: 
         `${apiUrl}/supervisor/doctor-workspace?identifier=${encodeURIComponent(identifier)}`,
       );
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to load doctor workspace.");
+      if (!res.ok)
+        throw new Error(data?.message || t("supervision.doctor.error.load_workspace"));
       setWorkspace(data);
       onWorkspaceChange?.(data);
     } catch (e: any) {
-      const nextError = e?.message || "Failed to load doctor workspace.";
+      const nextError = e?.message || t("supervision.doctor.error.load_workspace");
       setError(nextError);
       onWorkspaceChange?.(null);
     } finally {
@@ -105,7 +108,7 @@ export function DoctorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange }: 
 
   const requestJoin = async () => {
     if (!joinForm.groupId) {
-      setError("Choose a group first.");
+      setError(t("supervision.doctor.error.choose_group"));
       return;
     }
     setError(null);
@@ -121,18 +124,19 @@ export function DoctorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange }: 
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to request group access.");
-      setMessage("Group request sent to admin.");
+      if (!res.ok)
+        throw new Error(data?.message || t("supervision.doctor.error.request_group"));
+      setMessage(t("supervision.doctor.msg.group_request_sent"));
       setJoinForm({ groupId: "", note: "" });
       await loadWorkspace();
     } catch (e: any) {
-      setError(e?.message || "Failed to request group access.");
+      setError(e?.message || t("supervision.doctor.error.request_group"));
     }
   };
 
   const sendPartnerRequest = async () => {
     if (!partnerTargetId) {
-      setError("Choose a partner first.");
+      setError(t("supervision.doctor.error.choose_partner"));
       return;
     }
     setError(null);
@@ -148,20 +152,21 @@ export function DoctorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange }: 
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to send partner request.");
-      setMessage("Pairing request sent for admin confirmation.");
+      if (!res.ok)
+        throw new Error(data?.message || t("supervision.doctor.error.send_partner"));
+      setMessage(t("supervision.doctor.msg.pairing_sent"));
       setPartnerTargetId("");
       setPartnerNote("");
       await loadWorkspace();
     } catch (e: any) {
-      setError(e?.message || "Failed to send partner request.");
+      setError(e?.message || t("supervision.doctor.error.send_partner"));
     }
   };
 
   const createPost = async () => {
     if (!workspace?.groupMembership?.group.id) return;
     if (!postForm.body.trim()) {
-      setError("Write something before publishing.");
+      setError(t("supervision.doctor.error.write_post"));
       return;
     }
     setError(null);
@@ -180,12 +185,13 @@ export function DoctorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange }: 
         },
       );
       const data = await res.json();
-      if (!res.ok) throw new Error(data?.message || "Failed to publish post.");
-      setMessage("Post published to the group feed.");
+      if (!res.ok)
+        throw new Error(data?.message || t("supervision.doctor.error.publish_post"));
+      setMessage(t("supervision.doctor.msg.post_published"));
       setPostForm({ title: "", body: "" });
       await loadWorkspace();
     } catch (e: any) {
-      setError(e?.message || "Failed to publish post.");
+      setError(e?.message || t("supervision.doctor.error.publish_post"));
     }
   };
 
@@ -201,7 +207,11 @@ export function DoctorWorkspacePanel({ apiUrl, identifier, onWorkspaceChange }: 
         tabInactiveClass={tabInactiveClass}
       />
 
-      {loading ? <p className="text-sm text-[var(--muted-foreground)]">Loading workspace...</p> : null}
+      {loading ? (
+        <p className="text-sm text-[var(--muted-foreground)]">
+          {t("supervision.doctor.loading_workspace")}
+        </p>
+      ) : null}
 
       {view === "desk" ? (
         <DoctorWorkspaceDeskView

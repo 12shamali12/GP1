@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Dispatch, SetStateAction } from "react";
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { DoctorWorkspaceData } from "../../types";
 
 type Props = {
@@ -51,16 +52,25 @@ export function DoctorWorkspaceDeskView({
   requestJoin,
   sendPartnerRequest,
 }: Props) {
+  const t = useTranslation();
   return (
     <div className="grid gap-5 xl:grid-cols-[0.92fr_1.08fr]">
       <div className="space-y-5">
         <div className="denty-panel-strong p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="denty-kicker">Partner desk</p>
-              <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Semester pairing</h3>
+              <p className="denty-kicker">
+                {t("supervision.desk.partner_eyebrow")}
+              </p>
+              <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+                {t("supervision.desk.partner_title")}
+              </h3>
             </div>
-            <span className="denty-pill">{currentPartner ? "Confirmed" : "Admin review"}</span>
+            <span className="denty-pill">
+              {currentPartner
+                ? t("supervision.desk.partner_confirmed")
+                : t("supervision.desk.partner_review")}
+            </span>
           </div>
           {workspace?.groupMembership?.group ? (
             currentPartner ? (
@@ -76,7 +86,7 @@ export function DoctorWorkspaceDeskView({
                   {currentPartner.doctorIdNumber ? ` - ${currentPartner.doctorIdNumber}` : ""}
                 </p>
                 <p className="mt-4 text-sm leading-7 text-[var(--muted-foreground)]">
-                  Unpairing is handled by admin confirmation, not from the student dashboard.
+                  {t("supervision.desk.unpair_note")}
                 </p>
               </div>
             ) : (
@@ -86,7 +96,9 @@ export function DoctorWorkspaceDeskView({
                   onChange={(e) => setPartnerTargetId(e.target.value)}
                   className="denty-field text-sm"
                 >
-                  <option value="">Choose an unpaired student from your group</option>
+                  <option value="">
+                    {t("supervision.desk.choose_partner")}
+                  </option>
                   {groupMembersWithoutPartner.map((member) => (
                     <option key={member.doctor.id} value={member.doctor.id}>
                       {member.doctor.name} ({member.doctor.doctorIdNumber || member.doctor.username})
@@ -97,16 +109,16 @@ export function DoctorWorkspaceDeskView({
                   value={partnerNote}
                   onChange={(e) => setPartnerNote(e.target.value)}
                   className="denty-field min-h-[110px] text-sm"
-                  placeholder="Optional note for the admin and your requested partner"
+                  placeholder={t("supervision.desk.partner_note_placeholder")}
                 />
                 <button onClick={sendPartnerRequest} className="denty-button-primary px-4 py-3 text-sm font-semibold">
-                  Send pairing request
+                  {t("supervision.desk.send_pairing")}
                 </button>
               </div>
             )
           ) : (
             <div className="mt-5 rounded-[22px] border border-white/12 bg-white/36 p-5 text-sm leading-7 text-[var(--muted-foreground)]">
-              Join a group first, then request a partner from unpaired students in the same group.
+              {t("supervision.desk.join_first")}
             </div>
           )}
           <div className="mt-5 space-y-3">
@@ -123,13 +135,21 @@ export function DoctorWorkspaceDeskView({
                   {request.sender.doctorIdNumber ? ` - ${request.sender.doctorIdNumber}` : ""}
                 </p>
                 {request.note ? <p className="mt-3 text-sm leading-6 text-[var(--muted-foreground)]">{request.note}</p> : null}
-                <p className="mt-3 text-xs uppercase tracking-[0.16em] text-[rgba(10,22,40,0.52)]">Waiting for admin confirmation</p>
+                <p className="mt-3 text-xs uppercase tracking-[0.16em] text-[rgba(10,22,40,0.52)]">
+                  {t("supervision.desk.waiting_admin")}
+                </p>
               </div>
             ))}
             {workspace?.partnerRequests.outgoing.map((request) => (
               <div key={request.id} className="denty-dashboard-card-soft p-4">
-                <p className="text-sm font-semibold text-[var(--foreground)]">Request pending with {request.receiver.name}</p>
-                <p className="mt-2 text-xs text-[var(--muted-foreground)]">Admin will confirm the pairing after review.</p>
+                <p className="text-sm font-semibold text-[var(--foreground)]">
+                  {t("supervision.desk.request_pending_with", {
+                    name: request.receiver.name,
+                  })}
+                </p>
+                <p className="mt-2 text-xs text-[var(--muted-foreground)]">
+                  {t("supervision.desk.admin_will_confirm")}
+                </p>
               </div>
             ))}
           </div>
@@ -138,8 +158,12 @@ export function DoctorWorkspaceDeskView({
         <div className="denty-panel-strong p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="denty-kicker">Report lane</p>
-              <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Visible supervisors</h3>
+              <p className="denty-kicker">
+                {t("supervision.desk.report_eyebrow")}
+              </p>
+              <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+                {t("supervision.desk.report_title")}
+              </h3>
             </div>
             <span className="denty-pill">{workspace?.reportSupervisors.length || 0}</span>
           </div>
@@ -154,7 +178,9 @@ export function DoctorWorkspaceDeskView({
               </Link>
             ))}
             {workspace?.reportSupervisors.length === 0 ? (
-              <p className="text-sm text-[var(--muted-foreground)]">No supervisor is attached to today's clinic yet.</p>
+              <p className="text-sm text-[var(--muted-foreground)]">
+                {t("supervision.desk.no_supervisor")}
+              </p>
             ) : null}
           </div>
         </div>
@@ -164,10 +190,16 @@ export function DoctorWorkspaceDeskView({
         <div className="denty-panel-strong p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="denty-kicker">Today</p>
-              <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Clinic desk</h3>
+              <p className="denty-kicker">{t("supervision.desk.today_eyebrow")}</p>
+              <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+                {t("supervision.desk.today_title")}
+              </h3>
             </div>
-            <span className="denty-pill">{todayAssignments.length} duties</span>
+            <span className="denty-pill">
+              {t("supervision.desk.duties_count", {
+                count: todayAssignments.length,
+              })}
+            </span>
           </div>
           <div className="mt-5 space-y-3">
             {todayAssignments.map((assignment) => (
@@ -190,8 +222,12 @@ export function DoctorWorkspaceDeskView({
             ))}
             {!todayAssignments.length ? (
               <div className="denty-placeholder p-5">
-                <p className="denty-kicker">Clinic desk</p>
-                <p className="mt-2 text-sm text-[var(--muted-foreground)]">No clinic assignment is attached to today yet.</p>
+                <p className="denty-kicker">
+                  {t("supervision.desk.today_title")}
+                </p>
+                <p className="mt-2 text-sm text-[var(--muted-foreground)]">
+                  {t("supervision.desk.no_clinic_today")}
+                </p>
               </div>
             ) : null}
           </div>
@@ -199,15 +235,17 @@ export function DoctorWorkspaceDeskView({
 
         {!workspace?.groupMembership?.group ? (
           <div className="denty-panel-strong p-6">
-            <p className="denty-kicker">Join a group</p>
-            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Request semester placement</h3>
+            <p className="denty-kicker">{t("supervision.desk.join_eyebrow")}</p>
+            <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+              {t("supervision.desk.join_title")}
+            </h3>
             <div className="mt-5 space-y-3">
               <select
                 value={joinForm.groupId}
                 onChange={(e) => setJoinForm((prev) => ({ ...prev, groupId: e.target.value }))}
                 className="denty-field text-sm"
               >
-                <option value="">Choose a group</option>
+                <option value="">{t("supervision.desk.choose_group")}</option>
                 {workspace?.joinableGroups.map((group) => (
                   <option key={group.id} value={group.id}>{group.name} - {group.semesterLabel}</option>
                 ))}
@@ -216,10 +254,10 @@ export function DoctorWorkspaceDeskView({
                 value={joinForm.note}
                 onChange={(e) => setJoinForm((prev) => ({ ...prev, note: e.target.value }))}
                 className="denty-field min-h-[120px] text-sm"
-                placeholder="Optional note for the admin"
+                placeholder={t("supervision.desk.join_note_placeholder")}
               />
               <button onClick={requestJoin} className="denty-button-primary px-4 py-3 text-sm font-semibold">
-                Request group access
+                {t("supervision.desk.request_group_access")}
               </button>
             </div>
           </div>

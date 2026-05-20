@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminShell } from "@/features/admin/components/admin-shell";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 import { useAdminGroupsWorkspace } from "./hooks/use-admin-groups-workspace";
 import { GroupCreatePanel } from "./ui/group-create-panel";
@@ -9,6 +10,7 @@ import { GroupDetailModal } from "./ui/group-detail-modal";
 import { GroupDirectoryPanel } from "./ui/group-directory-panel";
 
 export default function AdminGroupsPage() {
+  const t = useTranslation();
   const {
     loading,
     error,
@@ -41,14 +43,14 @@ export default function AdminGroupsPage() {
     error,
     clearMessage: () => setMessage(null),
     clearError: () => setError(null),
-    messageTitle: "Groups updated",
-    errorTitle: "Group issue",
+    messageTitle: t("admin.groups.toast_updated"),
+    errorTitle: t("admin.groups.toast_issue"),
   });
 
   return (
     <AdminShell
-      title="Groups Studio"
-      description="Create groups, search by student name or ID, and open one focused detail panel for setup, current plans, next plans, and group activity."
+      title={t("admin.groups.title")}
+      description={t("admin.groups.description")}
     >
       <div className="grid gap-5 xl:grid-cols-[0.74fr_1.26fr]">
         <GroupCreatePanel

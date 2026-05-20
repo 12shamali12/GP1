@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminShell } from "@/features/admin/components/admin-shell";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 import { useAdminUsersWorkspace } from "./hooks/use-admin-users-workspace";
 import { UserDeleteDialog } from "./ui/user-delete-dialog";
@@ -8,6 +9,7 @@ import { UsersFilterPanel } from "./ui/users-filter-panel";
 import { UsersRoleSections } from "./ui/users-role-sections";
 
 export default function AdminUsersPage() {
+  const t = useTranslation();
   const {
     error,
     setError,
@@ -36,13 +38,13 @@ export default function AdminUsersPage() {
   useFeedbackToast({
     error,
     clearError: () => setError(null),
-    errorTitle: "User management",
+    errorTitle: t("admin.users.toast_title"),
   });
 
   return (
     <AdminShell
-      title="User Management"
-      description="Account controls now sit in a calmer management studio so they no longer stay buried inside mixed supervisor and admin screens."
+      title={t("admin.users.title")}
+      description={t("admin.users.description")}
     >
       <UsersFilterPanel
         query={query}

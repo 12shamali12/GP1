@@ -44,6 +44,7 @@ import { RoleShellLayout } from "@/features/ui/components/role-shell-layout";
 import type { DoctorWorkspaceData } from "@/features/supervision/types";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 import { useToast } from "@/features/ui/components/toast-provider";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 type User = {
   id?: string;
@@ -200,14 +201,15 @@ export default function DoctorPage() {
 
   const [reportMessage, setReportMessage] = useState<string | null>(null);
   const { pushToast } = useToast();
+  const t = useTranslation();
 
   useFeedbackToast({
     message,
     error,
     clearMessage: () => setMessage(null),
     clearError: () => setError(null),
-    messageTitle: "Doctor profile",
-    errorTitle: "Doctor profile",
+    messageTitle: t("doctor.report.toast_profile"),
+    errorTitle: t("doctor.report.toast_profile"),
   });
 
   useFeedbackToast({
@@ -215,19 +217,19 @@ export default function DoctorPage() {
     error: slotError,
     clearMessage: () => setSlotMessage(null),
     clearError: () => setSlotError(null),
-    messageTitle: "Availability planner",
-    errorTitle: "Availability planner",
+    messageTitle: t("doctor.report.toast_planner"),
+    errorTitle: t("doctor.report.toast_planner"),
   });
 
   useEffect(() => {
     if (!reportMessage || reportMessage === "Submitting report...") return;
     pushToast({
       kind: reportMessage.toLowerCase().includes("fail") ? "error" : "success",
-      title: "Case report",
+      title: t("doctor.report.toast_case"),
       description: reportMessage,
     });
     setReportMessage(null);
-  }, [pushToast, reportMessage]);
+  }, [pushToast, reportMessage, t]);
 
   const bookedAppointments = useMemo(
     () =>
@@ -454,7 +456,9 @@ export default function DoctorPage() {
       })
       .catch((e: any) => {
         if (!cancelled) {
-          setLeaderboardError(e?.message || "Failed to load leaderboard.");
+          setLeaderboardError(
+            e?.message || t("doctor.report.failed_leaderboard"),
+          );
         }
       })
       .finally(() => {
@@ -473,8 +477,8 @@ export default function DoctorPage() {
     error: leaderboardError,
     clearMessage: () => undefined,
     clearError: () => setLeaderboardError(null),
-    messageTitle: "Leaderboard",
-    errorTitle: "Leaderboard",
+    messageTitle: t("doctor.report.toast_leaderboard"),
+    errorTitle: t("doctor.report.toast_leaderboard"),
   });
 
   const handleAttachChatImage = useCallback(() => {
@@ -538,13 +542,13 @@ export default function DoctorPage() {
 
         <div className="denty-shell denty-dashboard-layout relative mx-0 max-w-none space-y-4 lg:space-y-0">
           <RoleShellLayout
-            topbarEyebrow="Doctor"
+            topbarEyebrow={t("doctor.common.doctor")}
             notificationCount={unreadNotifications}
             onNotificationsClick={() => setActiveSurface("notifications")}
             onProfileClick={() => setActiveSurface("profile")}
             sideRail={
               <DoctorSideRail
-                userName={user.name || "Doctor"}
+                userName={user.name || t("doctor.common.doctor")}
                 activeView={activeSurface}
                 unreadNotifications={unreadNotifications}
                 chatUnreadCount={chatUnreadCount}
@@ -569,7 +573,7 @@ export default function DoctorPage() {
               <DoctorOverviewSurface
                 apiUrl={API_URL}
                 identifier={identifier}
-                userName={user.name || "Doctor"}
+                userName={user.name || t("doctor.common.doctor")}
                 todayAppointments={todayAppointments}
                 pendingAppointments={pendingAppointments}
                 appointments={appointments}

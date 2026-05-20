@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { RefObject } from "react";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 type PatientCareDeskViewProps = {
   uniqueUpcoming: any[];
@@ -67,6 +68,7 @@ export function PatientCareDeskView({
   onSelectSlot,
   onSelectAppointment,
 }: PatientCareDeskViewProps) {
+  const t = useTranslation();
   const selectedClinic =
     selectedClinicId === "all"
       ? null
@@ -82,26 +84,26 @@ export function PatientCareDeskView({
         <div className="denty-panel-strong space-y-5 px-6 py-5 md:px-6 md:py-6">
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="denty-kicker">Upcoming care</p>
+              <p className="denty-kicker">{t("patient.care.upcoming_eyebrow")}</p>
               <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-                Reservations and requests
+                {t("patient.care.upcoming_title")}
               </h2>
               <p className="mt-3 max-w-2xl text-sm leading-7 text-[var(--muted-foreground)]">
-                Review your reserved appointments and open details before the visit day.
+                {t("patient.care.upcoming_description")}
               </p>
             </div>
             <button
               onClick={onReserveClick}
               className="denty-button-primary px-5 py-3 text-sm font-semibold"
             >
-              Reserve appointment
+              {t("patient.care.reserve_button")}
             </button>
           </div>
 
           <div className="space-y-3">
             {uniqueUpcoming.length === 0 ? (
               <div className="denty-dashboard-card-soft p-5 text-sm text-[var(--muted-foreground)]">
-                No appointments yet.
+                {t("patient.care.no_appointments")}
               </div>
             ) : null}
 
@@ -112,7 +114,8 @@ export function PatientCareDeskView({
               const end = appointment.slot?.endTime
                 ? new Date(appointment.slot.endTime)
                 : null;
-              const doctorName = appointment.slot?.doctor?.name || "Doctor";
+              const doctorName =
+                appointment.slot?.doctor?.name || t("patient.common.doctor");
               const avatar = appointment.slot?.doctor?.avatar || "";
               const initial = doctorName.charAt(0).toUpperCase();
 
@@ -140,11 +143,15 @@ export function PatientCareDeskView({
                           href={`/profiles/${appointment.slot.doctor.id}`}
                           className="font-semibold text-[var(--foreground)] hover:text-[rgba(7,111,133,0.96)]"
                         >
-                          Dr. {doctorName}
+                          {t("patient.appt.doctor_prefix", {
+                            name: doctorName,
+                          })}
                         </Link>
                       ) : (
                         <p className="font-semibold text-[var(--foreground)]">
-                          Dr. {doctorName}
+                          {t("patient.appt.doctor_prefix", {
+                            name: doctorName,
+                          })}
                         </p>
                       )}
                       <p className="mt-1 text-xs text-[var(--muted-foreground)]">
@@ -167,7 +174,9 @@ export function PatientCareDeskView({
                           : ""}
                       </p>
                       <p className="mt-1 text-xs text-[var(--muted-foreground)]">
-                        Status: {appointment.status}
+                        {t("patient.care.status_label", {
+                          value: appointment.status,
+                        })}
                       </p>
                     </div>
                   </div>
@@ -182,7 +191,7 @@ export function PatientCareDeskView({
                             : "denty-status-chip-strong"
                       }`}
                     >
-                      {appointment.slot?.purpose || "General"}
+                      {appointment.slot?.purpose || t("patient.common.general")}
                     </span>
                     <div className="flex items-center gap-2">
                       {appointment.slot?.doctor?.id ? (
@@ -190,14 +199,14 @@ export function PatientCareDeskView({
                           href={`/profiles/${appointment.slot.doctor.id}`}
                           className="denty-pill hover:bg-white/36"
                         >
-                          Profile
+                          {t("patient.common.profile")}
                         </Link>
                       ) : null}
                       <button
                         onClick={() => onSelectAppointment(appointment)}
                         className="denty-action px-3 py-2 text-[11px]"
                       >
-                        View details
+                        {t("patient.care.view_details")}
                       </button>
                     </div>
                   </div>
@@ -209,39 +218,47 @@ export function PatientCareDeskView({
 
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
           <div className="denty-stat-card p-4">
-            <p className="denty-kicker !tracking-[0.18em]">Upcoming</p>
+            <p className="denty-kicker !tracking-[0.18em]">
+              {t("patient.care.stat_upcoming")}
+            </p>
             <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               {uniqueUpcoming.length}
             </p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              Appointments in your queue
+              {t("patient.care.stat_upcoming_note")}
             </p>
           </div>
           <div className="denty-stat-card p-4">
-            <p className="denty-kicker !tracking-[0.18em]">Availability</p>
+            <p className="denty-kicker !tracking-[0.18em]">
+              {t("patient.care.stat_availability")}
+            </p>
             <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               {availableSlots.length}
             </p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              Slots matching your current filters
+              {t("patient.care.stat_availability_note")}
             </p>
           </div>
           <div className="denty-stat-card p-4">
-            <p className="denty-kicker !tracking-[0.18em]">History</p>
+            <p className="denty-kicker !tracking-[0.18em]">
+              {t("patient.care.stat_history")}
+            </p>
             <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               {history.length}
             </p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              Total appointments in your record
+              {t("patient.care.stat_history_note")}
             </p>
           </div>
           <div className="denty-stat-card p-4">
-            <p className="denty-kicker !tracking-[0.18em]">Alerts</p>
+            <p className="denty-kicker !tracking-[0.18em]">
+              {t("patient.care.stat_alerts")}
+            </p>
             <p className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
               {unreadNotifications}
             </p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              Unread notifications right now
+              {t("patient.care.stat_alerts_note")}
             </p>
           </div>
         </div>
@@ -250,46 +267,45 @@ export function PatientCareDeskView({
       <div ref={reservationRef} className="denty-dashboard-card space-y-5 p-5 md:p-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="denty-kicker">Booking planner</p>
+            <p className="denty-kicker">{t("patient.care.booking_eyebrow")}</p>
             <h3 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-              Reserve an appointment
+              {t("patient.care.booking_title")}
             </h3>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-              Filter by date, clinic, and required case, then choose the student slot that still
-              needs that procedure in the current semester flow.
+              {t("patient.care.booking_description")}
             </p>
           </div>
-          <span className="denty-pill">Live filtering</span>
+          <span className="denty-pill">{t("patient.care.live_filtering")}</span>
         </div>
 
         <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-              Visit intent
+              {t("patient.care.visit_intent")}
             </label>
             <select
               value={selectedType}
               onChange={(event) => onSelectedTypeChange(event.target.value)}
               className="denty-field"
             >
-              <option value="">All visit intents</option>
-              <option>General</option>
-              <option>Check-up</option>
-              <option>Cleaning</option>
-              <option>Pain/Urgent</option>
-              <option>Whitening</option>
+              <option value="">{t("patient.care.all_visit_intents")}</option>
+              <option value="General">{t("patient.care.intent_general")}</option>
+              <option value="Check-up">{t("patient.care.intent_checkup")}</option>
+              <option value="Cleaning">{t("patient.care.intent_cleaning")}</option>
+              <option value="Pain/Urgent">{t("patient.care.intent_pain")}</option>
+              <option value="Whitening">{t("patient.care.intent_whitening")}</option>
             </select>
           </div>
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-              Clinic
+              {t("patient.care.clinic")}
             </label>
             <select
               value={selectedClinicId}
               onChange={(event) => onSelectedClinicChange(event.target.value)}
               className="denty-field"
             >
-              <option value="all">All clinics</option>
+              <option value="all">{t("patient.care.all_clinics")}</option>
               {clinicOptions.map((clinic) => (
                 <option key={clinic.id} value={clinic.id}>
                   {clinic.name}
@@ -299,14 +315,14 @@ export function PatientCareDeskView({
           </div>
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-              Case
+              {t("patient.care.case")}
             </label>
             <select
               value={selectedClinicCaseId}
               onChange={(event) => onSelectedClinicCaseChange(event.target.value)}
               className="denty-field"
             >
-              <option value="all">All cases</option>
+              <option value="all">{t("patient.care.all_cases")}</option>
               {caseOptions.map((clinicCase) => (
                 <option key={clinicCase.id} value={clinicCase.id}>
                   {clinicCase.title}
@@ -316,7 +332,7 @@ export function PatientCareDeskView({
           </div>
           <div className="space-y-2">
             <label className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-              Month / year
+              {t("patient.care.month_year")}
             </label>
             <div className="flex gap-2">
               <select
@@ -328,7 +344,7 @@ export function PatientCareDeskView({
                 }
                 className="denty-field flex-1"
               >
-                <option value="all">All months</option>
+                <option value="all">{t("patient.care.all_months")}</option>
                 {[...Array(12).keys()].map((month) => (
                   <option key={month} value={month}>
                     {new Date(2024, month, 1).toLocaleString(undefined, {
@@ -346,7 +362,7 @@ export function PatientCareDeskView({
                 }
                 className="denty-field w-32"
               >
-                <option value="all">All years</option>
+                <option value="all">{t("patient.care.all_years")}</option>
                 {[2024, 2025, 2026].map((year) => (
                   <option key={year} value={year}>
                     {year}
@@ -360,42 +376,42 @@ export function PatientCareDeskView({
         <div className="grid gap-3 md:grid-cols-3">
           <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-              Clinic focus
+              {t("patient.care.clinic_focus")}
             </p>
             <p className="mt-2 text-base font-semibold text-[var(--foreground)]">
-              {selectedClinic?.name || "All clinics"}
+              {selectedClinic?.name || t("patient.care.all_clinics")}
             </p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              Narrow the planner to the clinic you want to visit first.
+              {t("patient.care.clinic_focus_note")}
             </p>
           </div>
           <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-              Case focus
+              {t("patient.care.case_focus")}
             </p>
             <p className="mt-2 text-base font-semibold text-[var(--foreground)]">
-              {selectedCase?.title || "All available cases"}
+              {selectedCase?.title || t("patient.care.all_available_cases")}
             </p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              Only students who still need this case will appear in the slot list.
+              {t("patient.care.case_focus_note")}
             </p>
           </div>
           <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-              Pair booking
+              {t("patient.care.pair_booking")}
             </p>
             <p className="mt-2 text-base font-semibold text-[var(--foreground)]">
-              Partner-aware reservations
+              {t("patient.care.pair_booking_value")}
             </p>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              Reserving one student automatically locks the paired student chair for the same shift.
+              {t("patient.care.pair_booking_note")}
             </p>
           </div>
         </div>
 
         <div className="space-y-2">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-            Pick a day
+            {t("patient.care.pick_day")}
           </p>
           <div className="grid max-h-72 grid-cols-7 gap-2 overflow-y-auto rounded-[22px] border border-[rgba(148,163,184,0.14)] bg-[rgba(244,245,247,0.88)] p-3">
             {filteredDays.map((date) => (
@@ -420,7 +436,10 @@ export function PatientCareDeskView({
         {selectedDay ? (
           <div className="space-y-2">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-              Slots for {selectedDay.toDateString()} ({selectedType || "Any visit intent"})
+              {t("patient.care.slots_for", {
+                date: selectedDay.toDateString(),
+                intent: selectedType || t("patient.care.any_visit_intent"),
+              })}
             </p>
             <div className="space-y-2">
               {availableSlots
@@ -493,18 +512,33 @@ export function PatientCareDeskView({
                                 href={`/profiles/${slot.doctor.id}`}
                                 className="hover:text-[rgba(7,111,133,0.96)]"
                               >
-                                Dr. {slot.doctor?.name || "Unknown"}
+                                {t("patient.appt.doctor_prefix", {
+                                  name:
+                                    slot.doctor?.name ||
+                                    t("patient.common.unknown"),
+                                })}
                               </Link>
                             ) : (
-                              <>Dr. {slot.doctor?.name || "Unknown"}</>
+                              <>
+                                {t("patient.appt.doctor_prefix", {
+                                  name:
+                                    slot.doctor?.name ||
+                                    t("patient.common.unknown"),
+                                })}
+                              </>
                             )}
                           </p>
                           <p className="text-xs text-[var(--muted-foreground)]">
-                            {slot.clinic?.name || "Clinic"} | {slot.doctor?.doctorIdNumber || "Student"}
+                            {slot.clinic?.name || t("patient.common.clinic")} |{" "}
+                            {slot.doctor?.doctorIdNumber ||
+                              t("patient.care.student_fallback")}
                           </p>
                           <p className="text-xs text-[var(--muted-foreground)]">
-                            Eligible for {(slot.caseOptions || []).length} case
-                            {(slot.caseOptions || []).length === 1 ? "" : "s"} in this clinic
+                            {t("patient.care.eligible_cases", {
+                              count: (slot.caseOptions || []).length,
+                              plural:
+                                (slot.caseOptions || []).length === 1 ? "" : "s",
+                            })}
                           </p>
                           <div className="flex flex-wrap gap-2 pt-1">
                             {(slot.caseOptions || []).slice(0, 4).map((item: any) => (
@@ -521,7 +555,9 @@ export function PatientCareDeskView({
                             ))}
                             {(slot.caseOptions || []).length > 4 ? (
                               <span className="rounded-full border border-white/12 bg-white/24 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--muted-foreground)]">
-                                +{(slot.caseOptions || []).length - 4} more
+                                {t("patient.care.more_cases", {
+                                  count: (slot.caseOptions || []).length - 4,
+                                })}
                               </span>
                             ) : null}
                           </div>
@@ -531,7 +567,7 @@ export function PatientCareDeskView({
                         onClick={() => onSelectSlot(slot)}
                         className="denty-action denty-action-primary"
                       >
-                        Choose
+                        {t("patient.care.choose")}
                       </button>
                     </div>
                   </div>
@@ -552,8 +588,7 @@ export function PatientCareDeskView({
                 return sameDay && matchesType && matchesClinic && matchesCase;
               }).length === 0 ? (
                 <div className="denty-dashboard-card-soft p-5 text-sm leading-7 text-[var(--muted-foreground)]">
-                  No student slots match this clinic and case on the selected day. Try another day
-                  or switch to a different case requirement.
+                  {t("patient.care.no_slots_match")}
                 </div>
               ) : null}
               {error ? <p className="text-sm text-[#b91c1c]">{error}</p> : null}

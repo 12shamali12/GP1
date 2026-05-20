@@ -1,6 +1,7 @@
 "use client";
 
 import type { DoctorWorkspaceData } from "@/features/supervision/types";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 const VIEW_OPTIONS = [
   "Bitewings",
@@ -117,6 +118,7 @@ export function DoctorReportWorkspace({
   onSubmitPatientFeedback,
   onSubmit,
 }: DoctorReportWorkspaceProps) {
+  const t = useTranslation();
   const existingReport = selectedReport?.report || null;
   const canSendReport = selectedReport?.status === "COMPLETED";
   const canRatePatient = selectedReport?.status === "COMPLETED";
@@ -126,19 +128,26 @@ export function DoctorReportWorkspace({
       <div className="denty-dashboard-card overflow-hidden p-5 md:p-6">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="denty-kicker">Case reporting</p>
+            <p className="denty-kicker">{t("doctor.report.eyebrow")}</p>
             <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
-              Clinical completion studio
+              {t("doctor.report.title")}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-              Confirm the visit, leave patient notes, rate the patient, and submit one structured
-              report for supervisor review without leaving the doctor suite.
+              {t("doctor.report.description")}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <span className="denty-pill">{bookedAppointments.length} active visits</span>
-            <span className="denty-pill">{noShowCount} no-shows</span>
-            <span className="denty-pill">{userName || "Doctor"}</span>
+            <span className="denty-pill">
+              {t("doctor.report.active_visits", {
+                count: bookedAppointments.length,
+              })}
+            </span>
+            <span className="denty-pill">
+              {t("doctor.report.no_shows", { count: noShowCount })}
+            </span>
+            <span className="denty-pill">
+              {userName || t("doctor.common.doctor")}
+            </span>
           </div>
         </div>
       </div>
@@ -147,7 +156,9 @@ export function DoctorReportWorkspace({
         <div className="denty-dashboard-card overflow-hidden p-5">
           <div className="space-y-3">
             {bookedAppointments.length === 0 ? (
-              <p className="text-sm text-[var(--muted-foreground)]">No approved or completed appointments yet.</p>
+              <p className="text-sm text-[var(--muted-foreground)]">
+                {t("doctor.report.no_appointments")}
+              </p>
             ) : null}
             {bookedAppointments
               .slice()
@@ -184,7 +195,7 @@ export function DoctorReportWorkspace({
                                     })}`
                                   : ""
                               }`
-                            : "No time"}
+                            : t("doctor.report.no_time")}
                         </p>
                         <div className="flex flex-wrap gap-2">
                           <span className="denty-pill">{appointment.status}</span>
@@ -194,13 +205,28 @@ export function DoctorReportWorkspace({
                         </div>
                       </div>
                       <p className="text-sm text-[var(--muted-foreground)]">
-                        Patient: {appointment.patient?.name || appointment.patientName || "Unknown"}
+                        {t("doctor.report.patient", {
+                          value:
+                            appointment.patient?.name ||
+                            appointment.patientName ||
+                            t("patient.common.unknown"),
+                        })}
                       </p>
                       <p className="text-sm text-[var(--muted-foreground)]">
-                        Clinic: {appointment.clinicCase?.clinic?.name || appointment.slot?.clinic?.name || "Clinic"}
+                        {t("doctor.report.clinic", {
+                          value:
+                            appointment.clinicCase?.clinic?.name ||
+                            appointment.slot?.clinic?.name ||
+                            t("doctor.profile.clinic"),
+                        })}
                       </p>
                       <p className="text-sm text-[var(--muted-foreground)]">
-                        Case: {appointment.clinicCase?.title || appointment.slot?.purpose || "General"}
+                        {t("doctor.report.case", {
+                          value:
+                            appointment.clinicCase?.title ||
+                            appointment.slot?.purpose ||
+                            t("doctor.legacy.case.general"),
+                        })}
                       </p>
                     </div>
 
@@ -210,14 +236,14 @@ export function DoctorReportWorkspace({
                           onClick={() => onNoShow(appointment.id)}
                           className="denty-action denty-action-danger"
                         >
-                          Haven&apos;t shown
+                          {t("doctor.report.havent_shown")}
                         </button>
                       ) : null}
                       <button
                         onClick={() => onSelectReport(appointment)}
                         className="denty-action denty-action-primary"
                       >
-                        Open case desk
+                        {t("doctor.report.open_case_desk")}
                       </button>
                     </div>
                   </div>
@@ -231,37 +257,45 @@ export function DoctorReportWorkspace({
             <div className="space-y-5">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <p className="denty-kicker">Report form</p>
+                  <p className="denty-kicker">{t("doctor.report.form_eyebrow")}</p>
                   <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
-                    Complete case report
+                    {t("doctor.report.form_title")}
                   </h3>
                 </div>
                 <button onClick={onCloseReportForm} className="denty-action denty-action-secondary">
-                  Clear form
+                  {t("doctor.report.clear_form")}
                 </button>
               </div>
 
               <div className="grid gap-3 md:grid-cols-2">
                 <div className="rounded-[22px] border border-white/10 bg-white/22 p-4 md:col-span-2">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Appointment snapshot
+                    {t("doctor.report.snapshot")}
                   </p>
                   <div className="mt-3 grid gap-3 md:grid-cols-3">
                     <p className="text-sm text-[var(--foreground)]">
-                      <span className="font-semibold">Patient:</span>{" "}
-                      {selectedReport.patient?.name || selectedReport.patientName || "Unknown"}
+                      <span className="font-semibold">
+                        {t("doctor.report.field_patient")}
+                      </span>{" "}
+                      {selectedReport.patient?.name ||
+                        selectedReport.patientName ||
+                        t("patient.common.unknown")}
                     </p>
                     <p className="text-sm text-[var(--foreground)]">
-                      <span className="font-semibold">Clinic:</span>{" "}
+                      <span className="font-semibold">
+                        {t("doctor.report.field_clinic")}
+                      </span>{" "}
                       {selectedReport.clinicCase?.clinic?.name ||
                         selectedReport.slot?.clinic?.name ||
-                        "Clinic"}
+                        t("doctor.profile.clinic")}
                     </p>
                     <p className="text-sm text-[var(--foreground)]">
-                      <span className="font-semibold">Case:</span>{" "}
+                      <span className="font-semibold">
+                        {t("doctor.report.field_case")}
+                      </span>{" "}
                       {selectedReport.clinicCase?.title ||
                         selectedReport.slot?.purpose ||
-                        "General"}
+                        t("doctor.legacy.case.general")}
                     </p>
                   </div>
                 </div>
@@ -271,7 +305,7 @@ export function DoctorReportWorkspace({
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                          Latest faculty review
+                          {t("doctor.report.latest_review")}
                         </p>
                         <p className="mt-2 text-sm font-semibold text-[var(--foreground)]">
                           {existingReport.status}
@@ -285,14 +319,14 @@ export function DoctorReportWorkspace({
                     </div>
                     <p className="mt-3 text-sm leading-7 text-[var(--foreground)]">
                       {existingReport.feedback ||
-                        "You can reopen this draft, update the fields below, and resubmit it."}
+                        t("doctor.report.review_hint")}
                     </p>
                   </div>
                 ) : null}
 
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Patient
+                    {t("doctor.report.label_patient")}
                   </p>
                   <input
                     value={selectedReport.patient?.name || selectedReport.patientName || ""}
@@ -302,7 +336,7 @@ export function DoctorReportWorkspace({
                 </div>
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Phone
+                    {t("doctor.report.label_phone")}
                   </p>
                   <input
                     value={selectedReport.patient?.phone || selectedReport.patientPhone || ""}
@@ -312,13 +346,13 @@ export function DoctorReportWorkspace({
                 </div>
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Doctor
+                    {t("doctor.report.label_doctor")}
                   </p>
                   <input value={userName || ""} readOnly className="denty-field text-sm" />
                 </div>
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Supervisor
+                    {t("doctor.report.label_supervisor")}
                   </p>
                   {doctorWorkspace?.reportSupervisors?.length ? (
                     <select
@@ -326,7 +360,9 @@ export function DoctorReportWorkspace({
                       onChange={(event) => onSupervisorChange(event.target.value)}
                       className="denty-field cursor-pointer text-sm"
                     >
-                      <option value="">Choose supervisor</option>
+                      <option value="">
+                        {t("doctor.report.choose_supervisor")}
+                      </option>
                       {doctorWorkspace.reportSupervisors.map((supervisor) => (
                         <option key={supervisor.id} value={supervisor.id}>
                           {supervisor.name}
@@ -343,7 +379,7 @@ export function DoctorReportWorkspace({
                 </div>
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Partner
+                    {t("doctor.report.label_partner")}
                   </p>
                   <input
                     value={
@@ -353,7 +389,7 @@ export function DoctorReportWorkspace({
                           doctorWorkspace.doctor.id
                           ? doctorWorkspace.partnerPair.doctorTwo.name
                           : doctorWorkspace.partnerPair.doctorOne.name
-                        : "No active partner")
+                        : t("doctor.report.no_partner"))
                     }
                     readOnly
                     className="denty-field text-sm"
@@ -361,7 +397,7 @@ export function DoctorReportWorkspace({
                 </div>
                 <div>
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Report title
+                    {t("doctor.report.report_title")}
                   </p>
                   <input
                     value={reportForm.title}
@@ -371,7 +407,7 @@ export function DoctorReportWorkspace({
                 </div>
                 <div className="md:col-span-2">
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Case summary
+                    {t("doctor.report.case_summary")}
                   </p>
                   <textarea
                     value={reportForm.description}
@@ -385,7 +421,7 @@ export function DoctorReportWorkspace({
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="rounded-[24px] border border-white/10 bg-white/22 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Chief complaint and history
+                    {t("doctor.report.complaint_history")}
                   </p>
                   <div className="mt-3 space-y-3">
                     <textarea
@@ -394,7 +430,7 @@ export function DoctorReportWorkspace({
                         onReportFieldChange("chiefComplaint", event.target.value)
                       }
                       className="denty-field min-h-[90px] text-sm"
-                      placeholder="Chief complaint and history of chief complaint"
+                      placeholder={t("doctor.report.ph_chief_complaint")}
                     />
                     <textarea
                       value={reportFormData.medicalHistory}
@@ -402,7 +438,7 @@ export function DoctorReportWorkspace({
                         onReportFieldChange("medicalHistory", event.target.value)
                       }
                       className="denty-field min-h-[90px] text-sm"
-                      placeholder="Relevant medical history"
+                      placeholder={t("doctor.report.ph_medical_history")}
                     />
                     <textarea
                       value={reportFormData.dentalHistory}
@@ -410,7 +446,7 @@ export function DoctorReportWorkspace({
                         onReportFieldChange("dentalHistory", event.target.value)
                       }
                       className="denty-field min-h-[90px] text-sm"
-                      placeholder="Dental past history"
+                      placeholder={t("doctor.report.ph_dental_history")}
                     />
                     <textarea
                       value={reportFormData.socialHistory}
@@ -418,14 +454,14 @@ export function DoctorReportWorkspace({
                         onReportFieldChange("socialHistory", event.target.value)
                       }
                       className="denty-field min-h-[90px] text-sm"
-                      placeholder="Social and family history"
+                      placeholder={t("doctor.report.ph_social_history")}
                     />
                   </div>
                 </div>
 
                 <div className="rounded-[24px] border border-white/10 bg-white/22 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Examination and imaging
+                    {t("doctor.report.examination_imaging")}
                   </p>
                   <div className="mt-3 space-y-3">
                     <textarea
@@ -434,7 +470,7 @@ export function DoctorReportWorkspace({
                         onReportFieldChange("extraOralFindings", event.target.value)
                       }
                       className="denty-field min-h-[80px] text-sm"
-                      placeholder="Extra-oral findings"
+                      placeholder={t("doctor.report.ph_extra_oral")}
                     />
                     <textarea
                       value={reportFormData.intraOralFindings}
@@ -442,7 +478,7 @@ export function DoctorReportWorkspace({
                         onReportFieldChange("intraOralFindings", event.target.value)
                       }
                       className="denty-field min-h-[80px] text-sm"
-                      placeholder="Intra-oral findings"
+                      placeholder={t("doctor.report.ph_intra_oral")}
                     />
                     <div className="flex flex-wrap gap-2">
                       {VIEW_OPTIONS.map((value) => (
@@ -467,7 +503,7 @@ export function DoctorReportWorkspace({
                         onReportFieldChange("radiographicFindings", event.target.value)
                       }
                       className="denty-field min-h-[90px] text-sm"
-                      placeholder="Radiographic findings"
+                      placeholder={t("doctor.report.ph_radiographic")}
                     />
                   </div>
                 </div>
@@ -475,7 +511,7 @@ export function DoctorReportWorkspace({
 
               <div className="rounded-[24px] border border-white/10 bg-white/22 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                  Diagnosis of main problems
+                  {t("doctor.report.diagnosis")}
                 </p>
                 <div className="mt-3 grid gap-3 md:grid-cols-3">
                   {reportFormData.diagnosisLines.map((line, index) => (
@@ -484,7 +520,9 @@ export function DoctorReportWorkspace({
                       value={line}
                       onChange={(event) => onDiagnosisLineChange(index, event.target.value)}
                       className="denty-field text-sm"
-                      placeholder={`Diagnosis ${index + 1}`}
+                      placeholder={t("doctor.report.ph_diagnosis", {
+                        n: index + 1,
+                      })}
                     />
                   ))}
                 </div>
@@ -492,7 +530,7 @@ export function DoctorReportWorkspace({
 
               <div className="rounded-[24px] border border-white/10 bg-white/22 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                  Treatment plan
+                  {t("doctor.report.treatment_plan")}
                 </p>
                 <div className="mt-3 grid gap-3">
                   {reportFormData.treatmentVisits.map((visit, index) => (
@@ -509,7 +547,7 @@ export function DoctorReportWorkspace({
                           onTreatmentVisitChange(index, "tooth", event.target.value)
                         }
                         className="denty-field text-sm"
-                        placeholder="Tooth"
+                        placeholder={t("doctor.report.ph_tooth")}
                       />
                       <input
                         value={visit.procedure}
@@ -517,7 +555,7 @@ export function DoctorReportWorkspace({
                           onTreatmentVisitChange(index, "procedure", event.target.value)
                         }
                         className="denty-field text-sm"
-                        placeholder="Procedure"
+                        placeholder={t("doctor.report.ph_procedure")}
                       />
                     </div>
                   ))}
@@ -527,7 +565,7 @@ export function DoctorReportWorkspace({
               {doctorWorkspace?.clinicTasks?.length ? (
                 <div className="space-y-3">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Clinic tasks worked on today
+                    {t("doctor.report.clinic_tasks")}
                   </p>
                   <div className="grid gap-3 md:grid-cols-2">
                     {doctorWorkspace.clinicTasks.map((task) => (
@@ -559,27 +597,27 @@ export function DoctorReportWorkspace({
               <div className="grid gap-4 md:grid-cols-[0.8fr_1.2fr]">
                 <div className="rounded-[24px] border border-white/10 bg-white/22 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Faculty notes for the patient
+                    {t("doctor.report.faculty_notes_patient")}
                   </p>
                   <textarea
                     value={completionNotes}
                     onChange={(event) => onCompletionNotesChange(event.target.value)}
                     className="denty-field mt-3 min-h-[120px] text-sm"
-                    placeholder="Post-visit notes, instructions, and next steps"
+                    placeholder={t("doctor.report.ph_completion_notes")}
                   />
                   <button
                     onClick={onCompleteAppointment}
                     className="denty-button-secondary mt-3 w-full px-4 py-3 text-sm font-semibold"
                   >
                     {selectedReport.status === "COMPLETED"
-                      ? "Update completion notes"
-                      : "Mark visit completed"}
+                      ? t("doctor.report.update_completion")
+                      : t("doctor.report.mark_completed")}
                   </button>
                 </div>
 
                 <div className="rounded-[24px] border border-white/10 bg-white/22 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Rate the patient
+                    {t("doctor.report.rate_patient")}
                   </p>
                   <div className="mt-3 grid gap-3 md:grid-cols-[0.35fr_1fr]">
                     <select
@@ -589,7 +627,9 @@ export function DoctorReportWorkspace({
                     >
                       {STAR_OPTIONS.map((value) => (
                         <option key={value} value={value}>
-                          {value.toFixed(1)} stars
+                          {t("doctor.profile.stars", {
+                            value: value.toFixed(1),
+                          })}
                         </option>
                       ))}
                     </select>
@@ -597,7 +637,7 @@ export function DoctorReportWorkspace({
                       value={patientFeedbackForm.comment}
                       onChange={(event) => onPatientCommentChange(event.target.value)}
                       className="denty-field text-sm"
-                      placeholder="Attendance, cooperation, or case notes"
+                      placeholder={t("doctor.report.ph_patient_comment")}
                     />
                   </div>
                   {canRatePatient ? (
@@ -605,11 +645,11 @@ export function DoctorReportWorkspace({
                       onClick={onSubmitPatientFeedback}
                       className="denty-button-secondary mt-3 w-full px-4 py-3 text-sm font-semibold"
                     >
-                      Save patient feedback
+                      {t("doctor.report.save_patient_feedback")}
                     </button>
                   ) : (
                     <p className="mt-3 text-sm text-[var(--muted-foreground)]">
-                      Patient feedback opens after you mark the visit as completed.
+                      {t("doctor.report.feedback_locked")}
                     </p>
                   )}
                 </div>
@@ -617,14 +657,14 @@ export function DoctorReportWorkspace({
 
               <div className="rounded-[24px] border border-white/10 bg-white/22 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                  Notes to faculty
+                  {t("doctor.report.notes_faculty")}
                 </p>
                 <textarea
                   value={reportFormData.facultyNotes}
                   onChange={(event) => onReportFieldChange("facultyNotes", event.target.value)}
                   rows={4}
                   className="denty-field mt-3 text-sm"
-                  placeholder="Optional notes for faculty review"
+                  placeholder={t("doctor.report.ph_faculty_notes")}
                 />
               </div>
 
@@ -634,7 +674,7 @@ export function DoctorReportWorkspace({
                   disabled={!canSendReport}
                   className="denty-button-primary px-5 py-3 text-sm disabled:cursor-not-allowed disabled:opacity-55"
                 >
-                  Send report
+                  {t("doctor.report.send_report")}
                 </button>
               </div>
 
@@ -645,11 +685,10 @@ export function DoctorReportWorkspace({
           ) : (
             <div className="flex h-full min-h-[30rem] flex-col items-center justify-center text-center text-[var(--muted-foreground)]">
               <p className="text-xl font-semibold text-[var(--foreground)]">
-                Select an appointment to report on
+                {t("doctor.report.empty_title")}
               </p>
               <p className="mt-3 max-w-xl text-sm leading-7">
-                Open any approved or completed appointment from the left lane to confirm the visit,
-                capture patient notes, and submit the case to the supervisor.
+                {t("doctor.report.empty_body")}
               </p>
             </div>
           )}

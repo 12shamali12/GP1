@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 type PatientAppointmentModalProps = {
   appointment: any | null;
@@ -20,6 +21,7 @@ export function PatientAppointmentModal({
   onCancelReservation,
   onRateDoctor,
 }: PatientAppointmentModalProps) {
+  const t = useTranslation();
   const [stars, setStars] = useState("5");
   const [comment, setComment] = useState("");
 
@@ -42,10 +44,15 @@ export function PatientAppointmentModal({
   const doctorName =
     appointment.slot?.doctor?.name ||
     appointment.doctor?.name ||
-    "Doctor";
+    t("patient.common.doctor");
   const clinicName =
-    appointment.clinicCase?.clinic?.name || appointment.slot?.clinic?.name || "Clinic";
-  const caseTitle = appointment.clinicCase?.title || appointment.slot?.purpose || "General";
+    appointment.clinicCase?.clinic?.name ||
+    appointment.slot?.clinic?.name ||
+    t("patient.common.clinic");
+  const caseTitle =
+    appointment.clinicCase?.title ||
+    appointment.slot?.purpose ||
+    t("patient.common.general");
   const reportRejected = appointment.report?.status === "CASE_REJECTED";
   const canRate = appointment.status === "COMPLETED" && !reportRejected;
 
@@ -54,16 +61,19 @@ export function PatientAppointmentModal({
       <div className="denty-modal w-full max-w-2xl space-y-5 rounded-[22px] p-6">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <p className="denty-kicker">Appointment history</p>
+            <p className="denty-kicker">{t("patient.appt.history")}</p>
             <h3 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
               {caseTitle}
             </h3>
             <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-              {clinicName} with Dr. {doctorName}
+              {t("patient.appt.with_doctor", {
+                clinic: clinicName,
+                doctor: doctorName,
+              })}
             </p>
           </div>
           <button onClick={onClose} className="denty-action px-3 py-2 text-[11px]">
-            Close
+            {t("patient.common.close")}
           </button>
         </div>
 
@@ -106,34 +116,36 @@ export function PatientAppointmentModal({
                     href={`/profiles/${appointment.slot?.doctor?.id || appointment.doctor?.id}`}
                     className="text-lg font-semibold text-[var(--foreground)] hover:text-[rgba(7,111,133,0.96)]"
                   >
-                    Dr. {doctorName}
+                    {t("patient.appt.doctor_prefix", { name: doctorName })}
                   </Link>
                 ) : (
                   <p className="text-lg font-semibold text-[var(--foreground)]">
-                    Dr. {doctorName}
+                    {t("patient.appt.doctor_prefix", { name: doctorName })}
                   </p>
                 )}
                 <p className="text-xs text-[var(--muted-foreground)]">
                   {appointment.doctor?.doctorIdNumber
-                    ? `Student ID ${appointment.doctor.doctorIdNumber}`
-                    : "Student clinic doctor"}
+                    ? t("patient.appt.student_id", {
+                        value: appointment.doctor.doctorIdNumber,
+                      })
+                    : t("patient.appt.student_clinic_doctor")}
                 </p>
               </div>
             </div>
 
             <div className="space-y-2 text-sm text-[var(--foreground)]">
               <p>
-                <span className="font-semibold">Date:</span>{" "}
+                <span className="font-semibold">{t("patient.appt.date")}</span>{" "}
                 {appointment.slot?.startTime
                   ? new Date(appointment.slot.startTime).toLocaleDateString(undefined, {
                       weekday: "long",
                       month: "short",
                       day: "numeric",
                     })
-                  : "Unknown"}
+                  : t("patient.common.unknown")}
               </p>
               <p>
-                <span className="font-semibold">Time:</span>{" "}
+                <span className="font-semibold">{t("patient.appt.time")}</span>{" "}
                 {appointment.slot?.startTime
                   ? new Date(appointment.slot.startTime).toLocaleTimeString([], {
                       hour: "2-digit",
@@ -148,17 +160,22 @@ export function PatientAppointmentModal({
                   : ""}
               </p>
               <p>
-                <span className="font-semibold">Status:</span> {appointment.status}
+                <span className="font-semibold">{t("patient.appt.status")}</span>{" "}
+                {appointment.status}
               </p>
               <p>
-                <span className="font-semibold">Clinic:</span> {clinicName}
+                <span className="font-semibold">{t("patient.appt.clinic")}</span>{" "}
+                {clinicName}
               </p>
               <p>
-                <span className="font-semibold">Case:</span> {caseTitle}
+                <span className="font-semibold">{t("patient.appt.case")}</span>{" "}
+                {caseTitle}
               </p>
               {appointment.partnerDoctor?.name ? (
                 <p>
-                  <span className="font-semibold">Paired with:</span>{" "}
+                  <span className="font-semibold">
+                    {t("patient.appt.paired_with")}
+                  </span>{" "}
                   {appointment.partnerDoctor.id ? (
                     <Link
                       href={`/profiles/${appointment.partnerDoctor.id}`}
@@ -176,7 +193,7 @@ export function PatientAppointmentModal({
             {appointment.doctorCompletionNotes ? (
               <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                  Visit notes
+                  {t("patient.appt.visit_notes")}
                 </p>
                 <p className="mt-3 text-sm leading-7 text-[var(--foreground)]">
                   {appointment.doctorCompletionNotes}
@@ -188,13 +205,17 @@ export function PatientAppointmentModal({
           <div className="denty-dashboard-card-soft space-y-4 p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="denty-kicker">Feedback</p>
+                <p className="denty-kicker">{t("patient.appt.feedback")}</p>
                 <h4 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
-                  Rate this appointment
+                  {t("patient.appt.rate_appointment")}
                 </h4>
               </div>
               {patientRating ? (
-                <span className="denty-pill">Saved {patientRating.stars}/5</span>
+                <span className="denty-pill">
+                  {t("patient.appt.saved_rating", {
+                    stars: patientRating.stars,
+                  })}
+                </span>
               ) : null}
             </div>
 
@@ -208,7 +229,7 @@ export function PatientAppointmentModal({
                   >
                     {STAR_OPTIONS.map((value) => (
                       <option key={value} value={value}>
-                        {value.toFixed(1)} stars
+                        {t("patient.appt.stars", { value: value.toFixed(1) })}
                       </option>
                     ))}
                   </select>
@@ -216,17 +237,16 @@ export function PatientAppointmentModal({
                     value={comment}
                     onChange={(event) => setComment(event.target.value)}
                     className="denty-field text-sm"
-                    placeholder="Add a comment about the visit"
+                    placeholder={t("patient.appt.comment_placeholder")}
                   />
                 </div>
 
                 <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                    Why this matters
+                    {t("patient.appt.why_matters")}
                   </p>
                   <p className="mt-3 text-sm leading-7 text-[var(--foreground)]">
-                    Your rating updates the student profile plus the overall and
-                    semester leaderboards after the case is accepted by the supervisor.
+                    {t("patient.appt.why_matters_note")}
                   </p>
                 </div>
 
@@ -235,13 +255,15 @@ export function PatientAppointmentModal({
                     onClick={() => onRateDoctor(Number(stars), comment)}
                     className="denty-button-primary px-4 py-3 text-sm font-semibold"
                   >
-                    {patientRating ? "Update rating" : "Submit rating"}
+                    {patientRating
+                      ? t("patient.appt.update_rating")
+                      : t("patient.appt.submit_rating")}
                   </button>
                   <button
                     onClick={onClose}
                     className="denty-button-secondary px-4 py-3 text-sm font-semibold"
                   >
-                    Later
+                    {t("patient.appt.later")}
                   </button>
                 </div>
               </>
@@ -249,8 +271,8 @@ export function PatientAppointmentModal({
               <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
                 <p className="text-sm leading-7 text-[var(--foreground)]">
                   {reportRejected
-                    ? "The case is still under faculty correction, so this rating is temporarily unavailable."
-                    : "Ratings open after the doctor marks the appointment as completed."}
+                    ? t("patient.appt.rating_rejected")
+                    : t("patient.appt.rating_locked")}
                 </p>
               </div>
             )}
@@ -261,7 +283,9 @@ export function PatientAppointmentModal({
                 disabled={cancellingId === appointment.id}
                 className="denty-action denty-action-danger w-full px-3 py-3 text-sm disabled:opacity-60"
               >
-                {cancellingId === appointment.id ? "Cancelling..." : "Cancel reservation"}
+                {cancellingId === appointment.id
+                  ? t("patient.appt.cancelling")
+                  : t("patient.appt.cancel_reservation")}
               </button>
             ) : null}
           </div>

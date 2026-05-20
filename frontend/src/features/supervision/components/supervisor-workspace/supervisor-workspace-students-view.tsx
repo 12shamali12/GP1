@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { Dispatch, SetStateAction } from "react";
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { SupervisorWorkspaceData } from "../../types";
 
 type Props = {
@@ -33,28 +34,39 @@ export function SupervisorWorkspaceStudentsView({
   submitTask,
   unfreezeDoctor,
 }: Props) {
+  const t = useTranslation();
   return (
     <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
       <div className="denty-panel-strong p-6">
-        <p className="denty-kicker">Tasks</p>
-        <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Assign tasks</h2>
+        <p className="denty-kicker">{t("supervision.sup.students.tasks_eyebrow")}</p>
+        <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+          {t("supervision.sup.students.tasks_title")}
+        </h2>
         <div className="mt-5 grid gap-3">
           <select value={taskForm.targetType} onChange={(e) => setTaskForm((prev) => ({ ...prev, targetType: e.target.value as "doctor" | "group" }))} className="denty-field text-sm">
-            <option value="doctor">Single student</option>
-            <option value="group">Whole group</option>
+            <option value="doctor">
+              {t("supervision.sup.students.target_single")}
+            </option>
+            <option value="group">
+              {t("supervision.sup.students.target_group")}
+            </option>
           </select>
           {taskForm.targetType === "group" ? (
             <select value={taskForm.groupId} onChange={(e) => setTaskForm((prev) => ({ ...prev, groupId: e.target.value }))} className="denty-field text-sm">
-              <option value="">Choose group</option>
+              <option value="">
+                {t("supervision.sup.students.choose_group")}
+              </option>
               {workspace?.groupDirectory.map((group) => <option key={group.id} value={group.id}>{group.name} - {group.semesterLabel}</option>)}
             </select>
           ) : (
-            <input value={selectedStudentName} readOnly className="denty-field text-sm" placeholder="Choose a student from Student finder" />
+            <input value={selectedStudentName} readOnly className="denty-field text-sm" placeholder={t("supervision.sup.students.choose_student")} />
           )}
-          <input value={taskForm.title} onChange={(e) => setTaskForm((prev) => ({ ...prev, title: e.target.value }))} className="denty-field text-sm" placeholder="Task title" />
-          <textarea value={taskForm.description} onChange={(e) => setTaskForm((prev) => ({ ...prev, description: e.target.value }))} className="denty-field min-h-[110px] text-sm" placeholder="Task description" />
+          <input value={taskForm.title} onChange={(e) => setTaskForm((prev) => ({ ...prev, title: e.target.value }))} className="denty-field text-sm" placeholder={t("supervision.sup.students.task_title_placeholder")} />
+          <textarea value={taskForm.description} onChange={(e) => setTaskForm((prev) => ({ ...prev, description: e.target.value }))} className="denty-field min-h-[110px] text-sm" placeholder={t("supervision.sup.students.task_desc_placeholder")} />
           <input type="datetime-local" value={taskForm.dueAt} onChange={(e) => setTaskForm((prev) => ({ ...prev, dueAt: e.target.value }))} className="denty-field text-sm" />
-          <button onClick={submitTask} className="denty-button-primary px-4 py-3 text-sm font-semibold">Assign task</button>
+          <button onClick={submitTask} className="denty-button-primary px-4 py-3 text-sm font-semibold">
+            {t("supervision.sup.students.assign_task")}
+          </button>
         </div>
 
         <div className="mt-5 space-y-3">
@@ -74,18 +86,26 @@ export function SupervisorWorkspaceStudentsView({
                   </p>
                 </div>
                 <button onClick={() => unfreezeDoctor(freeze.doctor.id)} className="rounded-full border border-emerald-600/28 bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700">
-                  Unfreeze
+                  {t("supervision.sup.students.unfreeze")}
                 </button>
               </div>
-              <p className="mt-3 text-sm text-[var(--muted-foreground)]">Until {new Date(freeze.blockedUntil).toLocaleString()}</p>
+              <p className="mt-3 text-sm text-[var(--muted-foreground)]">
+                {t("supervision.sup.students.frozen_until", {
+                  date: new Date(freeze.blockedUntil).toLocaleString(),
+                })}
+              </p>
             </div>
           ))}
         </div>
       </div>
 
       <div className="denty-panel-strong p-6">
-        <p className="denty-kicker">Group directory</p>
-        <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">Browse groups and pairs</h2>
+        <p className="denty-kicker">
+          {t("supervision.sup.students.directory_eyebrow")}
+        </p>
+        <h2 className="mt-3 text-2xl font-semibold text-[var(--foreground)]">
+          {t("supervision.sup.students.directory_title")}
+        </h2>
         <div className="mt-5 space-y-4">
           {workspace?.groupDirectory.map((group) => (
             <div key={group.id} className="denty-dashboard-card p-5">
@@ -94,11 +114,17 @@ export function SupervisorWorkspaceStudentsView({
                   <p className="text-xl font-semibold text-[var(--foreground)]">{group.name}</p>
                   <p className="mt-2 text-sm text-[var(--muted-foreground)]">{group.semesterLabel}</p>
                 </div>
-                <span className="denty-pill">{group.members.length} students</span>
+                <span className="denty-pill">
+                  {t("supervision.sup.students.students_count", {
+                    count: group.members.length,
+                  })}
+                </span>
               </div>
               <div className="mt-4 grid gap-4 lg:grid-cols-2">
                 <div className="denty-dashboard-card-soft p-4">
-                  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.52)]">Students</p>
+                  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.52)]">
+                    {t("supervision.sup.students.students")}
+                  </p>
                   <div className="mt-3 space-y-2">
                     {group.members.map((member) => (
                       <p key={member.doctor.id} className="text-sm text-[var(--foreground)]">
@@ -114,7 +140,9 @@ export function SupervisorWorkspaceStudentsView({
                   </div>
                 </div>
                 <div className="denty-dashboard-card-soft p-4">
-                  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.52)]">Pairs</p>
+                  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.52)]">
+                    {t("supervision.sup.students.pairs")}
+                  </p>
                   <div className="mt-3 space-y-2">
                     {group.partnerPairs?.map((pair) => (
                       <p key={pair.id} className="text-sm text-[var(--foreground)]">
@@ -133,7 +161,11 @@ export function SupervisorWorkspaceStudentsView({
                         </Link>
                       </p>
                     ))}
-                    {!group.partnerPairs?.length ? <p className="text-sm text-[var(--muted-foreground)]">No confirmed pairs yet.</p> : null}
+                    {!group.partnerPairs?.length ? (
+                      <p className="text-sm text-[var(--muted-foreground)]">
+                        {t("supervision.sup.students.no_pairs")}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
               </div>

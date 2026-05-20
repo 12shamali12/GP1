@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 type PatientSlotModalProps = {
   slot: any | null;
@@ -21,6 +22,8 @@ export function PatientSlotModal({
   onCancel,
   onReserve,
 }: PatientSlotModalProps) {
+  const t = useTranslation();
+
   if (!slot) return null;
 
   const selectedCase =
@@ -33,13 +36,15 @@ export function PatientSlotModal({
       <div className="denty-modal w-full max-w-2xl space-y-5 rounded-[22px] p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="denty-kicker">Reservation summary</p>
+            <p className="denty-kicker">{t("patient.slot.summary")}</p>
             <h3 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
-              {selectedCase?.title || slot.purpose || "Clinic appointment"}
+              {selectedCase?.title ||
+                slot.purpose ||
+                t("patient.slot.appointment_fallback")}
             </h3>
           </div>
           <button onClick={onClose} className="denty-action px-3 py-2 text-[11px]">
-            Close
+            {t("patient.common.close")}
           </button>
         </div>
 
@@ -82,17 +87,23 @@ export function PatientSlotModal({
                     href={`/profiles/${slot.doctor.id}`}
                     className="text-lg font-semibold text-[var(--foreground)] hover:text-[rgba(7,111,133,0.96)]"
                   >
-                    Dr. {slot.doctor?.name || "Unknown"}
+                    {t("patient.appt.doctor_prefix", {
+                      name: slot.doctor?.name || t("patient.common.unknown"),
+                    })}
                   </Link>
                 ) : (
                   <p className="text-lg font-semibold text-[var(--foreground)]">
-                    Dr. {slot.doctor?.name || "Unknown"}
+                    {t("patient.appt.doctor_prefix", {
+                      name: slot.doctor?.name || t("patient.common.unknown"),
+                    })}
                   </p>
                 )}
                 <p className="text-xs text-[var(--muted-foreground)]">
                   {slot.doctor?.doctorIdNumber
-                    ? `Student ID ${slot.doctor.doctorIdNumber}`
-                    : "Student clinic doctor"}
+                    ? t("patient.slot.student_id", {
+                        value: slot.doctor.doctorIdNumber,
+                      })
+                    : t("patient.slot.student_clinic_doctor")}
                 </p>
               </div>
             </div>
@@ -116,24 +127,32 @@ export function PatientSlotModal({
                   minute: "2-digit",
                 })}
               </p>
-              <p>Clinic: {slot.clinic?.name || "Clinic"}</p>
-              <p>Doctor phone: {slot.doctor?.phone || "Not provided"}</p>
+              <p>
+                {t("patient.slot.clinic_label", {
+                  value: slot.clinic?.name || t("patient.common.clinic"),
+                })}
+              </p>
+              <p>
+                {t("patient.slot.doctor_phone", {
+                  value:
+                    slot.doctor?.phone || t("patient.slot.phone_not_provided"),
+                })}
+              </p>
             </div>
 
             <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                Pair-aware booking
+                {t("patient.slot.pair_aware")}
               </p>
               <p className="mt-3 text-sm leading-7 text-[var(--foreground)]">
-                This reservation locks the paired student on the same shift too, so the case stays
-                with one working pair only.
+                {t("patient.slot.pair_aware_note")}
               </p>
               {slot.doctor?.id ? (
                 <Link
                   href={`/profiles/${slot.doctor.id}`}
                   className="mt-4 inline-flex rounded-full border border-white/12 bg-white/28 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[rgba(10,22,40,0.62)] hover:bg-white/38"
                 >
-                  View profile
+                  {t("patient.common.view_profile")}
                 </Link>
               ) : null}
             </div>
@@ -142,14 +161,16 @@ export function PatientSlotModal({
           <div className="denty-dashboard-card-soft space-y-4 p-5">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="denty-kicker">Case selection</p>
+                <p className="denty-kicker">{t("patient.slot.case_selection")}</p>
                 <h4 className="mt-2 text-xl font-semibold text-[var(--foreground)]">
-                  {selectedCase?.title || "Choose a clinic case"}
+                  {selectedCase?.title || t("patient.slot.choose_case")}
                 </h4>
               </div>
               <span className="denty-pill">
-                {(slot.caseOptions || []).length} open case
-                {(slot.caseOptions || []).length === 1 ? "" : "s"}
+                {t("patient.slot.open_cases", {
+                  count: (slot.caseOptions || []).length,
+                  plural: (slot.caseOptions || []).length === 1 ? "" : "s",
+                })}
               </span>
             </div>
 
@@ -170,11 +191,10 @@ export function PatientSlotModal({
 
             <div className="rounded-[22px] border border-white/10 bg-white/22 p-4">
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--muted-foreground)]">
-                Booking outcome
+                {t("patient.slot.booking_outcome")}
               </p>
               <p className="mt-3 text-sm leading-7 text-[var(--foreground)]">
-                The request stays pending until the student approves it. If the visit is cancelled,
-                both paired slots become visible again.
+                {t("patient.slot.booking_outcome_note")}
               </p>
             </div>
           </div>
@@ -185,14 +205,18 @@ export function PatientSlotModal({
             onClick={onCancel}
             className="denty-button-secondary flex-1 px-3 py-2 text-sm font-semibold"
           >
-            Cancel
+            {t("patient.common.cancel")}
           </button>
           <button
             onClick={onReserve}
             disabled={loading || pendingSlotId === slot.id}
             className="denty-button-primary flex-1 px-3 py-2 text-sm font-semibold disabled:opacity-60"
           >
-            {pendingSlotId === slot.id ? "Pending" : loading ? "Reserving..." : "Reserve"}
+            {pendingSlotId === slot.id
+              ? t("patient.slot.pending")
+              : loading
+                ? t("patient.slot.reserving")
+                : t("patient.slot.reserve")}
           </button>
         </div>
       </div>

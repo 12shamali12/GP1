@@ -1,6 +1,7 @@
 "use client";
 
 import { AdminShell } from "@/features/admin/components/admin-shell";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
 import { useAdminGroupModerationWorkspace } from "./hooks/use-admin-group-moderation-workspace";
 import { ModerationJoinRequestsView } from "./ui/moderation-join-requests-view";
@@ -10,6 +11,7 @@ import { ModerationStudentsView } from "./ui/moderation-students-view";
 import { ModerationTabNav } from "./ui/moderation-tab-nav";
 
 export default function AdminGroupModerationPage() {
+  const t = useTranslation();
   const {
     loading,
     error,
@@ -38,32 +40,31 @@ export default function AdminGroupModerationPage() {
     error,
     clearMessage: () => setMessage(null),
     clearError: () => setError(null),
-    messageTitle: "Moderation updated",
-    errorTitle: "Moderation issue",
+    messageTitle: t("admin.mod.toast_updated"),
+    errorTitle: t("admin.mod.toast_issue"),
   });
 
   return (
     <AdminShell
-      title="Group Moderation Desk"
-      description="Review join requests, approve partner requests, remove students from groups, and dissolve pairs from one dedicated moderation workspace."
+      title={t("admin.mod.title")}
+      description={t("admin.mod.description")}
     >
       <div className="denty-panel-strong p-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
-            <p className="denty-kicker">Moderation tabs</p>
+            <p className="denty-kicker">{t("admin.mod.tabs_eyebrow")}</p>
             <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
-              Group requests and membership controls
+              {t("admin.mod.tabs_heading")}
             </h2>
             <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-              The groups page now stays focused on group setup and planning.
-              This page carries the real review queue.
+              {t("admin.mod.tabs_intro")}
             </p>
           </div>
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search by student, ID, or group"
+            placeholder={t("admin.mod.search_placeholder")}
             className="denty-field max-w-[360px] text-sm"
           />
         </div>
@@ -74,7 +75,7 @@ export default function AdminGroupModerationPage() {
       {loading ? (
         <div className="denty-panel-strong p-5">
           <p className="text-sm text-[var(--muted-foreground)]">
-            Loading moderation desk...
+            {t("admin.mod.loading")}
           </p>
         </div>
       ) : null}

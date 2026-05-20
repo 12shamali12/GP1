@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "@/features/i18n/language-provider";
 import { usePublicProfile } from "@/features/profiles/hooks/use-public-profile";
 import { BrandMark } from "@/features/ui/components/brand-mark";
 import { ComingSoonModal } from "@/features/ui/components/coming-soon-modal";
@@ -32,6 +33,7 @@ type SupervisorSurface =
   | "settings";
 
 export default function SupervisorPage() {
+  const t = useTranslation();
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
   const [activeSurface, setActiveSurface] = useState<SupervisorSurface>("overview");
   const [error, setError] = useState<string | null>(null);
@@ -85,8 +87,8 @@ export default function SupervisorPage() {
     error,
     clearMessage: () => setMessage(null),
     clearError: () => setError(null),
-    messageTitle: "Supervisor profile",
-    errorTitle: "Supervisor profile",
+    messageTitle: t("supervisor.common.toast_profile"),
+    errorTitle: t("supervisor.common.toast_profile"),
   });
 
   useFeedbackToast({
@@ -94,8 +96,8 @@ export default function SupervisorPage() {
     error: leaderboardError,
     clearMessage: () => undefined,
     clearError: () => setLeaderboardError(null),
-    messageTitle: "Leaderboard",
-    errorTitle: "Leaderboard",
+    messageTitle: t("supervisor.common.toast_leaderboard"),
+    errorTitle: t("supervisor.common.toast_leaderboard"),
   });
 
   useEffect(() => {
@@ -114,7 +116,7 @@ export default function SupervisorPage() {
       })
       .catch((e: any) => {
         if (!cancelled) {
-          setLeaderboardError(e?.message || "Failed to load leaderboard.");
+          setLeaderboardError(e?.message || t("supervisor.common.failed_leaderboard"));
         }
       })
       .finally(() => {
@@ -258,61 +260,87 @@ export default function SupervisorPage() {
     { eyebrow: string; title: string; description: string; badges: string[] }
   > = {
     overview: {
-      eyebrow: "Workspace",
-      title: "Supervisor clinical desk",
-      description:
-        "Review students, clinics, reports, tasks, and exams from one structured supervision workspace.",
+      eyebrow: t("supervisor.surface.overview.eyebrow"),
+      title: t("supervisor.surface.overview.title"),
+      description: t("supervisor.surface.overview.description"),
       badges: [
-        `${workspacePreview?.stats.supervisedDoctors || 0} students`,
-        `${workspacePreview?.stats.pendingReports || 0} reports`,
-        `${workspacePreview?.stats.groups || 0} groups`,
+        t("supervisor.surface.overview.students", {
+          count: workspacePreview?.stats.supervisedDoctors || 0,
+        }),
+        t("supervisor.surface.overview.reports", {
+          count: workspacePreview?.stats.pendingReports || 0,
+        }),
+        t("supervisor.surface.overview.groups", {
+          count: workspacePreview?.stats.groups || 0,
+        }),
       ],
     },
     profile: {
-      eyebrow: "Identity",
-      title: "Supervisor profile",
-      description:
-        "Update your supervisor identity, contact details, and account credentials without leaving the main page.",
-      badges: ["Account", "Security", "Profile"],
+      eyebrow: t("supervisor.surface.profile.eyebrow"),
+      title: t("supervisor.surface.profile.title"),
+      description: t("supervisor.surface.profile.description"),
+      badges: [
+        t("supervisor.surface.profile.badge1"),
+        t("supervisor.surface.profile.badge2"),
+        t("supervisor.surface.profile.badge3"),
+      ],
     },
     notifications: {
-      eyebrow: "Alerts",
-      title: "Notification center",
-      description:
-        "Read and action supervisor updates from one visible stream instead of opening drawer overlays.",
-      badges: [`${unreadNotifications} unread`, "Inbox", "Signals"],
+      eyebrow: t("supervisor.surface.notifications.eyebrow"),
+      title: t("supervisor.surface.notifications.title"),
+      description: t("supervisor.surface.notifications.description"),
+      badges: [
+        t("supervisor.surface.notifications.unread", {
+          count: unreadNotifications,
+        }),
+        t("supervisor.surface.notifications.badge2"),
+        t("supervisor.surface.notifications.badge3"),
+      ],
     },
     calendar: {
-      eyebrow: "Schedule",
-      title: "Calendar and clinic coverage",
-      description:
-        "See assigned clinic duties and upcoming exams in one supervision calendar view.",
+      eyebrow: t("supervisor.surface.calendar.eyebrow"),
+      title: t("supervisor.surface.calendar.title"),
+      description: t("supervisor.surface.calendar.description"),
       badges: [
-        `${workspacePreview?.clinicOverview.length || 0} duties`,
-        `${workspacePreview?.upcomingExams.length || 0} exams`,
-        "Coverage",
+        t("supervisor.surface.calendar.duties", {
+          count: workspacePreview?.clinicOverview.length || 0,
+        }),
+        t("supervisor.surface.calendar.exams", {
+          count: workspacePreview?.upcomingExams.length || 0,
+        }),
+        t("supervisor.surface.calendar.coverage"),
       ],
     },
     chat: {
-      eyebrow: "Communication",
-      title: "Chat and room workspace",
-      description:
-        "Search, open, and continue direct conversations and shared rooms from an always-visible supervisor desk.",
-      badges: ["Direct chat", "Rooms", "Attachments"],
+      eyebrow: t("supervisor.surface.chat.eyebrow"),
+      title: t("supervisor.surface.chat.title"),
+      description: t("supervisor.surface.chat.description"),
+      badges: [
+        t("supervisor.surface.chat.badge1"),
+        t("supervisor.surface.chat.badge2"),
+        t("supervisor.surface.chat.badge3"),
+      ],
     },
     leaderboard: {
-      eyebrow: "Standings",
-      title: "Academic leaderboard",
-      description:
-        "Review where each student stands across the program, then dig into any semester cohort to compare peers.",
-      badges: ["Overall ranking", "Semester cohorts", "Student progress"],
+      eyebrow: t("supervisor.surface.leaderboard.eyebrow"),
+      title: t("supervisor.surface.leaderboard.title"),
+      description: t("supervisor.surface.leaderboard.description"),
+      badges: [
+        t("supervisor.surface.leaderboard.badge1"),
+        t("supervisor.surface.leaderboard.badge2"),
+        t("supervisor.surface.leaderboard.badge3"),
+      ],
     },
     settings: {
-      eyebrow: "Preferences",
-      title: "Supervisor settings",
-      description:
-        "Theme, language, notifications, and account controls grouped into one calm preferences surface.",
-      badges: ["Appearance", "Language", "Notifications", "Account"],
+      eyebrow: t("supervisor.surface.settings.eyebrow"),
+      title: t("supervisor.surface.settings.title"),
+      description: t("supervisor.surface.settings.description"),
+      badges: [
+        t("supervisor.surface.settings.badge1"),
+        t("supervisor.surface.settings.badge2"),
+        t("supervisor.surface.settings.badge3"),
+        t("supervisor.surface.settings.badge4"),
+      ],
     },
   };
 
@@ -336,13 +364,13 @@ export default function SupervisorPage() {
 
         <div className="denty-shell denty-dashboard-layout relative mx-0 max-w-none space-y-4 lg:space-y-0">
           <RoleShellLayout
-            topbarEyebrow="Supervisor"
+            topbarEyebrow={t("supervisor.common.topbar")}
             notificationCount={unreadNotifications}
             onNotificationsClick={() => setActiveSurface("notifications")}
             onProfileClick={() => setActiveSurface("profile")}
             sideRail={
               <SupervisorSideRail
-                userName={user.name || "Supervisor"}
+                userName={user.name || t("supervisor.common.supervisor")}
                 activeView={activeSurface}
                 unreadNotifications={unreadNotifications}
                 chatUnreadCount={chatUnreadCount}
@@ -364,7 +392,7 @@ export default function SupervisorPage() {
                   <div className="flex items-center gap-3">
                     <BrandMark className="h-14 w-14 frozen-float" />
                     <span className="rounded-full border border-white/20 bg-white/26 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-[rgba(10,22,40,0.64)]">
-                      Supervisor workspace
+                      {t("supervisor.common.workspace_badge")}
                     </span>
                   </div>
 

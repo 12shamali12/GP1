@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslation } from "@/features/i18n/language-provider";
 import type { ChatUser, ConversationItem } from "@/features/chat/types/chat";
 
 type AdminChatInboxPanelProps = {
@@ -26,39 +27,44 @@ export function AdminChatInboxPanel({
   onStartConversation,
   onSelectConversation,
 }: AdminChatInboxPanelProps) {
+  const t = useTranslation();
   const getConversationTitle = (conversation: ConversationItem) =>
     conversation.kind === "ROOM"
-      ? conversation.title || "Shared room"
+      ? conversation.title || t("admin.chat.shared_room")
       : conversation.otherUser?.name ||
         conversation.otherUser?.username ||
-        "Conversation";
+        t("admin.chat.conversation");
 
   const getConversationMeta = (conversation: ConversationItem) =>
     conversation.kind === "ROOM"
       ? conversation.description ||
         (conversation.group
-          ? `${conversation.group.name} | ${conversation.group.semesterLabel || "Group"}`
-          : "Shared room")
+          ? `${conversation.group.name} | ${conversation.group.semesterLabel || t("admin.chat.group_fallback")}`
+          : t("admin.chat.shared_room"))
       : conversation.lastMessage?.text ||
-        (conversation.lastMessage?.imageUrl ? "[Image]" : "Start chatting");
+        (conversation.lastMessage?.imageUrl
+          ? t("admin.chat.image_tag")
+          : t("admin.chat.start_chatting"));
 
   return (
     <div className="denty-panel-strong flex min-h-[48rem] max-h-[48rem] flex-col overflow-hidden p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="denty-kicker">Inbox</p>
+          <p className="denty-kicker">{t("admin.chat.inbox")}</p>
           <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
-            Conversations
+            {t("admin.chat.conversations")}
           </h2>
         </div>
-        <span className="denty-pill">{unreadConversations} unread</span>
+        <span className="denty-pill">
+          {t("admin.chat.unread_count", { count: unreadConversations })}
+        </span>
       </div>
 
       <input
         type="text"
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
-        placeholder="Search users by name, phone, username, or student ID"
+        placeholder={t("admin.chat.search_placeholder")}
         className="denty-field mt-4 text-sm"
       />
 
@@ -81,7 +87,7 @@ export function AdminChatInboxPanel({
                   {user.doctorIdNumber ? ` | ${user.doctorIdNumber}` : ""}
                 </p>
               </div>
-              <span className="denty-pill">Start</span>
+              <span className="denty-pill">{t("admin.chat.start")}</span>
             </button>
           ))}
         </div>
@@ -90,7 +96,7 @@ export function AdminChatInboxPanel({
       <div className="mt-4 flex-1 overflow-y-auto pr-2">
         {loading ? (
           <p className="text-sm text-[var(--muted-foreground)]">
-            Loading conversations...
+            {t("admin.chat.loading")}
           </p>
         ) : null}
 
@@ -120,7 +126,7 @@ export function AdminChatInboxPanel({
                   <div className="flex flex-col items-end gap-2">
                     {conversation.kind === "ROOM" ? (
                       <span className="rounded-full border border-white/12 bg-white/24 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.56)]">
-                        Room
+                        {t("admin.chat.room")}
                       </span>
                     ) : conversation.otherUser?.id ? (
                       <Link
@@ -128,7 +134,7 @@ export function AdminChatInboxPanel({
                         onClick={(event) => event.stopPropagation()}
                         className="rounded-full border border-white/12 bg-white/24 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.56)] hover:bg-white/36"
                       >
-                        Profile
+                        {t("admin.chat.profile")}
                       </Link>
                     ) : null}
                     <span className="denty-pill">{conversation.unread}</span>
@@ -140,9 +146,9 @@ export function AdminChatInboxPanel({
 
           {!loading && conversations.length === 0 && searchResults.length === 0 ? (
             <div className="denty-placeholder p-5">
-              <p className="denty-kicker">Chat</p>
+              <p className="denty-kicker">{t("nav.chat")}</p>
               <p className="mt-2 text-sm text-[var(--muted-foreground)]">
-                No conversations yet. Search for a user to start one.
+                {t("admin.chat.no_conversations")}
               </p>
             </div>
           ) : null}

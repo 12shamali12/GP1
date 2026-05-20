@@ -12,6 +12,7 @@ import {
   VACATION_OPTION,
 } from "./hooks/use-admin-planning-workspace";
 import { useFeedbackToast } from "@/features/ui/hooks/use-feedback-toast";
+import { useTranslation } from "@/features/i18n/language-provider";
 const panelClass =
   "overflow-hidden rounded-[24px] border border-white/12 bg-[linear-gradient(180deg,rgba(249,252,255,0.76),rgba(225,234,241,0.34))] p-6 shadow-[0_28px_72px_rgba(7,18,34,0.14)] backdrop-blur-[24px] md:p-5";
 const planningTabBaseClass =
@@ -35,6 +36,7 @@ const accentAction =
   "inline-flex min-h-[3rem] items-center justify-center rounded-[20px] border border-[rgba(137,219,255,0.24)] bg-[linear-gradient(135deg,rgba(10,22,40,0.94),rgba(7,111,133,0.9))] px-5 py-3 text-sm font-semibold text-white shadow-[0_24px_48px_rgba(6,17,34,0.24)] transition hover:-translate-y-[1px] hover:shadow-[0_28px_56px_rgba(6,17,34,0.3)]";
 
 export default function AdminPlanningPage() {
+  const t = useTranslation();
   const {
     loading,
     error,
@@ -114,14 +116,14 @@ export default function AdminPlanningPage() {
     error,
     clearMessage: () => setMessage(null),
     clearError: () => setError(null),
-    messageTitle: "Planning saved",
-    errorTitle: "Planning issue",
+    messageTitle: t("admin.plan.toast_saved"),
+    errorTitle: t("admin.plan.toast_issue"),
   });
 
   return (
     <AdminShell
-      title="Clinic Planning Studio"
-      description="Create clinics and shifts once, build named two-week plans with one fixed shift and a clinic or free day for each working date, then assign each plan to one group from a separate lane."
+      title={t("admin.plan.title")}
+      description={t("admin.plan.description")}
     >
       <PlanningTabNav
         tab={tab}
@@ -134,7 +136,7 @@ export default function AdminPlanningPage() {
       {loading ? (
         <div className={panelClass}>
           <p className="text-sm font-semibold text-[var(--muted-foreground)]">
-            Loading planning workspace...
+            {t("admin.plan.loading")}
           </p>
         </div>
       ) : null}
@@ -203,7 +205,9 @@ export default function AdminPlanningPage() {
                 ? `/supervisor/clinics/${editingClinicId}/update`
                 : "/supervisor/clinics",
               clinicForm,
-              editingClinicId ? "Clinic updated." : "Clinic created."
+              editingClinicId
+                ? t("admin.plan.msg_clinic_updated")
+                : t("admin.plan.msg_clinic_created")
             );
             if (data) resetClinicForm();
           }}
@@ -218,7 +222,9 @@ export default function AdminPlanningPage() {
                   shiftForm.appointmentCapacity || 2
                 ),
               },
-              editingShiftId ? "Shift updated." : "Shift created."
+              editingShiftId
+                ? t("admin.plan.msg_shift_updated")
+                : t("admin.plan.msg_shift_created")
             );
             if (data) resetShiftForm();
           }}
@@ -232,7 +238,9 @@ export default function AdminPlanningPage() {
                 sortOrder: Number(semesterForm.sortOrder || 0),
                 endsOn: semesterForm.endsOn || undefined,
               },
-              editingSemesterId ? "Semester updated." : "Semester created."
+              editingSemesterId
+                ? t("admin.plan.msg_semester_updated")
+                : t("admin.plan.msg_semester_created")
             );
             if (data) resetSemesterForm();
           }}
@@ -249,8 +257,8 @@ export default function AdminPlanningPage() {
                 requiredCount: Number(clinicCaseForm.requiredCount || 1),
               },
               editingClinicCaseId
-                ? "Clinic case updated."
-                : "Clinic case created."
+                ? t("admin.plan.msg_case_updated")
+                : t("admin.plan.msg_case_created")
             );
             if (data) resetClinicCaseForm();
           }}
@@ -363,12 +371,12 @@ export default function AdminPlanningPage() {
           <div className={panelClass}>
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="denty-kicker">Planning wall</p>
+                <p className="denty-kicker">{t("admin.plan.planning_wall")}</p>
                 <h2 className="mt-3 text-xl font-semibold text-[var(--foreground)]">
-                  Ten-day clinic board
+                  {t("admin.plan.ten_day_board")}
                 </h2>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--muted-foreground)]">
-                  Build the two-week window as one visual board: one fixed shift, one clinic or free day for each working row, and a clear balance between duty days and vacation days.
+                  {t("admin.plan.board_intro")}
                 </p>
               </div>
               <select
@@ -379,7 +387,9 @@ export default function AdminPlanningPage() {
                 }}
                 className="denty-field min-w-[18rem] cursor-pointer text-sm"
               >
-                {sortedPlans.length === 0 ? <option value="">No plans yet</option> : null}
+                {sortedPlans.length === 0 ? (
+                  <option value="">{t("admin.plan.no_plans_yet")}</option>
+                ) : null}
                 {sortedPlans.map((plan) => (
                   <option key={plan.id} value={plan.id}>
                     {plan.label}
@@ -411,19 +421,19 @@ export default function AdminPlanningPage() {
 
                   <div className="grid gap-3 md:grid-cols-3">
                     <div className="rounded-[24px] border border-white/10 bg-white/24 px-4 py-4">
-                      <p className="denty-kicker !tracking-[0.16em]">Clinic days</p>
+                      <p className="denty-kicker !tracking-[0.16em]">{t("admin.plan.clinic_days")}</p>
                       <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                         {planDays.filter((day) => !day.isVacation).length}
                       </p>
                     </div>
                     <div className="rounded-[24px] border border-white/10 bg-white/24 px-4 py-4">
-                      <p className="denty-kicker !tracking-[0.16em]">Free days</p>
+                      <p className="denty-kicker !tracking-[0.16em]">{t("admin.plan.free_days")}</p>
                       <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                         {planDays.filter((day) => day.isVacation).length}
                       </p>
                     </div>
                     <div className="rounded-[24px] border border-white/10 bg-white/24 px-4 py-4">
-                      <p className="denty-kicker !tracking-[0.16em]">Wall rows</p>
+                      <p className="denty-kicker !tracking-[0.16em]">{t("admin.plan.wall_rows")}</p>
                       <p className="mt-3 text-xl font-semibold text-[var(--foreground)]">
                         {planDays.length}
                       </p>
@@ -451,7 +461,7 @@ export default function AdminPlanningPage() {
                             })}
                           </p>
                           <p className="mt-1 text-sm font-medium uppercase tracking-[0.14em] text-[rgba(10,22,40,0.48)]">
-                            Day {index + 1}
+                            {t("admin.plan.day_number", { n: index + 1 })}
                           </p>
                         </div>
 
@@ -481,13 +491,15 @@ export default function AdminPlanningPage() {
                             }}
                             className="denty-field cursor-pointer text-sm"
                           >
-                            <option value="">Choose clinic</option>
+                            <option value="">{t("admin.plan.choose_clinic")}</option>
                             {sortedClinics.map((clinic) => (
                               <option key={clinic.id} value={clinic.id}>
                                 {clinic.name}
                               </option>
                             ))}
-                            <option value={VACATION_OPTION}>Vacation / free day</option>
+                            <option value={VACATION_OPTION}>
+                              {t("admin.plan.vacation_option")}
+                            </option>
                           </select>
 
                           <input
@@ -506,15 +518,15 @@ export default function AdminPlanningPage() {
                             className="denty-field text-sm md:min-w-[16rem]"
                             placeholder={
                               day.isVacation
-                                ? "Holiday, exam, or government order"
-                                : "Note"
+                                ? t("admin.plan.vacation_reason_placeholder")
+                                : t("admin.plan.note_placeholder")
                             }
                           />
 
                           {day.isVacation ? (
                             <div className="md:col-span-2">
                               <p className="rounded-[20px] border border-amber-200/40 bg-amber-50/70 px-4 py-3 text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">
-                                Vacation day: no clinic will be assigned here.
+                                {t("admin.plan.vacation_day_note")}
                               </p>
                             </div>
                           ) : null}
@@ -526,17 +538,17 @@ export default function AdminPlanningPage() {
 
                 <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
                   <p className="text-sm text-[var(--muted-foreground)]">
-                    Exactly 10 working rows: Sunday through Thursday across two weeks.
+                    {t("admin.plan.ten_rows_hint")}
                   </p>
                   <button type="button" onClick={savePlanDays} className={primaryAction}>
-                    Save plan schedule
+                    {t("admin.plan.save_schedule")}
                   </button>
                 </div>
               </>
             ) : (
               <div className="mt-5 rounded-[20px] border border-dashed border-white/18 bg-white/18 p-5">
                 <p className="text-sm text-[var(--muted-foreground)]">
-                  Create or choose a plan to edit its 10 working days.
+                  {t("admin.plan.choose_plan_hint")}
                 </p>
               </div>
             )}
@@ -560,7 +572,7 @@ export default function AdminPlanningPage() {
             const data = await submit(
               "/supervisor/plans/assign-group",
               assignmentForm,
-              "Plan queued for group."
+              t("admin.plan.msg_plan_queued")
             );
             if (data) {
               setAssignmentForm((prev) => ({ ...prev, notes: "" }));
@@ -586,7 +598,7 @@ export default function AdminPlanningPage() {
               !clinicSupervisorForm.clinicId ||
               !clinicSupervisorForm.supervisorId
             ) {
-              setError("Choose a clinic and a supervisor first.");
+              setError(t("admin.plan.choose_clinic_supervisor"));
               return;
             }
             const data = await submit(
@@ -596,7 +608,7 @@ export default function AdminPlanningPage() {
                 supervisorId: clinicSupervisorForm.supervisorId,
                 notes: clinicSupervisorForm.notes,
               },
-              "Supervisor linked to clinic."
+              t("admin.plan.msg_supervisor_linked")
             );
             if (data) {
               setClinicSupervisorForm((prev) => ({ ...prev, notes: "" }));
@@ -605,7 +617,7 @@ export default function AdminPlanningPage() {
           onRemoveClinicSupervisor={async (clinicId, supervisorId) => {
             await postWithoutBody(
               `/supervisor/clinics/${clinicId}/supervisors/${supervisorId}/remove`,
-              "Supervisor removed from clinic."
+              t("admin.plan.msg_supervisor_removed")
             );
           }}
         />
