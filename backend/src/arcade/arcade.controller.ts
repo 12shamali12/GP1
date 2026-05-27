@@ -42,6 +42,7 @@ export class ArcadeController {
   leaderboard(
     @CurrentUser() user: AuthUser | undefined,
     @Query("game") game?: string,
+    @Query("level") level?: string,
   ) {
     if (!user) throw new UnauthorizedException();
     if (!game || !(game in ArcadeGameType)) {
@@ -49,6 +50,19 @@ export class ArcadeController {
         "Query parameter 'game' must be one of: PLAQUE_BLASTER, TOOTH_DEFENDER, FLOSS_RUSH.",
       );
     }
-    return this.arcadeService.getLeaderboard(game as ArcadeGameType);
+    let levelFilter: number | undefined;
+    if (level !== undefined && level !== "") {
+      const parsed = Number(level);
+      if (!Number.isInteger(parsed) || parsed < 1 || parsed > 10) {
+        throw new BadRequestException(
+          "Query parameter 'level' must be an integer between 1 and 10.",
+        );
+      }
+      levelFilter = parsed;
+    }
+    return this.arcadeService.getLeaderboard(
+      game as ArcadeGameType,
+      levelFilter,
+    );
   }
 }

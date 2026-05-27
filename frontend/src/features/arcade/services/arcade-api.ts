@@ -17,13 +17,22 @@ export type ArcadeTodayEntry = {
   gameType: ArcadeGameType;
   canPlay: boolean;
   bestScore: number;
+  /** Best score the patient ever achieved at each level — index 0 = Lv 1. */
+  bestScorePerLevel: number[];
   streak: number;
-  nextLevel: number;
+  /** Highest level the patient is currently allowed to play (1..10). */
+  unlockedLevel: number;
+  /** Score needed to unlock the NEXT level, or null at Level 10. */
+  nextThreshold: number | null;
+  /** Full threshold array for displaying lock requirements per level. */
+  thresholds: number[];
 };
 
 export type SubmitArcadeScorePayload = {
   gameType: ArcadeGameType;
   score: number;
+  /** Level the patient picked from the dropdown (1..unlockedLevel). */
+  level?: number;
   durationMs?: number;
 };
 
@@ -32,8 +41,10 @@ export type SubmitArcadeScoreResponse = {
   score: number;
   isNewBest: boolean;
   bestScore: number;
-  streak: number;
-  streakLevel: number;
+  playedAtLevel: number;
+  unlockedLevel: number;
+  newLevelUnlocked: boolean;
+  nextThreshold: number | null;
 };
 
 export type ArcadeLeaderboardEntry = {
@@ -52,6 +63,8 @@ export type ArcadeLeaderboardEntry = {
 
 export type ArcadeLeaderboardSnapshot = {
   gameType: ArcadeGameType;
+  /** Level filter that was applied to this snapshot — null = all levels. */
+  level: number | null;
   generatedAt: string;
   entries: ArcadeLeaderboardEntry[];
 };
@@ -70,8 +83,9 @@ export const submitArcadeScore = (
 
 export const getArcadeLeaderboard = (
   gameType: ArcadeGameType,
+  level?: number,
 ): Promise<ArcadeLeaderboardSnapshot> =>
   httpJson<ArcadeLeaderboardSnapshot>("/arcade/leaderboard", {
     headers: authHeaders(),
-    query: { game: gameType },
+    query: level ? { game: gameType, level } : { game: gameType },
   });

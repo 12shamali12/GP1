@@ -12,6 +12,15 @@ export class SubmitArcadeScoreDto {
   @Max(1_000_000)
   score!: number;
 
+  // Difficulty level the player chose for this run (1..10). The service
+  // clamps to their unlocked range before persisting, so a tampered client
+  // can't claim a high level without earning it.
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  @Max(10)
+  level?: number;
+
   @IsOptional()
   @IsInt()
   @Min(0)

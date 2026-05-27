@@ -146,19 +146,51 @@ function restingTint(cell: number) {
   return REST_PALETTE[(row + col) % REST_PALETTE.length];
 }
 
-/** Spawn cadence (ms) and decoy share by level (1..10). */
+/**
+ * Per-level tuning. Level 1 is a chill tutorial-feeling run (no penalties,
+ * generous lifetimes, slow spawns). Difficulty climbs in dramatic steps as
+ * new mechanics unlock per level:
+ *
+ *   L1  : plaque + cavity only, slow spawns, long lifetimes      — chill
+ *   L2  : + brush spawns                                          — variety
+ *   L3  : + sugar bombs (-50 on tap)                              — punish miss-taps
+ *   L4  : faster spawns, shorter lifetimes                        — reflexes
+ *   L5  : + bombs (game-over on tap)                              — read targets
+ *   L6  : smaller lifetime window, more sugar                     — pressure
+ *   L7  : rapid spawns                                            — sweaty
+ *   L8  : tighter lifetimes, sugar share spikes                   — chaos
+ *   L9  : everything faster, more bombs                           — hardcore
+ *   L10 : maxed out — minimal lifetime, max decoy share           — expert
+ */
 function levelTuning(level: number) {
   const lv = Math.max(1, Math.min(10, level));
-  const spawnIntervalMs = Math.round(620 - (lv - 1) * 40); // 620 → 260
-  // Lollipops (sugar) and cavities ("pops") are the spicy ones — both spawn
-  // way more often now so the run feels eventful at every level.
-  const sugarShare = 0.2 + (lv - 1) * 0.03; // 20% → 47%
-  const cavityShare = 0.25 + (lv - 1) * 0.012; // 25% → 36%
-  const brushShare = Math.max(0.05, 0.14 - (lv - 1) * 0.007);
-  // Bombs stay rare — they're game-enders so the rate has to feel fair.
-  const bombShare = 0.03 + (lv - 1) * 0.006; // 3% → 9%
-  // Lifetime shrinks (faster reflex needed).
-  const lifeScale = Math.max(0.55, 1 - (lv - 1) * 0.05);
+
+  // Spawn cadence — Level 1 is generous (900ms), tightens to ~230ms at L10.
+  const spawnIntervalMs = Math.round(900 - (lv - 1) * 75);
+
+  // Mechanic gates — features unlock at specific levels.
+  const brushUnlocked = lv >= 2;
+  const sugarUnlocked = lv >= 3;
+  const bombUnlocked = lv >= 5;
+
+  // Cavity shares stay generous (the bonus everyone loves).
+  const cavityShare = 0.22 + (lv - 1) * 0.012;
+  // Brush share grows slowly after it unlocks.
+  const brushShare = brushUnlocked
+    ? Math.max(0.06, 0.16 - (lv - 2) * 0.008)
+    : 0;
+  // Sugar share starts modest at L3 (~12%) and climbs sharply through L10.
+  const sugarShare = sugarUnlocked
+    ? 0.12 + (lv - 3) * 0.05 // 12% → 47%
+    : 0;
+  // Bomb share — tiny at first, grows with level. Caps so the run stays fair.
+  const bombShare = bombUnlocked
+    ? Math.min(0.12, 0.03 + (lv - 5) * 0.018) // 3% → 12%
+    : 0;
+
+  // Lifetime scale — gentle at L1 (1.4x base), aggressive at L10 (0.5x).
+  const lifeScale = Math.max(0.5, 1.4 - (lv - 1) * 0.1);
+
   return {
     spawnIntervalMs,
     sugarShare,
@@ -166,6 +198,9 @@ function levelTuning(level: number) {
     brushShare,
     bombShare,
     lifeScale,
+    brushUnlocked,
+    sugarUnlocked,
+    bombUnlocked,
   };
 }
 
@@ -223,6 +258,21 @@ export function PlaqueBlasterGame({
   const tuning = levelTuning(level);
   const finishedRef = useRef(false);
 
+  // popFloat is used by both the rAF loop (for expired-target "missed!"
+  // markers) and handleTap (for hit/miss popups), so it has to be declared
+  // before the rAF useEffect that references it.
+  const popFloat = useCallback(
+    (cell: number, text: string, color: string, size: "lg" | "xl" | "xxl" = "lg") => {
+      idRef.current += 1;
+      const id = idRef.current;
+      setFloats((prev) => [...prev, { id, cell, text, color, size }]);
+      setTimeout(() => {
+        setFloats((prev) => prev.filter((f) => f.id !== id));
+      }, 900);
+    },
+    [],
+  );
+
   /* -------------------------------------------------------------------- */
   /* Main RAF loop — timer + lifetime decay                               */
   /* -------------------------------------------------------------------- */
@@ -233,9 +283,48 @@ export function PlaqueBlasterGame({
       const elapsed = performance.now() - startedAtRef.current;
       const remaining = Math.max(0, ROUND_DURATION_MS - elapsed);
       setTimeLeft(remaining);
-      setTargets((prev) =>
-        prev.filter((t) => performance.now() - t.bornAt < t.lifeMs),
-      );
+
+      // Detect targets that expired this frame. "Good" expirations (plaque,
+      // cavity, brush) mean the player failed to tap in time — that breaks
+      // the combo and pops a "missed!" indicator on the cell. Sugar/bomb
+      // expiring is fine (you successfully avoided it), so we silently drop
+      // those.
+      const now = performance.now();
+      const prev = targetsRef.current;
+      const surviving: SpawnedTarget[] = [];
+      const missed: SpawnedTarget[] = [];
+      for (const t of prev) {
+        if (now - t.bornAt < t.lifeMs) {
+          surviving.push(t);
+        } else if (
+          t.kind === "plaque" ||
+          t.kind === "cavity" ||
+          t.kind === "brush"
+        ) {
+          missed.push(t);
+        }
+        // sugar / bomb that expired = silently dropped
+      }
+
+      if (surviving.length !== prev.length) {
+        setTargets(surviving);
+      }
+
+      if (missed.length > 0) {
+        // Side-effect after the state update is queued: visual feedback +
+        // combo break. comboRef gives us the latest combo without nested
+        // setState.
+        const currentCombo = comboRef.current;
+        if (currentCombo >= 3) {
+          setComboLossValue(currentCombo);
+          setComboLossId((n) => n + 1);
+        }
+        setCombo(0);
+        for (const t of missed) {
+          popFloat(t.cell, "missed!", "rgba(244,63,94,0.85)", "lg");
+        }
+      }
+
       if (remaining === 0) {
         if (!finishedRef.current) {
           finishedRef.current = true;
@@ -250,13 +339,23 @@ export function PlaqueBlasterGame({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [onFinish]);
+  }, [onFinish, popFloat]);
 
   // Mirror score into a ref so the raf-loop closure can read the latest.
   const scoreRef = useRef(score);
   useEffect(() => {
     scoreRef.current = score;
   }, [score]);
+  // Same trick for combo + targets — the rAF loop reads them to detect
+  // expired targets and break the combo without nested setState calls.
+  const comboRef = useRef(combo);
+  useEffect(() => {
+    comboRef.current = combo;
+  }, [combo]);
+  const targetsRef = useRef<SpawnedTarget[]>([]);
+  useEffect(() => {
+    targetsRef.current = targets;
+  }, [targets]);
 
   // Auto-clear the combo-loss indicator ~900ms after each break so the HUD
   // returns to the live ×0 state. Re-keyed on comboLossId so consecutive
@@ -305,18 +404,6 @@ export function PlaqueBlasterGame({
   /* -------------------------------------------------------------------- */
   /* Tap handler                                                          */
   /* -------------------------------------------------------------------- */
-
-  const popFloat = useCallback(
-    (cell: number, text: string, color: string, size: "lg" | "xl" | "xxl" = "lg") => {
-      idRef.current += 1;
-      const id = idRef.current;
-      setFloats((prev) => [...prev, { id, cell, text, color, size }]);
-      setTimeout(() => {
-        setFloats((prev) => prev.filter((f) => f.id !== id));
-      }, 900);
-    },
-    [],
-  );
 
   const popRipple = useCallback((cell: number, color: string) => {
     idRef.current += 1;

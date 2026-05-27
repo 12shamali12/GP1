@@ -37,6 +37,34 @@ const ALL_GAMES: ArcadeGameType[] = [
   ArcadeGameType.FLOSS_RUSH,
 ];
 
+/**
+ * Score thresholds to unlock each level. Index 0 is the threshold to unlock
+ * Level 2 (Level 1 is always unlocked), index 8 unlocks Level 10. The curves
+ * are calibrated to each game's natural scoring rate.
+ */
+const LEVEL_THRESHOLDS: Record<ArcadeGameType, number[]> = {
+  // Plaque Blaster — 60s round, mid-game runs ~400-800.
+  PLAQUE_BLASTER: [300, 600, 1000, 1500, 2100, 2800, 3600, 4500, 5500],
+  // Tooth Defender — open-ended, each kill ~25-150 pts.
+  TOOTH_DEFENDER: [500, 1000, 1800, 2800, 4000, 5500, 7000, 9000, 11000],
+  // Floss Rush — score + distance, dies on first sugar.
+  FLOSS_RUSH: [200, 500, 900, 1400, 2000, 2700, 3500, 4500, 5800],
+};
+
+/** Returns the highest level unlocked given a best score for that game. */
+function computeUnlockedLevel(
+  gameType: ArcadeGameType,
+  bestScore: number,
+): number {
+  const thresholds = LEVEL_THRESHOLDS[gameType];
+  let unlocked = 1;
+  for (let i = 0; i < thresholds.length; i += 1) {
+    if (bestScore >= thresholds[i]) unlocked = i + 2;
+    else break;
+  }
+  return Math.min(10, unlocked);
+}
+
 // Count consecutive Amman days, ending at today/yesterday, with attempts for
 // this game type. Same shape as the quiz streak — keeps UX consistent.
 function computeStreak(dateKeys: Set<string>, todayKey: string): number {
@@ -77,7 +105,7 @@ export class ArcadeService {
 
     const attempts = await this.prisma.arcadeAttempt.findMany({
       where: { patientId: user.id },
-      select: { gameType: true, score: true, dateKey: true },
+      select: { gameType: true, score: true, dateKey: true, streakLevel: true },
     });
 
     return ALL_GAMES.map((gameType) => {
@@ -87,18 +115,31 @@ export class ArcadeService {
         (acc, a) => (a.score > acc ? a.score : acc),
         0,
       );
+      // Per-level best score, indexed 0..9 for levels 1..10. Lets the hub
+      // card show "Best at Level N: 1,200" when the patient picks a level.
+      const bestScorePerLevel = Array<number>(10).fill(0);
+      for (const a of mine) {
+        const lv = Math.max(1, Math.min(10, a.streakLevel)) - 1;
+        if (a.score > bestScorePerLevel[lv]) bestScorePerLevel[lv] = a.score;
+      }
       const streak = computeStreak(dateKeys, todayKey);
       const playedToday = dateKeys.has(todayKey);
-      // Next attempt's difficulty: if you've played today, the level you
-      // already locked in stays; otherwise it's streak + 1 (a new day extends
-      // the streak by one) capped at 10 so the curve stays playable.
-      const nextLevel = Math.min(10, Math.max(1, playedToday ? streak : streak + 1));
+      const unlockedLevel = computeUnlockedLevel(gameType, bestScore);
+      // Next threshold (score the patient still needs) for the next level,
+      // or null if Level 10 is already unlocked.
+      const nextThreshold =
+        unlockedLevel >= 10
+          ? null
+          : LEVEL_THRESHOLDS[gameType][unlockedLevel - 1];
       return {
         gameType,
         canPlay: gameTestMode() ? true : !playedToday,
         bestScore,
+        bestScorePerLevel,
         streak,
-        nextLevel,
+        unlockedLevel,
+        nextThreshold,
+        thresholds: LEVEL_THRESHOLDS[gameType],
       };
     });
   }
@@ -106,6 +147,7 @@ export class ArcadeService {
   /**
    * Submit a new score. Enforces one attempt per Amman-day per game UNLESS
    * GAME_TEST_MODE=true, in which case the latest score wins (last-write).
+   * The chosen level must be ≤ the patient's currently unlocked level.
    */
   async submitScore(user: AuthUser, dto: SubmitArcadeScoreDto) {
     this.requirePatient(user);
@@ -128,17 +170,20 @@ export class ArcadeService {
       }
     }
 
-    // Derive the streak this attempt was started at: the user's current
-    // streak BEFORE today's play.
     const past = await this.prisma.arcadeAttempt.findMany({
       where: { patientId: user.id, gameType: dto.gameType },
       select: { dateKey: true, score: true },
     });
-    const dateKeys = new Set(past.map((a) => a.dateKey));
-    const currentStreak = computeStreak(dateKeys, todayKey);
+    const prevBest = past.reduce(
+      (acc, a) => (a.score > acc ? a.score : acc),
+      0,
+    );
+    const unlockedBefore = computeUnlockedLevel(dto.gameType, prevBest);
+    // Player picks their level from the unlocked range; we trust the DTO
+    // but clamp defensively so a tampered client can't play Level 10 cold.
     const startedAtLevel = Math.min(
-      10,
-      Math.max(1, dateKeys.has(todayKey) ? currentStreak : currentStreak + 1),
+      unlockedBefore,
+      Math.max(1, dto.level ?? unlockedBefore),
     );
 
     const attempt = await this.prisma.arcadeAttempt.upsert({
@@ -165,36 +210,44 @@ export class ArcadeService {
           past.find((a) => a.dateKey === todayKey)?.score ?? 0,
         ),
         durationMs: dto.durationMs ?? 0,
+        streakLevel: startedAtLevel,
       },
     });
 
-    // Recompute streak with today included.
-    dateKeys.add(todayKey);
-    const newStreak = computeStreak(dateKeys, todayKey);
-    const bestScore = Math.max(
-      attempt.score,
-      ...past.filter((a) => a.dateKey !== todayKey).map((a) => a.score),
-      0,
-    );
+    const newBest = Math.max(prevBest, attempt.score);
+    const unlockedAfter = computeUnlockedLevel(dto.gameType, newBest);
+    const newLevelUnlocked = unlockedAfter > unlockedBefore;
 
     return {
       attemptId: attempt.id,
       score: attempt.score,
-      isNewBest: attempt.score >= bestScore,
-      bestScore,
-      streak: newStreak,
-      streakLevel: startedAtLevel,
+      isNewBest: attempt.score >= newBest,
+      bestScore: newBest,
+      playedAtLevel: startedAtLevel,
+      unlockedLevel: unlockedAfter,
+      newLevelUnlocked,
+      // If still climbing, surface the next threshold so the celebration
+      // can read "1500 to unlock Level 5".
+      nextThreshold:
+        unlockedAfter >= 10
+          ? null
+          : LEVEL_THRESHOLDS[dto.gameType][unlockedAfter - 1],
     };
   }
 
   /**
-   * Per-game leaderboard ranked by best score per patient. Patients with no
-   * attempts are still included (score=0) so a brand-new player sees their
-   * rank immediately.
+   * Per-game leaderboard ranked by best score per patient. When `level` is
+   * provided, the leaderboard is filtered to attempts played at exactly that
+   * level — "best Level 5 Plaque Blaster scores" etc. Patients with no
+   * attempts (or no attempts at the requested level) are excluded so the
+   * board reads as actual competitors instead of a list of zeros.
    */
-  async getLeaderboard(gameType: ArcadeGameType) {
+  async getLeaderboard(gameType: ArcadeGameType, level?: number) {
     const now = new Date();
     const todayKey = ammanDateKey(now);
+    const lvFilter =
+      level !== undefined ? { streakLevel: level } : {};
+    const includeEmpty = level === undefined;
 
     const patients = await this.prisma.user.findMany({
       where: {
@@ -208,37 +261,42 @@ export class ArcadeService {
         username: true,
         avatar: true,
         arcadeAttempts: {
-          where: { gameType },
-          select: { score: true, dateKey: true, completedAt: true },
+          where: { gameType, ...lvFilter },
+          select: { score: true, dateKey: true, completedAt: true, streakLevel: true },
         },
       },
     });
 
-    const rows = patients.map((p) => {
-      const attempts = p.arcadeAttempts;
-      const bestScore = attempts.reduce(
-        (acc, a) => (a.score > acc ? a.score : acc),
-        0,
-      );
-      const dateKeys = new Set(attempts.map((a) => a.dateKey));
-      const streak = computeStreak(dateKeys, todayKey);
-      const lastPlayedAt = attempts.reduce<Date | null>(
-        (acc, a) => (acc == null || a.completedAt > acc ? a.completedAt : acc),
-        null,
-      );
-      return {
-        patient: {
-          id: p.id,
-          name: p.name,
-          username: p.username,
-          avatar: p.avatar,
-        },
-        bestScore,
-        attempts: attempts.length,
-        streak,
-        lastPlayedAt: lastPlayedAt ? lastPlayedAt.toISOString() : null,
-      };
-    });
+    const rows = patients
+      .map((p) => {
+        const attempts = p.arcadeAttempts;
+        const bestScore = attempts.reduce(
+          (acc, a) => (a.score > acc ? a.score : acc),
+          0,
+        );
+        const dateKeys = new Set(attempts.map((a) => a.dateKey));
+        const streak = computeStreak(dateKeys, todayKey);
+        const lastPlayedAt = attempts.reduce<Date | null>(
+          (acc, a) =>
+            acc == null || a.completedAt > acc ? a.completedAt : acc,
+          null,
+        );
+        return {
+          patient: {
+            id: p.id,
+            name: p.name,
+            username: p.username,
+            avatar: p.avatar,
+          },
+          bestScore,
+          attempts: attempts.length,
+          streak,
+          lastPlayedAt: lastPlayedAt ? lastPlayedAt.toISOString() : null,
+        };
+      })
+      // When filtering by level, hide patients who never played at that
+      // level so the leaderboard reads as real competitors.
+      .filter((r) => (includeEmpty ? true : r.attempts > 0));
 
     rows.sort((a, b) => {
       if (b.bestScore !== a.bestScore) return b.bestScore - a.bestScore;
@@ -248,6 +306,7 @@ export class ArcadeService {
 
     return {
       gameType,
+      level: level ?? null,
       generatedAt: now.toISOString(),
       entries: rows.map((r, i) => ({ rank: i + 1, ...r })),
     };

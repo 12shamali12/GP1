@@ -44,36 +44,55 @@ type ArcadeLeaderboardViewProps = {
   currentUserId?: string;
 };
 
+/** "all" = combined leaderboard; 1..10 = per-level leaderboard. */
+type LevelFilter = "all" | number;
+
+function cacheKey(game: ArcadeGameType, level: LevelFilter): string {
+  return `${game}|${level}`;
+}
+
 export function ArcadeLeaderboardView({
   currentUserId,
 }: ArcadeLeaderboardViewProps) {
   const [activeTab, setActiveTab] = useState<ArcadeGameType>("PLAQUE_BLASTER");
+  // Level filter is shared across game tabs so switching games keeps the
+  // player on the same level — the patient saying "show me Lv 3 across
+  // all games" feels natural.
+  const [levelFilter, setLevelFilter] = useState<LevelFilter>("all");
   const [snapshots, setSnapshots] = useState<
-    Partial<Record<ArcadeGameType, ArcadeLeaderboardSnapshot>>
+    Record<string, ArcadeLeaderboardSnapshot>
   >({});
-  const [loadingTab, setLoadingTab] = useState<ArcadeGameType | null>(null);
+  const [loadingKey, setLoadingKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const loadTab = useCallback(async (game: ArcadeGameType) => {
-    setLoadingTab(game);
-    setError(null);
-    try {
-      const data = await getArcadeLeaderboard(game);
-      setSnapshots((prev) => ({ ...prev, [game]: data }));
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to load leaderboard.");
-    } finally {
-      setLoadingTab(null);
-    }
-  }, []);
+  const loadTab = useCallback(
+    async (game: ArcadeGameType, level: LevelFilter) => {
+      const key = cacheKey(game, level);
+      setLoadingKey(key);
+      setError(null);
+      try {
+        const data = await getArcadeLeaderboard(
+          game,
+          level === "all" ? undefined : level,
+        );
+        setSnapshots((prev) => ({ ...prev, [key]: data }));
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to load leaderboard.");
+      } finally {
+        setLoadingKey(null);
+      }
+    },
+    [],
+  );
 
+  const currentKey = cacheKey(activeTab, levelFilter);
   useEffect(() => {
-    if (!snapshots[activeTab]) {
-      void loadTab(activeTab);
+    if (!snapshots[currentKey]) {
+      void loadTab(activeTab, levelFilter);
     }
-  }, [activeTab, snapshots, loadTab]);
+  }, [activeTab, levelFilter, currentKey, snapshots, loadTab]);
 
-  const snapshot = snapshots[activeTab];
+  const snapshot = snapshots[currentKey];
   const meta = TAB_META[activeTab];
   const entries = snapshot?.entries ?? [];
 
@@ -114,22 +133,54 @@ export function ArcadeLeaderboardView({
         <div className="flex flex-wrap items-end justify-between gap-3 text-white">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/70">
-              Best-score ranking
+              {levelFilter === "all"
+                ? "Best-score ranking (all levels)"
+                : `Best score at Level ${levelFilter}`}
             </p>
             <h2 className="mt-2 text-2xl font-bold">{meta.label}</h2>
             <p className="mt-2 max-w-xl text-sm text-white/80">
-              Top patients by personal best. Each round is one shot per day —
-              keep your streak alive to play harder levels.
+              {levelFilter === "all"
+                ? "Top patients by personal best across every level played."
+                : `Top patients ranked by best score achieved playing at Level ${levelFilter}. Pick another level above to compare.`}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => void loadTab(activeTab)}
-            disabled={loadingTab === activeTab}
-            className="rounded-[14px] border border-white/30 bg-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-[12px] transition hover:bg-white/30 disabled:opacity-60"
-          >
-            {loadingTab === activeTab ? "Refreshing…" : "Refresh"}
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/70">
+              Level
+              <select
+                value={levelFilter === "all" ? "all" : String(levelFilter)}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setLevelFilter(v === "all" ? "all" : Number(v));
+                }}
+                className="cursor-pointer rounded-[12px] border border-white/30 bg-[rgba(4,10,22,0.45)] px-3 py-1.5 text-sm font-bold text-white outline-none hover:bg-[rgba(4,10,22,0.6)] focus:border-white/60"
+              >
+                <option value="all" style={{ background: "#0a1729", color: "#fff" }}>
+                  All levels
+                </option>
+                {Array.from({ length: 10 }).map((_, i) => {
+                  const lv = i + 1;
+                  return (
+                    <option
+                      key={lv}
+                      value={String(lv)}
+                      style={{ background: "#0a1729", color: "#fff" }}
+                    >
+                      Level {lv}
+                    </option>
+                  );
+                })}
+              </select>
+            </label>
+            <button
+              type="button"
+              onClick={() => void loadTab(activeTab, levelFilter)}
+              disabled={loadingKey === currentKey}
+              className="rounded-[14px] border border-white/30 bg-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-white backdrop-blur-[12px] transition hover:bg-white/30 disabled:opacity-60"
+            >
+              {loadingKey === currentKey ? "Refreshing…" : "Refresh"}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -140,16 +191,18 @@ export function ArcadeLeaderboardView({
       ) : null}
 
       <div className="denty-enter-stagger space-y-3">
-        {loadingTab === activeTab && !snapshot
+        {loadingKey === currentKey && !snapshot
           ? Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="denty-skeleton denty-skeleton-card" />
             ))
           : null}
 
-        {!loadingTab && snapshot && entries.length === 0 ? (
+        {!loadingKey && snapshot && entries.length === 0 ? (
           <div className="rounded-[24px] border border-dashed border-white/16 bg-white/14 p-5">
             <p className="text-sm text-[var(--muted-foreground)]">
-              Nobody has played this game yet — be the first to claim Rank #1.
+              {levelFilter === "all"
+                ? "Nobody has played this game yet — be the first to claim Rank #1."
+                : `No scores at Level ${levelFilter} yet. Be the first to set the mark.`}
             </p>
           </div>
         ) : null}

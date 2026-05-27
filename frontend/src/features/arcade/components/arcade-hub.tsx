@@ -82,6 +82,7 @@ type Mode =
   | {
       kind: "result";
       game: ArcadeGameType;
+      level: number;
       score: number;
       response: SubmitArcadeScoreResponse;
     };
@@ -96,6 +97,11 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<Mode>({ kind: "hub" });
+  // Player-chosen level per game, defaults to the highest unlocked level so
+  // the dropdown lands on the "best so far" by default.
+  const [selectedLevels, setSelectedLevels] = useState<
+    Partial<Record<ArcadeGameType, number>>
+  >({});
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -124,27 +130,44 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
     (gameType: ArcadeGameType) => {
       const entry = byType.get(gameType);
       if (!entry || !entry.canPlay) return;
-      setMode({ kind: "playing", game: gameType, level: entry.nextLevel });
+      // Use the dropdown selection, clamped to what's unlocked. Defaults to
+      // unlockedLevel when nothing's been picked yet.
+      const chosen = Math.min(
+        entry.unlockedLevel,
+        Math.max(1, selectedLevels[gameType] ?? entry.unlockedLevel),
+      );
+      setMode({ kind: "playing", game: gameType, level: chosen });
     },
-    [byType],
+    [byType, selectedLevels],
   );
 
   const handleFinish = useCallback(
     async (gameType: ArcadeGameType, score: number, durationMs: number) => {
       try {
+        // Re-read the current mode to grab the level we just played at —
+        // setMode below replaces it with "result" before refresh().
+        const playedLevel =
+          mode.kind === "playing" ? mode.level : 1;
         const response = await submitArcadeScore({
           gameType,
           score,
+          level: playedLevel,
           durationMs,
         });
-        setMode({ kind: "result", game: gameType, score, response });
+        setMode({
+          kind: "result",
+          game: gameType,
+          level: playedLevel,
+          score,
+          response,
+        });
         void refresh();
       } catch (e) {
         setError(e instanceof Error ? e.message : "Failed to save your score.");
         setMode({ kind: "hub" });
       }
     },
-    [refresh],
+    [mode, refresh],
   );
 
   const handleCancel = useCallback(() => {
@@ -152,86 +175,43 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
   }, []);
 
   /* -------------------------------------------------------------------- */
-  /* Playing — immersive full-viewport mode                               */
+  /* Playing / result — both rendered inside the full-viewport portal so   */
+  /* the game doesn't abruptly quit when the round ends. The stage decides */
+  /* which surface (game vs. celebration) to render internally.            */
   /* -------------------------------------------------------------------- */
 
-  if (mode.kind === "playing") {
-    // Render through a portal to document.body so the rail and patient page
-    // chrome stay behind the overlay; lock body scroll for "game mode" feel.
+  if (mode.kind === "playing" || mode.kind === "result") {
     return (
       <>
         {/* Placeholder in the original surface — keeps the panel from
             collapsing while the immersive overlay is mounted. */}
         <div className="flex min-h-[40vh] items-center justify-center rounded-[24px] border border-white/14 bg-white/24 p-8 text-center text-sm text-[var(--muted-foreground)]">
-          Game in progress — focus mode active.
+          {mode.kind === "playing"
+            ? "Game in progress — focus mode active."
+            : "Round complete — review your score in focus mode."}
         </div>
         <ArcadeFullscreenStage
           game={mode.game}
           level={mode.level}
+          result={mode.kind === "result" ? mode.response : null}
+          finalScore={mode.kind === "result" ? mode.score : null}
           onFinish={(s, dur) => void handleFinish(mode.game, s, dur)}
           onCancel={handleCancel}
+          onPlayAgain={() => {
+            const entry = byType.get(mode.game);
+            if (!entry) {
+              handleCancel();
+              return;
+            }
+            const chosen = Math.min(
+              entry.unlockedLevel,
+              Math.max(1, selectedLevels[mode.game] ?? entry.unlockedLevel),
+            );
+            setMode({ kind: "playing", game: mode.game, level: chosen });
+          }}
+          onOpenLeaderboard={onOpenLeaderboard}
         />
       </>
-    );
-  }
-
-  /* -------------------------------------------------------------------- */
-  /* Result screen                                                        */
-  /* -------------------------------------------------------------------- */
-
-  if (mode.kind === "result") {
-    const meta = GAME_META[mode.game];
-    const r = mode.response;
-    return (
-      <div
-        className="overflow-hidden rounded-[28px] border border-white/12 p-6 text-white shadow-[0_30px_80px_rgba(7,18,34,0.32)] sm:p-10"
-        style={{ background: meta.gradient }}
-      >
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/70">
-          {meta.label}
-        </p>
-        <p className="mt-2 text-3xl font-extrabold sm:text-4xl">
-          {r.isNewBest ? "New personal best!" : "Round complete"}
-        </p>
-
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          <Stat label="Score" value={r.score.toLocaleString()} />
-          <Stat label="Best" value={r.bestScore.toLocaleString()} />
-          <Stat
-            label="Streak"
-            value={`${r.streak} day${r.streak === 1 ? "" : "s"}`}
-          />
-        </div>
-
-        <p className="mt-6 max-w-2xl text-sm text-white/80">
-          {r.isNewBest
-            ? "You climbed your own leaderboard. Tomorrow's run starts one level harder — keep the streak alive."
-            : "Come back tomorrow to play at level " +
-              (r.streakLevel + 1) +
-              " and chase your best of " +
-              r.bestScore.toLocaleString() +
-              "."}
-        </p>
-
-        <div className="mt-7 flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => setMode({ kind: "hub" })}
-            className="rounded-[14px] border border-white/30 bg-white/20 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-[12px] transition hover:bg-white/30"
-          >
-            Back to games
-          </button>
-          {onOpenLeaderboard ? (
-            <button
-              type="button"
-              onClick={onOpenLeaderboard}
-              className="rounded-[14px] bg-white px-5 py-2.5 text-sm font-semibold text-slate-900 transition hover:bg-white/90"
-            >
-              View leaderboard
-            </button>
-          ) : null}
-        </div>
-      </div>
     );
   }
 
@@ -263,6 +243,11 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
           const meta = GAME_META[gameType];
           const entry = byType.get(gameType);
           const locked = entry ? !entry.canPlay : false;
+          const unlocked = entry?.unlockedLevel ?? 1;
+          const selected = Math.min(
+            unlocked,
+            Math.max(1, selectedLevels[gameType] ?? unlocked),
+          );
           return (
             <div
               key={gameType}
@@ -288,30 +273,88 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
                   {meta.description}
                 </p>
 
-                <div className="mt-auto grid grid-cols-3 gap-2">
+                <div className="mt-auto grid grid-cols-2 gap-2">
                   <StatChip
                     label="Best"
                     value={entry?.bestScore.toLocaleString() ?? "—"}
                   />
                   <StatChip
-                    label="Streak"
-                    value={
-                      entry?.streak ? `${entry.streak}d` : "—"
-                    }
-                  />
-                  <StatChip
-                    label={locked ? "Tomorrow" : "Next"}
-                    value={`Lv ${entry?.nextLevel ?? 1}`}
+                    label="Unlocked"
+                    value={`Lv ${unlocked}/10`}
                   />
                 </div>
+
+                {/* Level dropdown — Level 1 is always unlocked, levels above
+                    unlockedLevel are 🔒 and unselectable. */}
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/75">
+                    Difficulty
+                  </span>
+                  <select
+                    value={selected}
+                    onChange={(e) =>
+                      setSelectedLevels((prev) => ({
+                        ...prev,
+                        [gameType]: Number(e.target.value),
+                      }))
+                    }
+                    disabled={locked}
+                    className="cursor-pointer rounded-[14px] border border-white/30 bg-[rgba(4,10,22,0.55)] px-3 py-2 text-sm font-bold text-white outline-none transition hover:bg-[rgba(4,10,22,0.7)] focus:border-white/60 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {Array.from({ length: 10 }).map((_, i) => {
+                      const lv = i + 1;
+                      const isLocked = lv > unlocked;
+                      const threshold = entry?.thresholds[lv - 2];
+                      return (
+                        <option
+                          key={lv}
+                          value={lv}
+                          disabled={isLocked}
+                          style={{
+                            background: "#0a1729",
+                            color: isLocked ? "rgba(255,255,255,0.45)" : "#fff",
+                          }}
+                        >
+                          {isLocked
+                            ? `🔒 Level ${lv} — need ${threshold?.toLocaleString() ?? "?"}`
+                            : `Level ${lv}${lv === 1 ? " (start)" : ""}`}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {/* Best-at-this-level mini stat — refreshes when the player
+                      picks a different level in the dropdown. */}
+                  {entry ? (
+                    <span className="text-[11px] text-white/80">
+                      Best at Lv {selected}:{" "}
+                      <span className="font-bold tabular-nums text-white">
+                        {(entry.bestScorePerLevel[selected - 1] ?? 0).toLocaleString()}
+                      </span>
+                    </span>
+                  ) : null}
+                  {entry && entry.nextThreshold !== null ? (
+                    <span className="text-[10px] text-white/65">
+                      {(
+                        entry.nextThreshold - entry.bestScore
+                      ).toLocaleString()}{" "}
+                      more pts to unlock Level {unlocked + 1}
+                    </span>
+                  ) : entry && entry.nextThreshold === null ? (
+                    <span className="text-[10px] font-semibold text-amber-200">
+                      ⭐ All 10 levels unlocked
+                    </span>
+                  ) : null}
+                </label>
 
                 <button
                   type="button"
                   disabled={locked || loading}
                   onClick={() => startGame(gameType)}
-                  className="mt-2 inline-flex min-h-12 w-full items-center justify-center rounded-[16px] border border-white/20 bg-white/95 px-4 py-3 text-sm font-bold uppercase tracking-[0.18em] text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
+                  className="inline-flex min-h-12 w-full items-center justify-center rounded-[16px] border border-white/20 bg-white/95 px-4 py-3 text-sm font-bold uppercase tracking-[0.18em] text-slate-900 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  {locked ? "Locked till tomorrow" : "Play now"}
+                  {locked
+                    ? "Locked till tomorrow"
+                    : `Play Level ${selected}`}
                 </button>
               </div>
               <div
@@ -356,8 +399,17 @@ function StatChip({ label, value }: { label: string; value: string }) {
 type ArcadeFullscreenStageProps = {
   game: ArcadeGameType;
   level: number;
+  /** When non-null, the stage renders the celebration screen instead of the
+   *  game (the run just ended). */
+  result: SubmitArcadeScoreResponse | null;
+  /** Final score for this round, used by the celebration. */
+  finalScore: number | null;
   onFinish: (score: number, durationMs: number) => void;
   onCancel: () => void;
+  /** Called from the celebration's "Play again" button. */
+  onPlayAgain: () => void;
+  /** Optional — wired by the patient page to switch tabs. */
+  onOpenLeaderboard?: () => void;
 };
 
 /**
@@ -368,8 +420,12 @@ type ArcadeFullscreenStageProps = {
 function ArcadeFullscreenStage({
   game,
   level,
+  result,
+  finalScore,
   onFinish,
   onCancel,
+  onPlayAgain,
+  onOpenLeaderboard,
 }: ArcadeFullscreenStageProps) {
   const meta = GAME_META[game];
   const [mounted, setMounted] = useState(false);
@@ -377,6 +433,7 @@ function ArcadeFullscreenStage({
   // header stays consistent across all three games.
   const [hudSlot, setHudSlot] = useState<HTMLDivElement | null>(null);
   const [quitOpen, setQuitOpen] = useState(false);
+  const inResult = result !== null;
 
   useEffect(() => {
     setMounted(true);
@@ -446,10 +503,10 @@ function ArcadeFullscreenStage({
 
         <button
           type="button"
-          onClick={() => setQuitOpen(true)}
+          onClick={() => (inResult ? onCancel() : setQuitOpen(true))}
           className="inline-flex min-h-10 shrink-0 cursor-pointer items-center justify-center rounded-[12px] border border-rose-300/30 bg-rose-500/14 px-4 text-xs font-semibold uppercase tracking-[0.18em] text-rose-100 transition hover:bg-rose-500/25"
         >
-          Exit
+          {inResult ? "Close" : "Exit"}
         </button>
       </div>
 
@@ -459,7 +516,17 @@ function ArcadeFullscreenStage({
           aspect-ratio so they letterbox cleanly to either dimension. */}
       <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden px-3 py-3 sm:px-5 sm:py-4">
         <div className="arcade-focus-cursor flex h-full w-full max-w-[min(1700px,98vw)] items-center justify-center">
-          {game === "PLAQUE_BLASTER" ? (
+          {inResult && result ? (
+            <ArcadeResultCelebration
+              game={game}
+              level={level}
+              score={finalScore ?? result.score}
+              result={result}
+              onClose={onCancel}
+              onPlayAgain={onPlayAgain}
+              onOpenLeaderboard={onOpenLeaderboard}
+            />
+          ) : game === "PLAQUE_BLASTER" ? (
             <PlaqueBlasterGame
               level={level}
               onFinish={onFinish}
@@ -497,4 +564,144 @@ function ArcadeFullscreenStage({
   );
 
   return createPortal(stage, document.body);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Celebration — rendered inside the focus-mode portal when a run ends.       */
+/* -------------------------------------------------------------------------- */
+
+type ArcadeResultCelebrationProps = {
+  game: ArcadeGameType;
+  level: number;
+  score: number;
+  result: SubmitArcadeScoreResponse;
+  onClose: () => void;
+  onPlayAgain: () => void;
+  onOpenLeaderboard?: () => void;
+};
+
+function ArcadeResultCelebration({
+  game,
+  level,
+  score,
+  result,
+  onClose,
+  onPlayAgain,
+  onOpenLeaderboard,
+}: ArcadeResultCelebrationProps) {
+  const meta = GAME_META[game];
+  const headline = result.newLevelUnlocked
+    ? `🎉 Level ${result.unlockedLevel} unlocked!`
+    : result.isNewBest
+      ? "New personal best!"
+      : "Round complete";
+
+  return (
+    <div className="relative flex h-full w-full items-center justify-center">
+      <div
+        className="relative w-full max-w-3xl overflow-hidden rounded-[28px] border border-white/14 p-7 text-white shadow-[0_30px_80px_rgba(2,6,18,0.55)] sm:p-10"
+        style={{
+          background: meta.gradient,
+          animation: "denty-pop 420ms cubic-bezier(0.34, 1.56, 0.64, 1) both",
+        }}
+      >
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">
+          {meta.label} · Level {result.playedAtLevel}
+        </p>
+        <p className="mt-2 text-4xl font-extrabold leading-tight sm:text-5xl">
+          {headline}
+        </p>
+        <p className="mt-2 text-sm text-white/80">
+          You scored{" "}
+          <span className="font-bold text-white">
+            {score.toLocaleString()}
+          </span>{" "}
+          at Level {level}.
+        </p>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          <Stat label="Score" value={result.score.toLocaleString()} />
+          <Stat label="Best" value={result.bestScore.toLocaleString()} />
+          <Stat
+            label="Unlocked"
+            value={`Lv ${result.unlockedLevel}/10`}
+          />
+        </div>
+
+        <p className="mt-5 max-w-2xl text-sm text-white/85">
+          {result.newLevelUnlocked
+            ? `Level ${result.unlockedLevel} is now playable from the dropdown. Tougher spawns, faster cadence, bigger rewards — go push your best.`
+            : result.nextThreshold !== null
+              ? `${(result.nextThreshold - result.bestScore).toLocaleString()} more points and Level ${result.unlockedLevel + 1} unlocks.`
+              : "Level 10 — you've maxed out the unlocks. Now chase the leaderboard."}
+        </p>
+
+        <div className="mt-7 flex flex-wrap gap-3">
+          <button
+            type="button"
+            onClick={onPlayAgain}
+            className="inline-flex min-h-11 items-center justify-center rounded-[14px] bg-white px-5 py-2.5 text-sm font-bold uppercase tracking-[0.16em] text-slate-900 transition hover:bg-white/90"
+          >
+            Play again
+          </button>
+          {onOpenLeaderboard ? (
+            <button
+              type="button"
+              onClick={onOpenLeaderboard}
+              className="inline-flex min-h-11 items-center justify-center rounded-[14px] border border-white/30 bg-white/14 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-[12px] transition hover:bg-white/24"
+            >
+              View leaderboard
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex min-h-11 items-center justify-center rounded-[14px] border border-white/22 bg-transparent px-5 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10"
+          >
+            Back to hub
+          </button>
+        </div>
+
+        {/* Confetti burst when a new level unlocks — small CSS sparkles. */}
+        {result.newLevelUnlocked ? (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+          >
+            {Array.from({ length: 18 }).map((_, i) => {
+              const angle = (i / 18) * Math.PI * 2;
+              const radius = 220 + (i % 3) * 50;
+              const sx = Math.cos(angle) * radius;
+              const sy = Math.sin(angle) * radius;
+              return (
+                <span
+                  key={i}
+                  aria-hidden
+                  className="absolute left-1/2 top-1/2"
+                  style={
+                    {
+                      "--sx": `${sx}px`,
+                      "--sy": `${sy}px`,
+                      width: 14,
+                      height: 14,
+                      borderRadius: 9999,
+                      background:
+                        i % 3 === 0
+                          ? "rgba(252,211,77,0.95)"
+                          : i % 3 === 1
+                            ? "rgba(94,234,212,0.95)"
+                            : "rgba(244,114,182,0.95)",
+                      boxShadow: "0 0 22px currentColor",
+                      animation:
+                        "denty-spark-out 1400ms ease-out forwards",
+                    } as React.CSSProperties
+                  }
+                />
+              );
+            })}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
 }
