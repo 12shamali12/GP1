@@ -20,6 +20,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { HudChip } from "@/features/arcade/components/hud-chip";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 const LANES = 3;
 const LANE_NAMES = ["upper", "middle", "lower"] as const;
@@ -86,6 +87,7 @@ export function FlossRushGame({
   hudSlot,
 }: GameProps) {
   void onCancel; // Quit is owned by the parent's Exit button.
+  const t = useTranslation();
   const playAreaRef = useRef<HTMLDivElement>(null);
   const [score, setScore] = useState(0);
   const [distance, setDistance] = useState(0);
@@ -338,13 +340,17 @@ export function FlossRushGame({
 
   const hud = (
     <>
-      <HudChip label="Score" value={total.toLocaleString()} variant="score" />
       <HudChip
-        label="Distance"
+        label={t("arcade.hud.score")}
+        value={total.toLocaleString()}
+        variant="score"
+      />
+      <HudChip
+        label={t("arcade.hud.distance")}
         value={`${Math.floor(distance)}m`}
         variant="combo"
       />
-      <HudChip label="Level" value={level} variant="level" />
+      <HudChip label={t("arcade.hud.level")} value={level} variant="level" />
     </>
   );
 

@@ -20,6 +20,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { HudChip } from "@/features/arcade/components/hud-chip";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 type GameProps = {
   /** 1..11 — controls spawn cadence, target lifetime, decoy ratio. Lv 11
@@ -309,6 +310,7 @@ export function PlaqueBlasterGame({
   hudSlot,
 }: GameProps) {
   void onCancel; // Quit is owned by the parent's Exit button now.
+  const t = useTranslation();
   const [score, setScore] = useState(0);
   const [combo, setCombo] = useState(0);
   const [bestCombo, setBestCombo] = useState(0);
@@ -768,16 +770,16 @@ export function PlaqueBlasterGame({
   const missesLeft = MISS_LIMIT - misses;
   const hud = (
     <>
-      <HudChip label="Score" value={score} variant="score" />
+      <HudChip label={t("arcade.hud.score")} value={score} variant="score" />
       <HudChip
         key={comboKey}
-        label={comboLossActive ? "Lost" : "Combo"}
+        label={comboLossActive ? t("arcade.hud.combo_lost") : t("arcade.hud.combo")}
         value={comboValue}
         variant={comboVariant}
         urgent={comboLossActive || combo >= 5}
       />
       <HudChip
-        label="Misses"
+        label={t("arcade.hud.misses")}
         value={`${misses}/${MISS_LIMIT}`}
         variant={
           missesLeft <= 2 ? "danger" : missesLeft <= 4 ? "lives" : "neutral"
@@ -785,12 +787,12 @@ export function PlaqueBlasterGame({
         urgent={missesLeft <= 2}
       />
       <HudChip
-        label="Level"
+        label={t("arcade.hud.level")}
         value={endless ? "∞" : level}
         variant="level"
       />
       <HudChip
-        label={endless ? "Endless" : "Time"}
+        label={endless ? t("arcade.hud.endless") : t("arcade.hud.time")}
         value={endless ? `${Math.floor((performance.now() - startedAtRef.current) / 1000)}s` : `${seconds}s`}
         variant="timer"
         urgent={!endless && urgent}

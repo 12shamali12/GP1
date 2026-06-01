@@ -25,6 +25,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import * as THREE from "three";
 import { HudChip } from "@/features/arcade/components/hud-chip";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 type GameProps = {
   /** 1..10 — increases spawn rate, bacteria HP, and movement speed. */
@@ -85,6 +86,7 @@ export function ToothDefenderGame({
   hudSlot,
 }: GameProps) {
   void onCancel; // Quit is owned by the parent's Exit button.
+  const t = useTranslation();
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
   const [killCount, setKillCount] = useState(0);
@@ -183,18 +185,23 @@ export function ToothDefenderGame({
 
   const hud = (
     <>
-      <HudChip label="Score" value={score} variant="score" />
-      <HudChip label="Kills" value={killCount} variant="neutral" />
+      <HudChip label={t("arcade.hud.score")} value={score} variant="score" />
+      <HudChip label={t("arcade.hud.kills")} value={killCount} variant="neutral" />
       {combo >= 2 ? (
-        <HudChip label="Combo" value={`×${combo}`} variant="combo" urgent />
+        <HudChip
+          label={t("arcade.hud.combo")}
+          value={`×${combo}`}
+          variant="combo"
+          urgent
+        />
       ) : null}
       <HudChip
-        label="Lives"
+        label={t("arcade.hud.lives")}
         value={"❤".repeat(Math.max(0, lives)) || "—"}
         variant={lives <= 1 ? "danger" : "lives"}
         urgent={lives <= 1}
       />
-      <HudChip label="Level" value={level} variant="level" />
+      <HudChip label={t("arcade.hud.level")} value={level} variant="level" />
     </>
   );
 

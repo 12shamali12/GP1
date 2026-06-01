@@ -13,6 +13,7 @@
 import { useEffect, useState } from "react";
 import { getLevelBrief } from "@/features/arcade/lib/level-features";
 import type { ArcadeGameType } from "@/features/arcade/services/arcade-api";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 type ArcadeIntroCardProps = {
   game: ArcadeGameType;
@@ -34,6 +35,7 @@ export function ArcadeIntroCard({
   label,
   onStart,
 }: ArcadeIntroCardProps) {
+  const t = useTranslation();
   const brief = getLevelBrief(game, level);
   const [remaining, setRemaining] = useState(COUNTDOWN_SECONDS);
 
@@ -71,12 +73,14 @@ export function ArcadeIntroCard({
               {label}
             </p>
             <p className="text-3xl font-extrabold leading-tight sm:text-4xl">
-              Level {level}
+              {level >= 11
+                ? t("arcade.card.level_option_endless")
+                : t("arcade.card.level_option", { level })}
             </p>
           </div>
           <div className="ml-auto flex flex-col items-center justify-center">
             <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-white/65">
-              Starts in
+              {t("arcade.intro.starts_in")}
             </p>
             <span
               key={digitKey}
@@ -127,7 +131,7 @@ export function ArcadeIntroCard({
             onClick={onStart}
             className="inline-flex min-h-11 items-center justify-center rounded-[14px] bg-white px-6 py-2.5 text-sm font-bold uppercase tracking-[0.18em] text-slate-900 shadow-[0_12px_28px_rgba(2,6,18,0.45)] transition hover:bg-white/90 active:scale-95"
           >
-            Skip → Start
+            {t("arcade.intro.skip")}
           </button>
         </div>
 

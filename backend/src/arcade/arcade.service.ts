@@ -35,6 +35,9 @@ const ALL_GAMES: ArcadeGameType[] = [
   ArcadeGameType.PLAQUE_BLASTER,
   ArcadeGameType.TOOTH_DEFENDER,
   ArcadeGameType.FLOSS_RUSH,
+  ArcadeGameType.TOOTH_IQ,
+  ArcadeGameType.MATCH_LAB,
+  ArcadeGameType.BRUSH_BUDDY,
 ];
 
 /**
@@ -62,6 +65,17 @@ const LEVEL_THRESHOLDS: Record<ArcadeGameType, number[]> = {
   // Floss Rush — score + distance, dies on first sugar. Slower ramp early,
   // steeper at the top. Index 9 is the Lv 11 (endless) unlock.
   FLOSS_RUSH: [200, 500, 900, 1400, 2000, 2700, 3500, 4500, 5800, 7200],
+  // Tooth IQ — 10 MCQs per round, +100 base + time bonus + streak bonus.
+  // Round caps around 1.3k at Lv 1 and ~2.5k at Lv 10. Index 9 is Lv 11.
+  TOOTH_IQ: [600, 900, 1150, 1400, 1650, 1900, 2150, 2400, 2700, 3000],
+  // Match Lab — base 200 per pair + time/miss bonuses. Grid grows with level
+  // so a clean clear at L1 is ~1.2k, climbs to ~4k at L10. Index 9 is Lv 11.
+  MATCH_LAB: [500, 800, 1200, 1700, 2300, 3000, 3800, 4700, 5800, 7000],
+  // Brush Buddy — Simon-style, 5 rounds per fixed level. Each correct step
+  // = 60 + chain bonus, round-complete = 200 + 30/step. Starting lengths
+  // intentionally short at low levels so warm-up rounds clear fast.
+  // Index 9 is Lv 11 endless.
+  BRUSH_BUDDY: [300, 600, 950, 1350, 1800, 2300, 2900, 3600, 4400, 5400],
 };
 
 /**

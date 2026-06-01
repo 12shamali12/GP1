@@ -287,10 +287,82 @@ const FR_LEVELS: Record<number, LevelBrief> = {
   },
 };
 
+const IQ_LEVELS: Record<number, LevelBrief> = {
+  1: {
+    headline: "How to play",
+    blurb: "10 multiple-choice questions about your teeth. 15s each.",
+    features: [
+      { icon: "🦷", text: "Tap the right answer — +100 base points" },
+      { icon: "⏱️", text: "Answer fast — bigger time bonus" },
+      { icon: "🔥", text: "Chain correct answers — streak multiplier" },
+      { icon: "📚", text: "Wrong answers show the right one + a tip" },
+    ],
+  },
+  2: { headline: "New at Level 2", features: [{ icon: "🪥", text: "Questions cover daily brushing technique" }, { icon: "⏱️", text: "13s per question — answer a touch faster" }] },
+  3: { headline: "New at Level 3", features: [{ icon: "🧵", text: "Flossing, mouthwash and inter-dental care" }, { icon: "⚡", text: "Streak multiplier kicks in earlier" }] },
+  4: { headline: "New at Level 4", features: [{ icon: "🦠", text: "Cavities, plaque and how decay forms" }, { icon: "⏱️", text: "12s per question" }] },
+  5: { headline: "New at Level 5", features: [{ icon: "🫧", text: "Gum health, gingivitis vs periodontitis" }, { icon: "❓", text: "Some questions get a 4th harder option" }] },
+  6: { headline: "New at Level 6", features: [{ icon: "🍎", text: "Diet, sugar timing and tooth-friendly foods" }, { icon: "⏱️", text: "11s per question" }] },
+  7: { headline: "New at Level 7", features: [{ icon: "👶", text: "Baby teeth, eruption and pediatric dental care" }, { icon: "🔥", text: "Streak bonus doubled past 5 correct in a row" }] },
+  8: { headline: "New at Level 8", features: [{ icon: "🪥", text: "Fluoride science and toothpaste chemistry" }, { icon: "⏱️", text: "10s per question" }] },
+  9: { headline: "New at Level 9", features: [{ icon: "🏥", text: "Procedures: fillings, root canals, crowns, extractions" }] },
+  10: { headline: "New at Level 10", features: [{ icon: "🦴", text: "Oral anatomy — names of teeth, jaws and tissues" }, { icon: "⏱️", text: "9s per question, no easy hints" }] },
+  11: { headline: "Endless mode", blurb: "Questions cycle from across all topics; harder, faster, no warmup.", features: [{ icon: "♾️", text: "Endless rounds until you stop — best run wins" }, { icon: "🏆", text: "Streak multipliers carry across the run" }] },
+};
+
+const ML_LEVELS: Record<number, LevelBrief> = {
+  1: {
+    headline: "How to play",
+    blurb: "Flip cards and match pairs. 3 misses ends the run.",
+    features: [
+      { icon: "👀", text: "Cards flash open for a few seconds — memorize fast" },
+      { icon: "🃏", text: "Tap two — if they match they stay open" },
+      { icon: "❌", text: "3 wrong matches and the round ends" },
+      { icon: "⏱️", text: "Faster clears + fewer misses = higher score" },
+    ],
+  },
+  2: { headline: "New at Level 2", features: [{ icon: "➕", text: "+1 pair to remember" }, { icon: "👀", text: "Preview time trimmed" }] },
+  3: { headline: "New at Level 3", features: [{ icon: "🦷", text: "Anatomy cards: incisors, canines, molars" }, { icon: "👀", text: "Even less preview time" }] },
+  4: { headline: "New at Level 4", features: [{ icon: "🪥", text: "Tool cards added — brushes, floss, scaler" }] },
+  5: { headline: "New at Level 5", features: [{ icon: "🍎", text: "Healthy + sugary food cards added" }, { icon: "👀", text: "Preview blink — just 3 seconds" }] },
+  6: { headline: "New at Level 6", features: [{ icon: "🦠", text: "Condition cards: cavity, gingivitis, abscess" }] },
+  7: { headline: "New at Level 7", features: [{ icon: "🃏", text: "Bigger grid — more pairs in play" }, { icon: "👀", text: "Preview 2.5s" }] },
+  8: { headline: "New at Level 8", features: [{ icon: "🌀", text: "Cards subtly shuffle once mid-preview" }] },
+  9: { headline: "New at Level 9", features: [{ icon: "💎", text: "Bonus pair flashes — match it fast for double points" }] },
+  10: { headline: "New at Level 10", features: [{ icon: "👀", text: "Preview only 1.5s — pure recall" }, { icon: "🃏", text: "Largest grid yet" }] },
+  11: { headline: "Endless mode", blurb: "Boards keep coming back-to-back. Three misses across the run end it.", features: [{ icon: "♾️", text: "No round end — only a miss limit" }, { icon: "🏆", text: "Score compounds across boards" }] },
+};
+
+const BB_LEVELS: Record<number, LevelBrief> = {
+  1: {
+    headline: "How to play",
+    blurb: "Watch the brush light up your teeth — then repeat the pattern.",
+    features: [
+      { icon: "👀", text: "Starts with just 2 steps — easy warm-up" },
+      { icon: "🪥", text: "Tap the same quadrants in the same order" },
+      { icon: "❌", text: "3 misses and the round ends" },
+      { icon: "📈", text: "Each correct round adds one more step (5 rounds total)" },
+    ],
+  },
+  2: { headline: "New at Level 2", features: [{ icon: "⚡", text: "Pattern plays slightly faster" }] },
+  3: { headline: "New at Level 3", features: [{ icon: "📈", text: "Starts at 3 steps instead of 2" }, { icon: "💎", text: "Clean-round bonus added" }] },
+  4: { headline: "New at Level 4", features: [{ icon: "⚡", text: "Pattern playback noticeably quicker" }] },
+  5: { headline: "New at Level 5", features: [{ icon: "🪥", text: "Inner surfaces matter — 6 zones, not 4" }, { icon: "📈", text: "Starts at 4 steps" }] },
+  6: { headline: "New at Level 6", features: [{ icon: "⚡", text: "Faster cadence, less reaction time" }] },
+  7: { headline: "New at Level 7", features: [{ icon: "👅", text: "Tongue + cheek zones added — full mouth coverage" }, { icon: "📈", text: "Starts at 5 steps" }] },
+  8: { headline: "New at Level 8", features: [{ icon: "🌀", text: "Brief misdirection flicker between steps" }] },
+  9: { headline: "New at Level 9", features: [{ icon: "📈", text: "Starts at 6 steps and each round adds 2 instead of 1" }] },
+  10: { headline: "New at Level 10", features: [{ icon: "🚀", text: "Top speed, longest patterns — full Bass-technique cycle" }] },
+  11: { headline: "Endless mode", blurb: "Patterns keep growing until you miss 3 times.", features: [{ icon: "♾️", text: "No round cap — keep extending the chain" }, { icon: "🏆", text: "Chain bonus compounds — long runs are worth a lot" }] },
+};
+
 const TABLES: Record<ArcadeGameType, Record<number, LevelBrief>> = {
   PLAQUE_BLASTER: PB_LEVELS,
   TOOTH_DEFENDER: TD_LEVELS,
   FLOSS_RUSH: FR_LEVELS,
+  TOOTH_IQ: IQ_LEVELS,
+  MATCH_LAB: ML_LEVELS,
+  BRUSH_BUDDY: BB_LEVELS,
 };
 
 /**

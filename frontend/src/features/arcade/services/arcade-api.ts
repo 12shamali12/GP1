@@ -4,14 +4,17 @@ import { authHeaders } from "@/lib/api/auth";
 /**
  * Arcade API client — patient competitive games.
  *
- * Three games share this client; the backend disambiguates with `gameType`.
+ * All games share this client; the backend disambiguates with `gameType`.
  * Daily lock is enforced server-side; the client just renders state.
  */
 
 export type ArcadeGameType =
   | "PLAQUE_BLASTER"
   | "TOOTH_DEFENDER"
-  | "FLOSS_RUSH";
+  | "FLOSS_RUSH"
+  | "TOOTH_IQ"
+  | "MATCH_LAB"
+  | "BRUSH_BUDDY";
 
 export type ArcadeTodayEntry = {
   gameType: ArcadeGameType;

@@ -1,5 +1,7 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { AdminShell } from "@/features/admin/components/admin-shell";
 import { PlanningAssignmentsView } from "./ui/planning-assignments-view";
 import { PlanningDeleteDialog } from "./ui/planning-delete-dialog";
@@ -119,6 +121,27 @@ export default function AdminPlanningPage() {
     messageTitle: t("admin.plan.toast_saved"),
     errorTitle: t("admin.plan.toast_issue"),
   });
+
+  // ?focus=new-case  →  jump to Resources tab, scroll to + open the clinic case form.
+  // Used by the "Add case" shortcut on /admin/cases.
+  const searchParams = useSearchParams();
+  const focus = searchParams?.get("focus");
+  const handledFocusRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (loading) return;
+    if (focus !== "new-case") return;
+    if (handledFocusRef.current === focus) return;
+    handledFocusRef.current = focus;
+    setTab("resources");
+    if (!showClinicCaseForm) {
+      resetClinicCaseForm();
+      setShowClinicCaseForm(true);
+    }
+    requestAnimationFrame(() => {
+      const el = document.getElementById("planning-clinic-case-form");
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [focus, loading, showClinicCaseForm, setTab, setShowClinicCaseForm, resetClinicCaseForm]);
 
   return (
     <AdminShell

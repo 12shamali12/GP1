@@ -47,7 +47,7 @@ export class ArcadeController {
     if (!user) throw new UnauthorizedException();
     if (!game || !(game in ArcadeGameType)) {
       throw new BadRequestException(
-        "Query parameter 'game' must be one of: PLAQUE_BLASTER, TOOTH_DEFENDER, FLOSS_RUSH.",
+        "Query parameter 'game' must be one of: PLAQUE_BLASTER, TOOTH_DEFENDER, FLOSS_RUSH, TOOTH_IQ, MATCH_LAB, BRUSH_BUDDY.",
       );
     }
     let levelFilter: number | undefined;

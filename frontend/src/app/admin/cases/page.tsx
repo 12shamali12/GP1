@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AdminShell } from "@/features/admin/components/admin-shell";
 import {
@@ -230,7 +231,16 @@ export default function AdminCasesPage() {
                 Each case becomes a bookable option for any student in its semester when they have an open slot at the linked clinic.
               </p>
             </div>
-            <span className="denty-pill">{filteredCases.length} / {cases.length}</span>
+            <div className="flex flex-none items-center gap-2">
+              <span className="denty-pill">{filteredCases.length} / {cases.length}</span>
+              <Link
+                href="/admin/planning?focus=new-case"
+                className="inline-flex items-center gap-1.5 rounded-full border border-teal-400/35 bg-gradient-to-r from-teal-500/90 to-sky-500/90 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-white shadow-[0_10px_24px_rgba(20,184,166,0.32)] transition hover:-translate-y-[1px] hover:shadow-[0_14px_30px_rgba(20,184,166,0.42)]"
+              >
+                <span aria-hidden className="text-base leading-none">+</span>
+                Add case
+              </Link>
+            </div>
           </div>
 
           <div className="mt-4 grid gap-2 sm:grid-cols-[1fr_auto_auto_auto]">

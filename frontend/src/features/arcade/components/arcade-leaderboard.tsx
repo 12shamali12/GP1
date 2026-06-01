@@ -32,12 +32,30 @@ const TAB_META: Record<
     emoji: "💨",
     gradient: "linear-gradient(135deg,rgba(15,118,110,0.95),rgba(20,184,166,0.75))",
   },
+  TOOTH_IQ: {
+    label: "Tooth IQ",
+    emoji: "🧠",
+    gradient: "linear-gradient(135deg,rgba(30,64,175,0.95),rgba(67,56,202,0.75))",
+  },
+  MATCH_LAB: {
+    label: "Match Lab",
+    emoji: "🃏",
+    gradient: "linear-gradient(135deg,rgba(180,83,9,0.95),rgba(217,119,6,0.7))",
+  },
+  BRUSH_BUDDY: {
+    label: "Brush Buddy",
+    emoji: "🪥",
+    gradient: "linear-gradient(135deg,rgba(190,24,93,0.95),rgba(220,38,127,0.75))",
+  },
 };
 
 const TAB_ORDER: ArcadeGameType[] = [
   "PLAQUE_BLASTER",
   "TOOTH_DEFENDER",
   "FLOSS_RUSH",
+  "TOOTH_IQ",
+  "MATCH_LAB",
+  "BRUSH_BUDDY",
 ];
 
 type ArcadeLeaderboardViewProps = {

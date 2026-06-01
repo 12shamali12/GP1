@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useRef } from "react";
+import { useTranslation } from "@/features/i18n/language-provider";
 
 type QuitConfirmModalProps = {
   open: boolean;
@@ -24,6 +25,7 @@ export function QuitConfirmModal({
   onCancel,
   onConfirm,
 }: QuitConfirmModalProps) {
+  const t = useTranslation();
   const confirmRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -67,11 +69,10 @@ export function QuitConfirmModal({
             id="arcade-quit-title"
             className="mt-2 text-2xl font-extrabold tracking-tight"
           >
-            Quit this run?
+            {t("arcade.quit.title")}
           </h3>
           <p className="mt-3 text-sm leading-6 text-white/75">
-            Your current score won't be saved, and today's attempt will still
-            count — you can't play this game again until tomorrow.
+            {t("arcade.quit.body")}
           </p>
           <div className="mt-6 flex flex-wrap justify-end gap-2">
             <button
@@ -79,7 +80,7 @@ export function QuitConfirmModal({
               onClick={onCancel}
               className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[14px] border border-white/18 bg-white/8 px-5 text-sm font-semibold text-white transition hover:bg-white/14 focus:outline-none focus:ring-2 focus:ring-white/40"
             >
-              Keep playing
+              {t("arcade.quit.keep_playing")}
             </button>
             <button
               ref={confirmRef}
@@ -87,7 +88,7 @@ export function QuitConfirmModal({
               onClick={onConfirm}
               className="inline-flex min-h-11 cursor-pointer items-center justify-center rounded-[14px] border border-rose-300/40 bg-[linear-gradient(135deg,rgba(244,63,94,0.95),rgba(190,24,93,0.95))] px-5 text-sm font-semibold text-white shadow-[0_14px_30px_rgba(190,24,93,0.45)] transition hover:brightness-110 focus:outline-none focus:ring-2 focus:ring-rose-200/60"
             >
-              Quit anyway
+              {t("arcade.quit.quit_anyway")}
             </button>
           </div>
         </div>

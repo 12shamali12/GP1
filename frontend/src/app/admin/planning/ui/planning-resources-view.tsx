@@ -373,7 +373,10 @@ export function PlanningResourcesView({
         ) : null}
 
         {showClinicCaseForm ? (
-          <div className="mt-5 grid gap-3 rounded-[20px] border border-white/12 bg-white/34 p-4 md:grid-cols-2">
+          <div
+            id="planning-clinic-case-form"
+            className="mt-5 grid gap-3 rounded-[20px] border border-white/12 bg-white/34 p-4 md:grid-cols-2"
+          >
             <div className="flex items-center justify-between gap-3 md:col-span-2">
               <p className="text-sm font-semibold uppercase tracking-[0.16em] text-[rgba(10,22,40,0.62)]">
                 {editingClinicCaseId

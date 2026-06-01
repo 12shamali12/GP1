@@ -2545,6 +2545,22 @@ html[data-reduced-motion="true"] *::after {
   }
 }
 
+/* Brush Buddy "MISS!" overlay — instant pop, hold readable, fade out. */
+@keyframes denty-miss-flash {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 @keyframes denty-modal-enter {
   from {
     opacity: 0;

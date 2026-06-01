@@ -868,6 +868,9 @@ enum ArcadeGameType {
   PLAQUE_BLASTER
   TOOTH_DEFENDER
   FLOSS_RUSH
+  TOOTH_IQ
+  MATCH_LAB
+  BRUSH_BUDDY
 }
 
 // One arcade game attempt per patient, per game type, per Amman day.

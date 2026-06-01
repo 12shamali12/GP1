@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Patient arcade hub — landing page for the three competitive games.
+ * Patient arcade hub — landing page for the six competitive games.
  *
  * Shows a card per game with the patient's best score, current streak, and
  * the level the next attempt will be played at. Clicking a card swaps the
@@ -25,49 +25,82 @@ import {
 import { PlaqueBlasterGame } from "@/features/arcade/games/plaque-blaster";
 import { ToothDefenderGame } from "@/features/arcade/games/tooth-defender";
 import { FlossRushGame } from "@/features/arcade/games/floss-rush";
+import { ToothIqGame } from "@/features/arcade/games/tooth-iq";
+import { MatchLabGame } from "@/features/arcade/games/match-lab";
+import { BrushBuddyGame } from "@/features/arcade/games/brush-buddy";
 import { QuitConfirmModal } from "@/features/arcade/components/quit-confirm-modal";
 import { ArcadeIntroCard } from "@/features/arcade/components/arcade-intro-card";
+import { useTranslation } from "@/features/i18n/language-provider";
 
+/**
+ * Visual / non-translated metadata per game. The actual label, tagline and
+ * description copy is looked up via i18n keys (arcade.game.<id>.name etc.)
+ * at render time so the hub mirrors the active language.
+ */
 const GAME_META: Record<
   ArcadeGameType,
   {
-    label: string;
-    tagline: string;
-    description: string;
+    labelKey: string;
+    taglineKey: string;
+    descriptionKey: string;
     emoji: string;
     gradient: string;
     accent: string;
   }
 > = {
   PLAQUE_BLASTER: {
-    label: "Plaque Blaster",
-    tagline: "30 seconds. Tap fast. Don't bite the sugar.",
-    description:
-      "A 5×3 grid of teeth. Plaque, gold cavities, brushes and sugar bombs spawn — tap to score, ignore the candy. Chain hits for combo multipliers.",
+    labelKey: "arcade.game.plaque_blaster.name",
+    taglineKey: "arcade.game.plaque_blaster.tagline",
+    descriptionKey: "arcade.game.plaque_blaster.description",
     emoji: "🦷",
     gradient:
       "linear-gradient(135deg,rgba(14,116,144,0.95),rgba(13,148,136,0.7))",
     accent: "rgba(94,234,212,0.95)",
   },
   TOOTH_DEFENDER: {
-    label: "Tooth Defender 3D",
-    tagline: "Three lives. Endless bacteria.",
-    description:
-      "A 3D scene. Click bacteria as they swarm your molar. Tougher waves at higher levels — first-shot kills score a bonus. Three lives, then it's over.",
+    labelKey: "arcade.game.tooth_defender.name",
+    taglineKey: "arcade.game.tooth_defender.tagline",
+    descriptionKey: "arcade.game.tooth_defender.description",
     emoji: "🛡️",
     gradient:
       "linear-gradient(135deg,rgba(76,29,149,0.95),rgba(190,24,93,0.75))",
     accent: "rgba(244,114,182,0.95)",
   },
   FLOSS_RUSH: {
-    label: "Floss Rush",
-    tagline: "Three lanes. One mistake.",
-    description:
-      "A 3-lane runner. Switch lanes to collect floss, water, and golden teeth — touch a sugar candy and the run is over. Speed climbs with distance.",
+    labelKey: "arcade.game.floss_rush.name",
+    taglineKey: "arcade.game.floss_rush.tagline",
+    descriptionKey: "arcade.game.floss_rush.description",
     emoji: "💨",
     gradient:
       "linear-gradient(135deg,rgba(15,118,110,0.95),rgba(20,184,166,0.75))",
     accent: "rgba(186,230,253,0.95)",
+  },
+  TOOTH_IQ: {
+    labelKey: "arcade.game.tooth_iq.name",
+    taglineKey: "arcade.game.tooth_iq.tagline",
+    descriptionKey: "arcade.game.tooth_iq.description",
+    emoji: "🧠",
+    gradient:
+      "linear-gradient(135deg,rgba(30,64,175,0.95),rgba(67,56,202,0.75))",
+    accent: "rgba(165,180,252,0.95)",
+  },
+  MATCH_LAB: {
+    labelKey: "arcade.game.match_lab.name",
+    taglineKey: "arcade.game.match_lab.tagline",
+    descriptionKey: "arcade.game.match_lab.description",
+    emoji: "🃏",
+    gradient:
+      "linear-gradient(135deg,rgba(180,83,9,0.95),rgba(217,119,6,0.7))",
+    accent: "rgba(253,224,71,0.95)",
+  },
+  BRUSH_BUDDY: {
+    labelKey: "arcade.game.brush_buddy.name",
+    taglineKey: "arcade.game.brush_buddy.tagline",
+    descriptionKey: "arcade.game.brush_buddy.description",
+    emoji: "🪥",
+    gradient:
+      "linear-gradient(135deg,rgba(190,24,93,0.95),rgba(220,38,127,0.75))",
+    accent: "rgba(251,207,232,0.95)",
   },
 };
 
@@ -75,6 +108,9 @@ const GAME_ORDER: ArcadeGameType[] = [
   "PLAQUE_BLASTER",
   "TOOTH_DEFENDER",
   "FLOSS_RUSH",
+  "TOOTH_IQ",
+  "MATCH_LAB",
+  "BRUSH_BUDDY",
 ];
 
 type Mode =
@@ -94,6 +130,7 @@ type ArcadeHubProps = {
 };
 
 export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
+  const t = useTranslation();
   const [today, setToday] = useState<ArcadeTodayEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -223,7 +260,7 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
   return (
     <div className="space-y-5">
       {/* Hub header — arcade-flavored: dark themed bg, animated tooth mascot,
-          three colored pill badges, gradient title. */}
+          colored pill badges per game, gradient title. */}
       <div
         className="relative overflow-hidden rounded-[24px] border border-white/14 p-5 text-white shadow-[0_28px_72px_rgba(7,18,34,0.32)] backdrop-blur-[24px] sm:p-7"
         style={{
@@ -247,14 +284,13 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-cyan-200/80">
-              Toothie&apos;s Games
+              {t("arcade.hub.eyebrow")}
             </p>
             <h2 className="mt-1 bg-[linear-gradient(135deg,#bef264,#5eead4,#a5b4fc)] bg-clip-text text-3xl font-extrabold text-transparent sm:text-4xl">
-              Three games. Eleven levels. One leaderboard each.
+              {t("arcade.hub.heading")}
             </h2>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-white/80">
-              Play once per game per day. Score the per-level threshold to
-              unlock the next difficulty. Reach <span className="font-bold text-amber-200">Lv 11 Endless</span> for an open run with no timer — survive as long as you can.
+              {t("arcade.hub.subheading")}
             </p>
           </div>
         </div>
@@ -267,7 +303,7 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
               style={{ background: GAME_META[g].gradient }}
             >
               <span aria-hidden>{GAME_META[g].emoji}</span>
-              {GAME_META[g].label}
+              {t(GAME_META[g].labelKey)}
             </span>
           ))}
         </div>
@@ -301,25 +337,29 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
                   </span>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-white">{meta.label}</p>
+                  <p className="text-lg font-bold text-white">
+                    {t(meta.labelKey)}
+                  </p>
                   <p className="mt-1 text-sm font-medium text-white/85">
-                    {meta.tagline}
+                    {t(meta.taglineKey)}
                   </p>
                 </div>
                 <p className="text-xs leading-6 text-white/75">
-                  {meta.description}
+                  {t(meta.descriptionKey)}
                 </p>
 
                 <div className="mt-auto grid grid-cols-2 gap-2">
                   <StatChip
-                    label={`Best at Lv ${selected}`}
+                    label={t("arcade.card.best_at_level", { level: selected })}
                     value={(() => {
                       const v = entry?.bestScorePerLevel?.[selected - 1] ?? 0;
-                      return v > 0 ? v.toLocaleString() : "—";
+                      return v > 0
+                        ? v.toLocaleString()
+                        : t("arcade.card.not_played_yet");
                     })()}
                   />
                   <StatChip
-                    label="Unlocked"
+                    label={t("arcade.card.unlocked")}
                     value={`Lv ${unlocked}/11`}
                   />
                 </div>
@@ -328,7 +368,7 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
                     unlockedLevel are 🔒 and unselectable. */}
                 <label className="flex flex-col gap-1.5">
                   <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/75">
-                    Difficulty
+                    {t("arcade.card.difficulty")}
                   </span>
                   <select
                     value={selected}
@@ -345,14 +385,23 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
                       const lv = i + 1;
                       const isLocked = lv > unlocked;
                       const threshold = entry?.thresholds[lv - 2];
+                      const thresholdLabel =
+                        threshold?.toLocaleString() ?? "?";
                       const label =
                         lv === 11
                           ? isLocked
-                            ? `🔒 Level 11 · Endless — need ${threshold?.toLocaleString() ?? "?"}`
-                            : "♾️ Level 11 · Endless"
+                            ? t("arcade.card.level_locked_endless", {
+                                threshold: thresholdLabel,
+                              })
+                            : t("arcade.card.level_option_endless")
                           : isLocked
-                            ? `🔒 Level ${lv} — need ${threshold?.toLocaleString() ?? "?"}`
-                            : `Level ${lv}${lv === 1 ? " (start)" : ""}`;
+                            ? t("arcade.card.level_locked_format", {
+                                level: lv,
+                                threshold: thresholdLabel,
+                              })
+                            : lv === 1
+                              ? t("arcade.card.level_option_start")
+                              : t("arcade.card.level_option", { level: lv });
                       return (
                         <option
                           key={lv}
@@ -368,12 +417,10 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
                       );
                     })}
                   </select>
-                  {/* Best-of-all-time across every level. Compact secondary
-                      stat — the prominent chip above already shows the
-                      per-level best for whatever level is selected. */}
+                  {/* Best-of-all-time across every level. */}
                   {entry ? (
                     <span className="text-[11px] text-white/80">
-                      Best of all:{" "}
+                      {t("arcade.card.best_of_all")}:{" "}
                       <span className="font-bold tabular-nums text-white">
                         {(entry.bestScore ?? 0).toLocaleString()}
                       </span>
@@ -381,8 +428,6 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
                   ) : null}
                   {entry && entry.nextThreshold !== null ? (
                     (() => {
-                      // Unlocks are sequential: the threshold must be earned
-                      // playing AT the highest unlocked level.
                       const bestAtUnlocked =
                         entry.bestScorePerLevel?.[unlocked - 1] ?? 0;
                       const remaining = Math.max(
@@ -391,17 +436,17 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
                       );
                       return (
                         <span className="text-[10px] text-white/65">
-                          Score {remaining.toLocaleString()} more{" "}
-                          <span className="font-semibold text-white/85">
-                            at Lv {unlocked}
-                          </span>{" "}
-                          to unlock Lv {unlocked + 1}
+                          {t("arcade.card.unlock_hint", {
+                            needed: remaining.toLocaleString(),
+                            current: unlocked,
+                            next: unlocked + 1,
+                          })}
                         </span>
                       );
                     })()
                   ) : entry && entry.nextThreshold === null ? (
                     <span className="text-[10px] font-semibold text-amber-200">
-                      ⭐ All 10 levels unlocked
+                      ⭐ {t("arcade.card.all_unlocked")}
                     </span>
                   ) : null}
                 </label>
@@ -413,8 +458,10 @@ export function ArcadeHub({ onOpenLeaderboard }: ArcadeHubProps) {
                   className="denty-play-button inline-flex min-h-12 w-full items-center justify-center rounded-[16px] border border-white/20 bg-white/95 px-4 py-3 text-sm font-bold uppercase tracking-[0.18em] text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {locked
-                    ? "Locked till tomorrow"
-                    : `Play Level ${selected}`}
+                    ? t("arcade.card.locked")
+                    : selected === 11
+                      ? t("arcade.card.play_endless")
+                      : t("arcade.card.play_level", { level: selected })}
                 </button>
               </div>
               <div
@@ -487,10 +534,11 @@ function ArcadeFullscreenStage({
   onPlayAgain,
   onOpenLeaderboard,
 }: ArcadeFullscreenStageProps) {
+  const t = useTranslation();
   const meta = GAME_META[game];
   const [mounted, setMounted] = useState(false);
   // Slot for the in-game HUD chips — games portal their chips here so the
-  // header stays consistent across all three games.
+  // header stays consistent across every game.
   const [hudSlot, setHudSlot] = useState<HTMLDivElement | null>(null);
   const [quitOpen, setQuitOpen] = useState(false);
   const inResult = result !== null;
@@ -553,10 +601,10 @@ function ArcadeFullscreenStage({
           </span>
           <div className="min-w-0 max-sm:hidden">
             <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-white/55">
-              Focus mode
+              {t("arcade.focus.label")}
             </p>
             <p className="truncate text-base font-bold text-white">
-              {meta.label}
+              {t(meta.labelKey)}
             </p>
           </div>
         </div>
@@ -574,7 +622,7 @@ function ArcadeFullscreenStage({
           onClick={() => (inResult ? onCancel() : setQuitOpen(true))}
           className="inline-flex min-h-10 shrink-0 cursor-pointer items-center justify-center rounded-[12px] border border-rose-300/30 bg-rose-500/14 px-4 text-xs font-semibold uppercase tracking-[0.18em] text-rose-100 transition hover:bg-rose-500/25"
         >
-          {inResult ? "Close" : "Exit"}
+          {inResult ? t("arcade.focus.close") : t("arcade.focus.exit")}
         </button>
       </div>
 
@@ -600,7 +648,7 @@ function ArcadeFullscreenStage({
               level={level}
               gradient={meta.gradient}
               emoji={meta.emoji}
-              label={meta.label}
+              label={t(meta.labelKey)}
               onStart={() => setIntroDone(true)}
             />
           ) : game === "PLAQUE_BLASTER" ? (
@@ -617,8 +665,29 @@ function ArcadeFullscreenStage({
               onCancel={onCancel}
               hudSlot={hudSlot}
             />
-          ) : (
+          ) : game === "FLOSS_RUSH" ? (
             <FlossRushGame
+              level={level}
+              onFinish={onFinish}
+              onCancel={onCancel}
+              hudSlot={hudSlot}
+            />
+          ) : game === "TOOTH_IQ" ? (
+            <ToothIqGame
+              level={level}
+              onFinish={onFinish}
+              onCancel={onCancel}
+              hudSlot={hudSlot}
+            />
+          ) : game === "MATCH_LAB" ? (
+            <MatchLabGame
+              level={level}
+              onFinish={onFinish}
+              onCancel={onCancel}
+              hudSlot={hudSlot}
+            />
+          ) : (
+            <BrushBuddyGame
               level={level}
               onFinish={onFinish}
               onCancel={onCancel}
@@ -630,7 +699,7 @@ function ArcadeFullscreenStage({
 
       <QuitConfirmModal
         open={quitOpen}
-        gameLabel={meta.label}
+        gameLabel={t(meta.labelKey)}
         onCancel={() => setQuitOpen(false)}
         onConfirm={() => {
           setQuitOpen(false);
@@ -666,12 +735,13 @@ function ArcadeResultCelebration({
   onPlayAgain,
   onOpenLeaderboard,
 }: ArcadeResultCelebrationProps) {
+  const t = useTranslation();
   const meta = GAME_META[game];
   const headline = result.newLevelUnlocked
-    ? `🎉 Level ${result.unlockedLevel} unlocked!`
+    ? t("arcade.result.new_level", { level: result.unlockedLevel })
     : result.isNewBest
-      ? "New personal best!"
-      : "Round complete";
+      ? t("arcade.result.new_best")
+      : t("arcade.result.round_complete");
 
   return (
     <div className="relative flex h-full w-full items-center justify-center">
@@ -683,34 +753,36 @@ function ArcadeResultCelebration({
         }}
       >
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-white/75">
-          {meta.label} · Level {result.playedAtLevel}
+          {t(meta.labelKey)} · {t("arcade.hud.level")} {result.playedAtLevel}
         </p>
         <p className="mt-2 text-4xl font-extrabold leading-tight sm:text-5xl">
           {headline}
         </p>
         <p className="mt-2 text-sm text-white/80">
-          You played at Level {level}.
+          {t("arcade.result.played_at", { level })}
         </p>
 
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
-          {/* Score card = the score the player just earned this round.
-              result.score is the persisted max (could be a prior higher
-              today-run in test mode), so we display the actual round score
-              passed in from the game. */}
-          <Stat label="Score" value={score.toLocaleString()} />
-          <Stat label="Best" value={result.bestScore.toLocaleString()} />
+          <Stat label={t("arcade.result.score")} value={score.toLocaleString()} />
+          <Stat label={t("arcade.result.best")} value={result.bestScore.toLocaleString()} />
           <Stat
-            label="Unlocked"
+            label={t("arcade.result.unlocked")}
             value={`Lv ${result.unlockedLevel}/11`}
           />
         </div>
 
         <p className="mt-5 max-w-2xl text-sm text-white/85">
           {result.newLevelUnlocked
-            ? `Level ${result.unlockedLevel} is now playable from the dropdown. Tougher spawns, faster cadence, bigger rewards — go push your best.`
+            ? t("arcade.result.level_unlocked_body", {
+                level: result.unlockedLevel,
+              })
             : result.nextThreshold !== null
-              ? `Score ${result.nextThreshold.toLocaleString()} or more at Level ${result.unlockedLevel} to unlock Level ${result.unlockedLevel + 1}.`
-              : "Level 10 — you've maxed out the unlocks. Now chase the leaderboard."}
+              ? t("arcade.result.next_threshold_body", {
+                  threshold: result.nextThreshold.toLocaleString(),
+                  current: result.unlockedLevel,
+                  next: result.unlockedLevel + 1,
+                })
+              : t("arcade.result.max_level_body")}
         </p>
 
         <div className="mt-7 flex flex-wrap gap-3">
@@ -719,7 +791,7 @@ function ArcadeResultCelebration({
             onClick={onPlayAgain}
             className="denty-play-button inline-flex min-h-11 items-center justify-center rounded-[14px] bg-white px-5 py-2.5 text-sm font-bold uppercase tracking-[0.16em] text-slate-900"
           >
-            Play again
+            {t("arcade.result.play_again")}
           </button>
           {onOpenLeaderboard ? (
             <button
@@ -727,7 +799,7 @@ function ArcadeResultCelebration({
               onClick={onOpenLeaderboard}
               className="inline-flex min-h-11 items-center justify-center rounded-[14px] border border-white/30 bg-white/14 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-[12px] transition hover:bg-white/24"
             >
-              View leaderboard
+              {t("arcade.result.view_leaderboard")}
             </button>
           ) : null}
           <button
@@ -735,7 +807,7 @@ function ArcadeResultCelebration({
             onClick={onClose}
             className="inline-flex min-h-11 items-center justify-center rounded-[14px] border border-white/22 bg-transparent px-5 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/10"
           >
-            Back to hub
+            {t("arcade.result.back_hub")}
           </button>
         </div>
 

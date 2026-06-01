@@ -27,7 +27,8 @@ type NavItem = {
     | "profile"
     | "notifications"
     | "chat"
-    | "cases";
+    | "cases"
+    | "settings";
   countKey?:
     | "pendingQueue"
     | "supervisorRequests"
@@ -134,6 +135,14 @@ const navItems: NavItem[] = [
     searchLabel: "Chat",
     note: "Live",
     icon: "chat",
+    countKey: "chat",
+  },
+  {
+    href: "/admin/settings",
+    labelKey: "nav.settings",
+    searchLabel: "Settings",
+    note: "Preferences",
+    icon: "settings",
     countKey: "chat",
   },
 ];

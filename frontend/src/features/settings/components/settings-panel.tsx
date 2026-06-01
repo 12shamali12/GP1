@@ -12,7 +12,7 @@ import {
   type ThemePreference,
 } from "@/features/settings/hooks/use-settings-prefs";
 
-export type SettingsRole = "doctor" | "patient" | "supervisor";
+export type SettingsRole = "doctor" | "patient" | "supervisor" | "admin";
 
 type StoredUser = {
   id?: string;
@@ -114,6 +114,10 @@ const ROLE_COPY_KEYS: Record<
   supervisor: {
     eyebrow: "settings.eyebrow.supervisor",
     description: "settings.role.description.supervisor",
+  },
+  admin: {
+    eyebrow: "settings.eyebrow.admin",
+    description: "settings.role.description.admin",
   },
 };
 
